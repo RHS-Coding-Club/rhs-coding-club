@@ -31,7 +31,7 @@ service cloud.firestore {
 
     // Projects Collection
     match /projects/{projectId} {
-      allow read: if resource.data.approved == true || request.auth.uid == resource.data.authorId;
+      allow read: if resource.data.approved == true || request.auth.uid == resource.data.authorId || isAdminOrOfficer();
       allow create: if request.auth.uid != null;
       allow update: if request.auth.uid == resource.data.authorId || isAdminOrOfficer();
       allow delete: if request.auth.uid == resource.data.authorId || isAdminOrOfficer();

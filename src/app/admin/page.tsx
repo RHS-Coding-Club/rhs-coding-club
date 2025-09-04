@@ -39,8 +39,10 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
-import { Users, Shield, Settings, UserCheck, Plus, Edit, Trash2, Save, Upload, X, Mail, Github, Calendar, Eye } from 'lucide-react';
+import { Users, Shield, Settings, UserCheck, Plus, Edit, Trash2, Save, Upload, X, Mail, Github, Calendar, Eye, FolderOpen } from 'lucide-react';
 import { Officer } from '@/lib/firebase-collections';
+import { ProjectManagement } from '@/components/admin/project-management';
+import { projectService } from '@/lib/services/projects';
 
 // Predefined officer roles
 const OFFICER_ROLES = [
@@ -81,6 +83,7 @@ export default function AdminPage() {
   const { userProfile } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [officers, setOfficers] = useState<Officer[]>([]);
+  const [projectStats, setProjectStats] = useState({ total: 0, pending: 0, featured: 0 });
   const [loading, setLoading] = useState(true);
   const [officersLoading, setOfficersLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
@@ -134,6 +137,24 @@ export default function AdminPage() {
       console.error('Error fetching officers:', error);
     } finally {
       setOfficersLoading(false);
+    }
+  };
+
+  const fetchProjectStats = async () => {
+    try {
+      const [allProjects, pendingProjects, featuredProjects] = await Promise.all([
+        projectService.getProjects({}),
+        projectService.getPendingProjects(),
+        projectService.getFeaturedProjects()
+      ]);
+      
+      setProjectStats({
+        total: allProjects.length,
+        pending: pendingProjects.length,
+        featured: featuredProjects.length
+      });
+    } catch (error) {
+      console.error('Error fetching project stats:', error);
     }
   };
 
@@ -327,6 +348,7 @@ export default function AdminPage() {
   useEffect(() => {
     fetchUsers();
     fetchOfficers();
+    fetchProjectStats();
   }, []);
 
   const getRoleColor = (role: string) => {
@@ -418,12 +440,26 @@ export default function AdminPage() {
                   <div className="text-2xl font-bold">{stats.member}</div>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Projects</CardTitle>
+                  <FolderOpen className="h-4 w-4 text-purple-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{projectStats.total}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {projectStats.pending} pending, {projectStats.featured} featured
+                  </p>
+                </CardContent>
+              </Card>
             </div>
 
             <Tabs defaultValue="users" className="space-y-6">
               <TabsList>
                 <TabsTrigger value="users">User Management</TabsTrigger>
                 <TabsTrigger value="officers">Officers</TabsTrigger>
+                <TabsTrigger value="projects">Projects</TabsTrigger>
                 <TabsTrigger value="events">Events</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
@@ -885,6 +921,10 @@ export default function AdminPage() {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="projects" className="space-y-6">
+                <ProjectManagement />
               </TabsContent>
 
               <TabsContent value="events" className="space-y-6">

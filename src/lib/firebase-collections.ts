@@ -54,6 +54,9 @@ export interface Project {
   authorId: string; // User ID
   featured?: boolean;
   approved: boolean;
+  year?: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export interface Challenge {
