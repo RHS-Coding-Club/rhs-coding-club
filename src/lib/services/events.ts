@@ -62,7 +62,7 @@ export class EventService {
     const { id, ...updates } = eventData;
     const eventRef = doc(this.eventsCollection, id);
     
-    const updateData: any = { ...updates };
+    const updateData: Record<string, unknown> = { ...updates };
     if (updates.date) {
       updateData.date = Timestamp.fromDate(updates.date);
     }

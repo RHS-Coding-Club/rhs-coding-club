@@ -47,7 +47,6 @@ export function BlogPostForm({ post, onSubmit, onCancel, loading }: BlogPostForm
     formState: { errors },
     watch,
     setValue,
-    reset,
   } = useForm<FormData>({
     defaultValues: {
       title: post?.title || '',

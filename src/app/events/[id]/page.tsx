@@ -22,14 +22,11 @@ import {
 import { useEvent } from '@/hooks/useEvents';
 import { RSVPButton } from '@/components/events/rsvp-button';
 import { generateGoogleCalendarUrl } from '@/lib/services/events';
-import { useAuth } from '@/contexts/auth-context';
-import Link from 'next/link';
 import { toast } from 'sonner';
 
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuth();
   const eventId = params.id as string;
   
   const { event, loading, error, refetch } = useEvent(eventId);
@@ -57,7 +54,7 @@ export default function EventDetailPage() {
           <div className="max-w-4xl mx-auto text-center space-y-4">
             <h1 className="text-2xl font-bold">Event Not Found</h1>
             <p className="text-muted-foreground">
-              The event you're looking for doesn't exist or has been removed.
+              The event you&apos;re looking for doesn&apos;t exist or has been removed.
             </p>
             <Button onClick={() => router.back()} className="gap-2">
               <ArrowLeft className="h-4 w-4" />
@@ -81,7 +78,7 @@ export default function EventDetailPage() {
           text: event.description,
           url: window.location.href,
         });
-      } catch (err) {
+      } catch {
         // User cancelled sharing
       }
     } else {
@@ -287,7 +284,7 @@ export default function EventDetailPage() {
               <CardContent className="p-8 text-center space-y-4">
                 <h3 className="text-xl font-semibold">Ready to Join?</h3>
                 <p className="text-muted-foreground">
-                  Don't miss out on this exciting event. RSVP now to secure your spot!
+                  Don&apos;t miss out on this exciting event. RSVP now to secure your spot!
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                   <RSVPButton

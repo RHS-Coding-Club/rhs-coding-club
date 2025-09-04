@@ -34,7 +34,6 @@ import {
 import { useEvents, useEventActions } from '@/hooks/useEvents';
 import { EventForm } from '@/components/events/event-form';
 import { EventWithRsvps } from '@/lib/services/events';
-import { useAuth } from '@/contexts/auth-context';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import Link from 'next/link';
 
@@ -139,7 +138,7 @@ function AdminEventsContent() {
     }
   };
 
-  const handleEventSubmit = (eventId?: string) => {
+  const handleEventSubmit = () => {
     setCreateDialogOpen(false);
     setEditDialogOpen(false);
     setEditingEvent(null);
@@ -283,7 +282,7 @@ function AdminEventsContent() {
                     <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-semibold mb-2">No past events</h3>
                     <p className="text-muted-foreground">
-                      Past events will appear here after they're completed.
+                      Past events will appear here after they&apos;re completed.
                     </p>
                   </CardContent>
                 </Card>

@@ -87,7 +87,7 @@ export function ProtectedRoute({
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-muted-foreground">
-                You don't have permission to access this page.
+                You don&apos;t have permission to access this page.
               </p>
               <p className="text-sm text-muted-foreground">
                 Required roles: {requiredRoles.join(', ')}

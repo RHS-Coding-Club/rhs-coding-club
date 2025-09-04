@@ -48,7 +48,7 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
     'GraphQL', 'REST API', 'WebSocket', 'PWA', 'Electron'
   ];
 
-  const handleInputChange = (field: keyof CreateProjectData, value: any) => {
+  const handleInputChange = (field: keyof CreateProjectData, value: string | number | File | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -130,7 +130,8 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
     setErrorMessage('');
 
     try {
-      const { newTech, ...projectData } = formData;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { newTech: _, ...projectData } = formData;
       await projectService.createProject(projectData, user.uid);
       
       setSubmitStatus('success');

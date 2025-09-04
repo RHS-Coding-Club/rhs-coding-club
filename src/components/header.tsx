@@ -3,20 +3,12 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, X, Code2 } from 'lucide-react';
+import { Menu, Code2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthButton } from '@/components/auth/auth-button';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu';
 
 const navigation = [
   { name: 'Home', href: '/' },

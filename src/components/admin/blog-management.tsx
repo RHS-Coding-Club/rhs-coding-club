@@ -31,8 +31,7 @@ import {
   Trash2, 
   Search, 
   Eye, 
-  Loader2,
-  ExternalLink 
+  Loader2
 } from 'lucide-react';
 import { formatDistance } from 'date-fns';
 import Link from 'next/link';
@@ -67,7 +66,7 @@ export function BlogManagement() {
       toast.success('Post created successfully');
       setIsCreateDialogOpen(false);
       refreshPosts();
-    } catch (error) {
+    } catch {
       toast.error('Failed to create post');
     }
   };
@@ -81,7 +80,7 @@ export function BlogManagement() {
       setIsEditDialogOpen(false);
       setEditingPost(null);
       refreshPosts();
-    } catch (error) {
+    } catch {
       toast.error('Failed to update post');
     }
   };
@@ -95,7 +94,7 @@ export function BlogManagement() {
       await remove(postId);
       toast.success('Post deleted successfully');
       refreshPosts();
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete post');
     }
   };

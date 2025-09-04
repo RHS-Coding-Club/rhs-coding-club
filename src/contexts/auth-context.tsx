@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import {
   User,
   signInWithEmailAndPassword,
@@ -22,8 +22,8 @@ export interface UserProfile {
   displayName: string;
   photoURL?: string;
   role: UserRole;
-  createdAt: any;
-  lastLoginAt: any;
+  createdAt: Date | null;
+  lastLoginAt: Date | null;
 }
 
 interface AuthContextType {
@@ -47,8 +47,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   // Helper function to remove undefined values from objects before saving to Firestore
-  const cleanObject = (obj: any): any => {
-    const cleaned: any = {};
+  const cleanObject = (obj: Record<string, unknown>): Record<string, unknown> => {
+    const cleaned: Record<string, unknown> = {};
     Object.keys(obj).forEach(key => {
       if (obj[key] !== undefined) {
         cleaned[key] = obj[key];
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return cleaned;
   };
 
-  const createUserProfile = async (user: User, additionalData?: any) => {
+  const createUserProfile = useCallback(async (user: User, additionalData?: Record<string, unknown>) => {
     const userDocRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userDocRef);
 
@@ -90,9 +90,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await setDoc(userDocRef, { lastLoginAt: serverTimestamp() }, { merge: true });
       return { uid: user.uid, ...userDoc.data() } as UserProfile;
     }
-  };
+  }, []);
 
-  const fetchUserProfile = async (user: User) => {
+  const fetchUserProfile = useCallback(async (user: User) => {
     try {
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
-  };
+  }, [createUserProfile]);
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
@@ -172,7 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [fetchUserProfile]);
 
   const value: AuthContextType = {
     user,

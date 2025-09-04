@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Challenge, Submission, User } from '@/lib/firebase-collections';
 import { challengesService } from '@/lib/services/challenges';
 
@@ -34,13 +34,7 @@ export function useChallenge(id: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      loadChallenge();
-    }
-  }, [id]);
-
-  const loadChallenge = async () => {
+  const loadChallenge = useCallback(async () => {
     try {
       setLoading(true);
       const data = await challengesService.getChallengeById(id);
@@ -51,7 +45,13 @@ export function useChallenge(id: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      loadChallenge();
+    }
+  }, [id, loadChallenge]);
 
   return { challenge, loading, error, refetch: loadChallenge };
 }
@@ -61,13 +61,7 @@ export function useSubmissions(challengeId?: string, userId?: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (challengeId || userId) {
-      loadSubmissions();
-    }
-  }, [challengeId, userId]);
-
-  const loadSubmissions = async () => {
+  const loadSubmissions = useCallback(async () => {
     try {
       setLoading(true);
       let data: Submission[] = [];
@@ -88,7 +82,13 @@ export function useSubmissions(challengeId?: string, userId?: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [challengeId, userId]);
+
+  useEffect(() => {
+    if (challengeId || userId) {
+      loadSubmissions();
+    }
+  }, [challengeId, userId, loadSubmissions]);
 
   return { submissions, loading, error, refetch: loadSubmissions };
 }

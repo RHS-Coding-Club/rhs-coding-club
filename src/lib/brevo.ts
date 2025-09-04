@@ -5,7 +5,7 @@ export interface NewsletterSubscriber {
   email: string;
   firstName?: string;
   lastName?: string;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
 }
 
 export interface TransactionalEmail {

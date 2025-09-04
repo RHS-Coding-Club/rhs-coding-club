@@ -67,8 +67,8 @@ interface User {
   email: string;
   displayName: string;
   role: UserRole;
-  createdAt: any;
-  lastLoginAt: any;
+  createdAt: Date | null;
+  lastLoginAt: Date | null;
 }
 
 interface OfficerFormData {
@@ -201,7 +201,7 @@ export default function AdminPage() {
     }
   };
 
-  const uploadImage = async (file: File, officerId?: string): Promise<string> => {
+  const uploadImage = async (file: File): Promise<string> => {
     setUploading(true);
     try {
       // Create a unique filename
@@ -893,7 +893,7 @@ export default function AdminPage() {
                                 <p className="text-sm text-muted-foreground mb-3 overflow-hidden" style={{ 
                                   display: '-webkit-box',
                                   WebkitLineClamp: 2,
-                                  WebkitBoxOrient: 'vertical' as any
+                                  WebkitBoxOrient: 'vertical' as const
                                 }}>
                                   {officer.bio}
                                 </p>

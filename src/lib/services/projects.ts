@@ -9,9 +9,7 @@ import {
   query,
   where,
   orderBy,
-  limit,
   Timestamp,
-  writeBatch,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Project } from '@/lib/firebase-collections';

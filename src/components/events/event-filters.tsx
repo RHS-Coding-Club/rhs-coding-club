@@ -136,7 +136,7 @@ export function EventFilters({ filters, onFiltersChange, className }: EventFilte
             <span>Active filters:</span>
             {filters.search && (
               <Badge variant="outline" className="gap-1">
-                "{filters.search}"
+                &quot;{filters.search}&quot;
                 <X
                   className="h-3 w-3 cursor-pointer"
                   onClick={() => handleSearchChange('')}

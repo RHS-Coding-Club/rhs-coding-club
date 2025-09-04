@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, CalendarIcon, X, Plus } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { useEventActions } from '@/hooks/useEvents';
 import { CreateEventData, UpdateEventData, EventWithRsvps } from '@/lib/services/events';
 
@@ -60,7 +60,6 @@ export function EventForm({ event, onSubmit, onCancel }: EventFormProps) {
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
     defaultValues: event ? {

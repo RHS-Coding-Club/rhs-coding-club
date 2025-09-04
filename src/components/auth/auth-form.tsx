@@ -47,8 +47,8 @@ export function AuthForm({ onClose }: AuthFormProps) {
     try {
       await signInWithEmail(signInData.email, signInData.password);
       onClose?.();
-    } catch (error: any) {
-      setError(error.message || 'Failed to sign in');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Failed to sign in');
     } finally {
       setLoading(false);
     }
@@ -74,8 +74,8 @@ export function AuthForm({ onClose }: AuthFormProps) {
     try {
       await signUpWithEmail(signUpData.email, signUpData.password, signUpData.displayName);
       onClose?.();
-    } catch (error: any) {
-      setError(error.message || 'Failed to create account');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Failed to create account');
     } finally {
       setLoading(false);
     }
@@ -88,8 +88,8 @@ export function AuthForm({ onClose }: AuthFormProps) {
     try {
       await signInWithGoogle();
       onClose?.();
-    } catch (error: any) {
-      setError(error.message || 'Failed to sign in with Google');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Failed to sign in with Google');
     } finally {
       setLoading(false);
     }

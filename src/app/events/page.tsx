@@ -3,13 +3,12 @@
 import { useState, useMemo } from 'react';
 import { Container } from '@/components/container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalendarDays, Users, Trophy, Coffee } from 'lucide-react';
 import { useEvents, useUpcomingEvents, usePastEvents } from '@/hooks/useEvents';
 import { EventCard } from '@/components/events/event-card';
 import { EventFilters, EventFilters as EventFiltersType } from '@/components/events/event-filters';
-import { EventWithRsvps, eventService } from '@/lib/services/events';
+import { EventWithRsvps } from '@/lib/services/events';
 
 function filterEvents(events: EventWithRsvps[], filters: EventFiltersType): EventWithRsvps[] {
   return events.filter(event => {
