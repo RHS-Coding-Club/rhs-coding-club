@@ -8,6 +8,7 @@ import { Menu, X, Code2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { AuthButton } from '@/components/auth/auth-button';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -66,13 +67,11 @@ export function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
+            <AuthButton />
             <ThemeToggle />
             <div className="hidden md:flex items-center space-x-2">
               <Button asChild size="sm">
                 <Link href="/join">Join Club</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/dashboard">Dashboard</Link>
               </Button>
             </div>
 
@@ -99,9 +98,6 @@ export function Header() {
                   <div className="pt-4 space-y-2">
                     <Button asChild className="w-full">
                       <Link href="/join">Join Club</Link>
-                    </Button>
-                    <Button asChild variant="outline" className="w-full">
-                      <Link href="/dashboard">Dashboard</Link>
                     </Button>
                   </div>
                 </div>

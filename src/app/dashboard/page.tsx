@@ -5,17 +5,45 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ProtectedRoute } from '@/components/auth/protected-route';
+import { useAuth } from '@/contexts/auth-context';
 import { Calendar, Users, Trophy, BookOpen } from 'lucide-react';
 
 export default function DashboardPage() {
+  const { userProfile } = useAuth();
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'officer':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'member':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    }
+  };
+
   return (
-    <div className="py-20">
-      <Container>
-        <div className="max-w-6xl mx-auto space-y-8">
-          <div className="flex items-center justify-between">
-            <h1 className="text-4xl font-bold">Dashboard</h1>
-            <Badge variant="outline">Member</Badge>
-          </div>
+    <ProtectedRoute requiredRoles={['admin', 'officer', 'member']}>
+      <div className="py-20">
+        <Container>
+          <div className="max-w-6xl mx-auto space-y-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-4xl font-bold">Dashboard</h1>
+                <p className="text-muted-foreground mt-2">
+                  Welcome back, {userProfile?.displayName}!
+                </p>
+              </div>
+              <Badge 
+                variant="outline" 
+                className={getRoleColor(userProfile?.role || 'guest')}
+              >
+                {userProfile?.role ? userProfile.role.charAt(0).toUpperCase() + userProfile.role.slice(1) : 'Guest'}
+              </Badge>
+            </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <Card>
@@ -157,5 +185,6 @@ export default function DashboardPage() {
         </div>
       </Container>
     </div>
+    </ProtectedRoute>
   );
 }
