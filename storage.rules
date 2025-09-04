@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// Craft rules based on data in your Firestore database
+// allow write: if firestore.get(
+//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Officers images
+    match /officers/{allPaths=**} {
+      // Allow admins and officers to read, write, and delete
+      allow read: if true; // Public read access for displaying images
+      allow write, delete: if request.auth != null && 
+        (firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['admin', 'officer']);
+    }
+    
+    // Default rule - deny access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -12,6 +12,20 @@ export interface User {
   badges?: string[];
 }
 
+export interface Officer {
+  id: string;
+  name: string;
+  role: string; // Position like "President", "Vice President", etc.
+  bio: string;
+  email: string;
+  githubUrl?: string;
+  imageUrl?: string;
+  order: number; // For sorting display order
+  isActive: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 export interface Event {
   id: string;
   title: string;
