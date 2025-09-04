@@ -10,6 +10,7 @@ export interface User {
   gradYear?: number;
   skills?: string[];
   badges?: string[];
+  points?: number;
 }
 
 export interface Officer {
@@ -62,12 +63,17 @@ export interface Project {
 export interface Challenge {
   id: string;
   title: string;
+  description: string;
   prompt: string;
   difficulty: 'easy' | 'medium' | 'hard';
-  samples?: string[];
+  sampleInput?: string;
+  sampleOutput?: string;
   points: number;
   weekNo: number;
   published: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  createdBy: string; // User ID
 }
 
 export interface Submission {
@@ -75,8 +81,13 @@ export interface Submission {
   challengeId: string;
   userId: string;
   code: string;
-  result?: any;
-  score?: number;
+  language: string;
+  status: 'pending' | 'pass' | 'fail';
+  points: number;
+  submittedAt: Timestamp;
+  reviewedAt?: Timestamp;
+  reviewedBy?: string; // Officer/Admin user ID
+  feedback?: string;
 }
 
 export interface Post {

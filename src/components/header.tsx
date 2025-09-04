@@ -25,6 +25,7 @@ const navigation = [
   { name: 'Projects', href: '/projects' },
   { name: 'Resources', href: '/resources' },
   { name: 'Challenges', href: '/challenges' },
+  { name: 'Leaderboard', href: '/leaderboard' },
   { name: 'Blog', href: '/blog' },
   { name: 'Contact', href: '/contact' },
 ];
