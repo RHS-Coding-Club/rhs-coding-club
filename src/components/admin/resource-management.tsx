@@ -17,7 +17,6 @@ import { Resource } from '@/lib/firebase-collections';
 import { resourceService, CreateResourceData } from '@/lib/services/resources';
 import { ResourceForm } from '@/components/resources';
 import { useAuth } from '@/contexts/auth-context';
-import { seedResources } from '@/lib/seed-resources';
 
 export function ResourceManagement() {
   const { user } = useAuth();
@@ -84,7 +83,6 @@ export function ResourceManagement() {
     
     try {
       setSeeding(true);
-      await seedResources(user.uid);
       await fetchResources();
     } catch (error) {
       console.error('Error seeding resources:', error);

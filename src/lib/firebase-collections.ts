@@ -94,10 +94,14 @@ export interface Post {
   id: string;
   title: string;
   summary: string;
-  content: string;
+  content: string; // markdown content
   tags?: string[];
-  published: boolean;
+  author: string; // Author name
   authorId: string; // User ID
+  published: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  slug?: string; // URL-friendly version of title
 }
 
 export interface Resource {

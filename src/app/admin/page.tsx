@@ -43,6 +43,7 @@ import { Users, Shield, Settings, UserCheck, Plus, Edit, Trash2, Save, Upload, X
 import { Officer } from '@/lib/firebase-collections';
 import { ProjectManagement } from '@/components/admin/project-management';
 import { ResourceManagement } from '@/components/admin/resource-management';
+import { BlogManagement } from '@/components/admin/blog-management';
 import { projectService } from '@/lib/services/projects';
 
 // Predefined officer roles
@@ -460,6 +461,7 @@ export default function AdminPage() {
               <TabsList>
                 <TabsTrigger value="users">User Management</TabsTrigger>
                 <TabsTrigger value="officers">Officers</TabsTrigger>
+                <TabsTrigger value="blog">Blog</TabsTrigger>
                 <TabsTrigger value="projects">Projects</TabsTrigger>
                 <TabsTrigger value="resources">Resources</TabsTrigger>
                 <TabsTrigger value="events">Events</TabsTrigger>
@@ -923,6 +925,10 @@ export default function AdminPage() {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="blog" className="space-y-6">
+                <BlogManagement />
               </TabsContent>
 
               <TabsContent value="projects" className="space-y-6">
