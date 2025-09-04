@@ -32,7 +32,6 @@
     "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "eslint-config-prettier": "^10.1.8",
-    "feed": "^5.1.0",
     "firebase": "^12.2.1",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.542.0",
