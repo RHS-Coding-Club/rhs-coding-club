@@ -39,7 +39,7 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
-import { Users, Shield, Settings, UserCheck, Plus, Edit, Trash2, Save, Upload, X, Mail, Github } from 'lucide-react';
+import { Users, Shield, Settings, UserCheck, Plus, Edit, Trash2, Save, Upload, X, Mail, Github, Calendar, Eye } from 'lucide-react';
 import { Officer } from '@/lib/firebase-collections';
 
 // Predefined officer roles
@@ -424,6 +424,7 @@ export default function AdminPage() {
               <TabsList>
                 <TabsTrigger value="users">User Management</TabsTrigger>
                 <TabsTrigger value="officers">Officers</TabsTrigger>
+                <TabsTrigger value="events">Events</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
 
@@ -882,6 +883,29 @@ export default function AdminPage() {
                         ))}
                       </div>
                     )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="events" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Event Management</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-muted-foreground">
+                      Manage club events, workshops, and competitions.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Button onClick={() => window.location.href = '/admin/events'} className="gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Manage Events
+                      </Button>
+                      <Button variant="outline" onClick={() => window.location.href = '/events'} className="gap-2">
+                        <Eye className="h-4 w-4" />
+                        View Public Events
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
