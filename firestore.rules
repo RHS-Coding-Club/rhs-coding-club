@@ -1,0 +1,72 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if a user is an admin or officer
+    function isAdminOrOfficer() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'officer'];
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth.uid != null;
+      allow update: if request.auth.uid == userId || isAdminOrOfficer();
+      allow delete: if false; // Prevent accidental deletion
+    }
+
+    // Events Collection
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, update, delete: if isAdminOrOfficer();
+    }
+
+    // RSVPs Collection
+    match /rsvps/{rsvpId} {
+      allow read: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
+      allow create, update: if request.auth.uid == request.resource.data.userId;
+      allow delete: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
+    }
+
+    // Projects Collection
+    match /projects/{projectId} {
+      allow read: if resource.data.approved == true || request.auth.uid == resource.data.authorId;
+      allow create: if request.auth.uid != null;
+      allow update: if request.auth.uid == resource.data.authorId || isAdminOrOfficer();
+      allow delete: if request.auth.uid == resource.data.authorId || isAdminOrOfficer();
+    }
+
+    // Challenges Collection
+    match /challenges/{challengeId} {
+      allow read: if resource.data.published == true || isAdminOrOfficer();
+      allow create, update, delete: if isAdminOrOfficer();
+    }
+
+    // Submissions Collection
+    match /submissions/{submissionId} {
+      allow read: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
+      allow create: if request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth.uid == resource.data.userId;
+      allow delete: if false;
+    }
+
+    // Posts Collection
+    match /posts/{postId} {
+      allow read: if resource.data.published == true || isAdminOrOfficer();
+      allow create, update, delete: if isAdminOrOfficer();
+    }
+
+    // Resources Collection
+    match /resources/{resourceId} {
+      allow read: if request.auth.uid != null;
+      allow create: if request.auth.uid != null;
+      allow update, delete: if isAdminOrOfficer();
+    }
+
+    // Attendance Collection
+    match /attendance/{attendanceId} {
+      allow read, create, update, delete: if isAdminOrOfficer();
+    }
+  }
+}
