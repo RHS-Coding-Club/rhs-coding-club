@@ -42,6 +42,7 @@ import { db, storage } from '@/lib/firebase';
 import { Users, Shield, Settings, UserCheck, Plus, Edit, Trash2, Save, Upload, X, Mail, Github, Calendar, Eye, FolderOpen } from 'lucide-react';
 import { Officer } from '@/lib/firebase-collections';
 import { ProjectManagement } from '@/components/admin/project-management';
+import { ResourceManagement } from '@/components/admin/resource-management';
 import { projectService } from '@/lib/services/projects';
 
 // Predefined officer roles
@@ -460,6 +461,7 @@ export default function AdminPage() {
                 <TabsTrigger value="users">User Management</TabsTrigger>
                 <TabsTrigger value="officers">Officers</TabsTrigger>
                 <TabsTrigger value="projects">Projects</TabsTrigger>
+                <TabsTrigger value="resources">Resources</TabsTrigger>
                 <TabsTrigger value="events">Events</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
@@ -925,6 +927,10 @@ export default function AdminPage() {
 
               <TabsContent value="projects" className="space-y-6">
                 <ProjectManagement />
+              </TabsContent>
+
+              <TabsContent value="resources" className="space-y-6">
+                <ResourceManagement />
               </TabsContent>
 
               <TabsContent value="events" className="space-y-6">

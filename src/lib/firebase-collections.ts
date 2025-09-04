@@ -92,10 +92,13 @@ export interface Post {
 export interface Resource {
   id: string;
   title: string;
+  description: string;
   url: string;
-  tags?: string[];
-  level?: 'beginner' | 'intermediate' | 'advanced';
+  tags: string[];
+  level: 'beginner' | 'intermediate' | 'advanced';
   addedBy: string; // User ID
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export interface Attendance {
