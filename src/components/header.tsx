@@ -6,7 +6,8 @@ import { motion } from 'framer-motion';
 import { Menu, Code2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthButton } from '@/components/auth/auth-button';
 
@@ -77,19 +78,24 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-80">
-                <div className="flex flex-col space-y-4 mt-8">
-                  {navigation.map(item => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="text-lg font-medium transition-colors hover:text-primary"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                  <div className="pt-4 space-y-2">
-                    <Button asChild className="w-full">
+                <VisuallyHidden>
+                  <SheetTitle>Navigation Menu</SheetTitle>
+                </VisuallyHidden>
+                <div className="flex flex-col h-full">
+                  <div className="flex flex-col space-y-6 mt-12 px-2">
+                    {navigation.map(item => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className="text-lg font-medium transition-colors hover:text-primary py-3 px-4 rounded-lg hover:bg-accent/50 border-b border-border/20 last:border-b-0"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="mt-auto mb-8 px-2">
+                    <Button asChild className="w-full h-12 text-base">
                       <Link href="/join">Join Club</Link>
                     </Button>
                   </div>
