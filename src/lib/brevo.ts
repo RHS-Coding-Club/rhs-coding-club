@@ -150,11 +150,60 @@ class BrevoService {
       to: [{ email: this.senderEmail, name: this.senderName }],
       subject: `New Contact Form Submission: ${subject}`,
       htmlContent: `
-        <h1>New Contact Form Submission</h1>
-        <p><strong>From:</strong> ${senderName} (${senderEmail})</p>
-        <p><strong>Subject:</strong> ${subject}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>New Contact Form Submission</title>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f7; color: #333; margin: 0; padding: 0; }
+                .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
+                .header { background-color: #4f46e5; color: #ffffff; padding: 24px; text-align: center; }
+                .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
+                .content { padding: 32px; }
+                .content h2 { font-size: 20px; margin-top: 0; margin-bottom: 16px; color: #4f46e5; }
+                .info-table { width: 100%; margin-bottom: 24px; border-collapse: collapse; }
+                .info-table td { padding: 8px 0; vertical-align: top; }
+                .info-table td:first-child { font-weight: 600; color: #4a5568; width: 80px; }
+                .message-box { background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; white-space: pre-wrap; word-wrap: break-word; font-size: 15px; line-height: 1.6; }
+                .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; border-top: 1px solid #e2e8f0; }
+                a { color: #4f46e5; text-decoration: none; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>New Website Message</h1>
+                </div>
+                <div class="content">
+                    <h2>Submission Details</h2>
+                    <table class="info-table">
+                        <tr>
+                            <td>From:</td>
+                            <td>${senderName}</td>
+                        </tr>
+                        <tr>
+                            <td>Email:</td>
+                            <td><a href="mailto:${senderEmail}">${senderEmail}</a></td>
+                        </tr>
+                        <tr>
+                            <td>Subject:</td>
+                            <td>${subject}</td>
+                        </tr>
+                    </table>
+                    <h2>Message</h2>
+                    <div class="message-box">
+                        ${message.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>This email was sent from the contact form on the RHS Coding Club website.</p>
+                    <p>&copy; ${new Date().getFullYear()} RHS Coding Club. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
       `,
       textContent: `
         New Contact Form Submission

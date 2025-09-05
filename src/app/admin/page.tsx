@@ -45,6 +45,7 @@ import { ProjectManagement } from '@/components/admin/project-management';
 import { ResourceManagement } from '@/components/admin/resource-management';
 import { BlogManagement } from '@/components/admin/blog-management';
 import { projectService } from '@/lib/services/projects';
+import { PendingMemberManagement } from '@/components/admin/pending-member-management';
 
 // Predefined officer roles
 const OFFICER_ROLES = [
@@ -460,6 +461,7 @@ export default function AdminPage() {
             <Tabs defaultValue="users" className="space-y-6">
               <TabsList>
                 <TabsTrigger value="users">User Management</TabsTrigger>
+                <TabsTrigger value="membership">Membership</TabsTrigger>
                 <TabsTrigger value="officers">Officers</TabsTrigger>
                 <TabsTrigger value="blog">Blog</TabsTrigger>
                 <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -525,6 +527,10 @@ export default function AdminPage() {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="membership" className="space-y-6">
+                <PendingMemberManagement />
               </TabsContent>
 
               <TabsContent value="officers" className="space-y-6">

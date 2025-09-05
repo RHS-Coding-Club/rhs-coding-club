@@ -74,5 +74,17 @@ service cloud.firestore {
       allow read: if true; // Public read access for About page
       allow create, update, delete: if isAdminOrOfficer();
     }
+
+    // Contacts Collection
+    match /contacts/{contactId} {
+      allow read, update, delete: if isAdminOrOfficer();
+      allow create: if true; // Anyone can send a message
+    }
+
+    // Pending Members Collection
+    match /pendingMembers/{memberId} {
+      allow read, update, delete: if isAdminOrOfficer();
+      allow create: if true; // Anyone can apply to join
+    }
   }
 }

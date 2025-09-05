@@ -116,6 +116,26 @@ export interface Resource {
   updatedAt: Timestamp;
 }
 
+export interface Contact {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  submittedAt: Timestamp;
+}
+
+export interface PendingMember {
+  id: string;
+  name: string;
+  email: string;
+  grade: string;
+  experience: string;
+  interests: string;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: Timestamp;
+}
+
 export interface Attendance {
   id: string;
   eventId: string;
