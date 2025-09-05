@@ -1,5 +1,10 @@
-// Brevo API integration
-// Note: This is a simplified version. For production, implement proper Brevo SDK integration.
+// Brevo API integration using official SDK
+import { 
+  TransactionalEmailsApi, 
+  ContactsApi,
+  TransactionalEmailsApiApiKeys,
+  ContactsApiApiKeys
+} from '@getbrevo/brevo';
 
 export interface NewsletterSubscriber {
   email: string;
@@ -21,38 +26,53 @@ class BrevoService {
   private readonly apiKey = process.env.BREVO_API_KEY;
   private readonly senderEmail = process.env.BREVO_SENDER_EMAIL || '';
   private readonly senderName = process.env.BREVO_SENDER_NAME || 'RHS Coding Club';
-  private readonly baseUrl = 'https://api.brevo.com/v3';
+  private apiInstance: TransactionalEmailsApi | null = null;
+  private contactsApiInstance: ContactsApi | null = null;
+
+  private initializeAPIs() {
+    if (!this.apiKey) {
+      // Only log error if we're actually trying to use the service
+      if (typeof window === 'undefined') {
+        // Only log on server-side
+        console.error('BREVO_API_KEY is not configured');
+      }
+      return false;
+    }
+
+    if (!this.apiInstance || !this.contactsApiInstance) {
+      // Initialize API instances with authentication
+      this.apiInstance = new TransactionalEmailsApi();
+      this.apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, this.apiKey);
+
+      this.contactsApiInstance = new ContactsApi();
+      this.contactsApiInstance.setApiKey(ContactsApiApiKeys.apiKey, this.apiKey);
+    }
+
+    return true;
+  }
 
   /**
    * Subscribe a user to the newsletter
    */
   async subscribeToNewsletter(subscriber: NewsletterSubscriber): Promise<boolean> {
-    if (!this.apiKey) {
-      console.error('BREVO_API_KEY is not configured');
+    if (!this.initializeAPIs() || !this.contactsApiInstance) {
       return false;
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/contacts`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'api-key': this.apiKey,
+      const createContact = {
+        email: subscriber.email,
+        attributes: {
+          FIRSTNAME: subscriber.firstName || '',
+          LASTNAME: subscriber.lastName || '',
+          ...subscriber.attributes,
         },
-        body: JSON.stringify({
-          email: subscriber.email,
-          attributes: {
-            FIRSTNAME: subscriber.firstName || '',
-            LASTNAME: subscriber.lastName || '',
-            ...subscriber.attributes,
-          },
-          listIds: [1], // Replace with your actual list ID
-          updateEnabled: true,
-        }),
-      });
+        listIds: [1], // Replace with your actual list ID
+        updateEnabled: true,
+      };
 
-      return response.ok;
+      await this.contactsApiInstance.createContact(createContact);
+      return true;
     } catch (error) {
       console.error('Error subscribing to newsletter:', error);
       return false;
@@ -63,21 +83,13 @@ class BrevoService {
    * Unsubscribe a user from the newsletter
    */
   async unsubscribeFromNewsletter(email: string): Promise<boolean> {
-    if (!this.apiKey) {
-      console.error('BREVO_API_KEY is not configured');
+    if (!this.initializeAPIs() || !this.contactsApiInstance) {
       return false;
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/contacts/${encodeURIComponent(email)}`, {
-        method: 'DELETE',
-        headers: {
-          'Accept': 'application/json',
-          'api-key': this.apiKey,
-        },
-      });
-
-      return response.ok;
+      await this.contactsApiInstance.deleteContact(email);
+      return true;
     } catch (error) {
       console.error('Error unsubscribing from newsletter:', error);
       return false;
@@ -88,33 +100,25 @@ class BrevoService {
    * Send a transactional email
    */
   async sendTransactionalEmail(emailData: TransactionalEmail): Promise<boolean> {
-    if (!this.apiKey) {
-      console.error('BREVO_API_KEY is not configured');
+    if (!this.initializeAPIs() || !this.apiInstance) {
       return false;
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/smtp/email`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'api-key': this.apiKey,
+      const sendSmtpEmail = {
+        to: emailData.to,
+        subject: emailData.subject,
+        htmlContent: emailData.htmlContent,
+        textContent: emailData.textContent,
+        sender: emailData.sender || {
+          email: this.senderEmail,
+          name: this.senderName,
         },
-        body: JSON.stringify({
-          to: emailData.to,
-          subject: emailData.subject,
-          htmlContent: emailData.htmlContent,
-          textContent: emailData.textContent,
-          sender: emailData.sender || {
-            email: this.senderEmail,
-            name: this.senderName,
-          },
-          replyTo: emailData.replyTo,
-        }),
-      });
+        replyTo: emailData.replyTo,
+      };
 
-      return response.ok;
+      await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      return true;
     } catch (error) {
       console.error('Error sending transactional email:', error);
       return false;
@@ -885,8 +889,7 @@ class BrevoService {
    * Send a custom newsletter to multiple recipients
    */
   async sendCustomNewsletter(recipients: string[], subject: string, message: string): Promise<boolean> {
-    if (!this.apiKey) {
-      console.error('BREVO_API_KEY is not configured');
+    if (!this.initializeAPIs()) {
       return false;
     }
 

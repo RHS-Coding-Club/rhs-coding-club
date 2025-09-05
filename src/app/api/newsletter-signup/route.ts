@@ -20,13 +20,13 @@ export async function POST(req: NextRequest) {
 
     if (success) {
       // Send welcome email
-      const welcomeEmailSent = await brevoService.sendNewsletterWelcomeEmail(email);
+      await brevoService.sendNewsletterWelcomeEmail(email);
       
       return NextResponse.json({ success: true, message: 'Successfully subscribed and welcome email sent!' });
     } else {
       return NextResponse.json({ success: false, message: 'Failed to add to email service' }, { status: 500 });
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

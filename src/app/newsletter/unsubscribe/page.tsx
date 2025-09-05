@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Container } from '@/components/container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { newsletterSubscribersCollection } from '@/lib/firebase-collections';
 
-export default function UnsubscribePage() {
+function UnsubscribeContent() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -80,7 +80,7 @@ export default function UnsubscribePage() {
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
+      await response.json();
 
       if (response.ok) {
         setUnsubscribed(true);
@@ -109,11 +109,11 @@ export default function UnsubscribePage() {
             </div>
             <div className="space-y-4">
               <h1 className="text-3xl md:text-4xl font-bold">
-                You've Been Unsubscribed
+                You&apos;ve Been Unsubscribed
               </h1>
               <p className="text-lg text-muted-foreground">
                 You have successfully unsubscribed from the RHS Coding Club newsletter.
-                We're sorry to see you go!
+                We&apos;re sorry to see you go!
               </p>
             </div>
             <Card className="text-left">
@@ -149,7 +149,7 @@ export default function UnsubscribePage() {
               Unsubscribe from Newsletter
             </h1>
             <p className="text-lg text-muted-foreground">
-              We're sorry to see you go. Enter your email address to unsubscribe from our newsletter.
+              We&apos;re sorry to see you go. Enter your email address to unsubscribe from our newsletter.
             </p>
           </div>
 
@@ -195,7 +195,7 @@ export default function UnsubscribePage() {
               <div className="mt-6 p-4 bg-muted rounded-lg">
                 <h3 className="font-semibold mb-2">What happens when you unsubscribe?</h3>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• You'll stop receiving our newsletter emails</li>
+                  <li>• You&apos;ll stop receiving our newsletter emails</li>
                   <li>• Your email will be removed from our mailing list</li>
                   <li>• You can re-subscribe anytime from our website</li>
                   <li>• It may take up to 24 hours for the change to take effect</li>
@@ -206,5 +206,27 @@ export default function UnsubscribePage() {
         </div>
       </Container>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-background">
+      <Container>
+        <div className="py-20">
+          <div className="text-center">
+            <h1 className="text-3xl md:text-4xl font-bold">Loading...</h1>
+          </div>
+        </div>
+      </Container>
+    </div>
+  );
+}
+
+export default function UnsubscribePage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <UnsubscribeContent />
+    </Suspense>
   );
 }

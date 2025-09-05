@@ -12,13 +12,6 @@ import { toast } from 'sonner';
 import { getDocs } from 'firebase/firestore';
 import { newsletterSubscribersCollection } from '@/lib/firebase-collections';
 
-interface NewsletterEmail {
-  subject: string;
-  message: string;
-  sentAt?: Date;
-  recipientCount?: number;
-}
-
 export function NewsletterManagement() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
@@ -80,74 +73,6 @@ export function NewsletterManagement() {
     } finally {
       setSending(false);
     }
-  };
-
-  const getPreviewHtml = () => {
-    return `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${subject}</title>
-          <style>
-              body { 
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-                  background-color: #fafafa; 
-                  color: #0a0a0a; 
-                  margin: 0; 
-                  padding: 0; 
-                  line-height: 1.6;
-              }
-              .container { 
-                  max-width: 600px; 
-                  margin: 20px auto; 
-                  background-color: #ffffff; 
-                  border-radius: 8px; 
-                  overflow: hidden; 
-                  border: 1px solid #e4e4e7; 
-                  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-              }
-              .header { 
-                  background-color: #0a0a0a; 
-                  color: #fafafa; 
-                  padding: 32px 24px; 
-                  text-align: center; 
-              }
-              .header h1 { 
-                  margin: 0; 
-                  font-size: 28px; 
-                  font-weight: 600; 
-                  letter-spacing: -0.025em;
-              }
-              .content { 
-                  padding: 32px 24px; 
-              }
-              .footer { 
-                  background-color: #f4f4f5; 
-                  padding: 24px; 
-                  text-align: center; 
-                  font-size: 14px; 
-                  color: #71717a; 
-                  border-top: 1px solid #e4e4e7; 
-              }
-          </style>
-      </head>
-      <body>
-          <div class="container">
-              <div class="header">
-                  <h1>📧 ${subject}</h1>
-              </div>
-              <div class="content">
-                  ${message.replace(/\n/g, '<br>')}
-              </div>
-              <div class="footer">
-                  <p>© ${new Date().getFullYear()} RHS Coding Club. All rights reserved.</p>
-              </div>
-          </div>
-      </body>
-      </html>
-    `;
   };
 
   return (
@@ -279,7 +204,7 @@ You can include:
             <div className="flex items-start gap-2">
               <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
               <div>
-                <strong>Keep it concise:</strong> Newsletters work best when they're informative but not overwhelming.
+                <strong>Keep it concise:</strong> Newsletters work best when they&apos;re informative but not overwhelming.
               </div>
             </div>
             <div className="flex items-start gap-2">
@@ -297,7 +222,7 @@ You can include:
             <div className="flex items-start gap-2">
               <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
               <div>
-                <strong>Personal touch:</strong> Write in a friendly, conversational tone that reflects your club's personality.
+                <strong>Personal touch:</strong> Write in a friendly, conversational tone that reflects your club&apos;s personality.
               </div>
             </div>
           </div>

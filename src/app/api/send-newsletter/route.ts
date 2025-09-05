@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
         error: 'Failed to send newsletter' 
       }, { status: 500 });
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
