@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, getDocs, doc, updateDoc, deleteDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { PendingMember } from '@/lib/firebase-collections';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Check, X, UserPlus, Trash2 } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 export function PendingMemberManagement() {
   const [pendingMembers, setPendingMembers] = useState<PendingMember[]>([]);
