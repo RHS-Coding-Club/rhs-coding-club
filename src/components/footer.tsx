@@ -3,6 +3,7 @@ import { Code2, Github, Mail } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { NewsletterForm } from './newsletter-form';
 
 export function Footer() {
   return (
@@ -127,9 +128,7 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               Subscribe to our newsletter for the latest updates and events.
             </p>
-            <Button asChild>
-              <Link href="/newsletter">Subscribe</Link>
-            </Button>
+            <NewsletterForm />
           </div>
         </div>
 

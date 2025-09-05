@@ -86,5 +86,13 @@ service cloud.firestore {
       allow read, update, delete: if isAdminOrOfficer();
       allow create: if true; // Anyone can apply to join
     }
+
+    // Newsletter Subscribers Collection
+    match /newsletterSubscribers/{subscriberId} {
+      allow read: if true; // Allow server-side reading for newsletter sending
+      allow create: if true; // Allow unauthenticated newsletter subscriptions
+      allow delete: if true; // Allow anyone to unsubscribe and server-side operations
+      allow update: if isAdminOrOfficer(); // Only admins can update subscriber data
+    }
   }
 }

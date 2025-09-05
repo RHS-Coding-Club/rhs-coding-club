@@ -60,6 +60,31 @@ class BrevoService {
   }
 
   /**
+   * Unsubscribe a user from the newsletter
+   */
+  async unsubscribeFromNewsletter(email: string): Promise<boolean> {
+    if (!this.apiKey) {
+      console.error('BREVO_API_KEY is not configured');
+      return false;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/contacts/${encodeURIComponent(email)}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'api-key': this.apiKey,
+        },
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error('Error unsubscribing from newsletter:', error);
+      return false;
+    }
+  }
+
+  /**
    * Send a transactional email
    */
   async sendTransactionalEmail(emailData: TransactionalEmail): Promise<boolean> {
@@ -102,39 +127,592 @@ class BrevoService {
   async sendWelcomeEmail(email: string, name: string): Promise<boolean> {
     const welcomeEmailData: TransactionalEmail = {
       to: [{ email, name }],
-      subject: 'Welcome to RHS Coding Club!',
+      subject: 'Welcome to RHS Coding Club! 🎉',
       htmlContent: `
-        <h1>Welcome to RHS Coding Club, ${name}!</h1>
-        <p>We're excited to have you join our community of passionate student developers.</p>
-        <p>Here's what you can expect:</p>
-        <ul>
-          <li>Weekly coding workshops and tutorials</li>
-          <li>Collaborative project opportunities</li>
-          <li>Coding competitions and challenges</li>
-          <li>Networking with fellow students and industry professionals</li>
-        </ul>
-        <p>Our next meeting is this Friday at 3:30 PM in Computer Lab 1. We can't wait to see you there!</p>
-        <p>Best regards,<br>The RHS Coding Club Team</p>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to RHS Coding Club</title>
+            <style>
+                body { 
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+                    background-color: #fafafa; 
+                    color: #0a0a0a; 
+                    margin: 0; 
+                    padding: 0; 
+                    line-height: 1.6;
+                }
+                .container { 
+                    max-width: 600px; 
+                    margin: 20px auto; 
+                    background-color: #ffffff; 
+                    border-radius: 8px; 
+                    overflow: hidden; 
+                    border: 1px solid #e4e4e7; 
+                    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+                }
+                .header { 
+                    background-color: #0a0a0a; 
+                    color: #fafafa; 
+                    padding: 32px 24px; 
+                    text-align: center; 
+                }
+                .header h1 { 
+                    margin: 0; 
+                    font-size: 28px; 
+                    font-weight: 600; 
+                    letter-spacing: -0.025em;
+                }
+                .header p { 
+                    margin: 8px 0 0 0; 
+                    font-size: 16px; 
+                    opacity: 0.8; 
+                    color: #a1a1aa;
+                }
+                .content { 
+                    padding: 32px 24px; 
+                }
+                .content h2 { 
+                    font-size: 24px; 
+                    margin-top: 0; 
+                    margin-bottom: 16px; 
+                    color: #0a0a0a; 
+                    font-weight: 600;
+                }
+                .content p { 
+                    font-size: 16px; 
+                    line-height: 1.6; 
+                    margin-bottom: 16px; 
+                    color: #52525b;
+                }
+                .features { 
+                    background-color: #f4f4f5; 
+                    border: 1px solid #e4e4e7;
+                    border-radius: 8px; 
+                    padding: 24px; 
+                    margin: 24px 0; 
+                }
+                .features h3 {
+                    margin-top: 0; 
+                    color: #0a0a0a; 
+                    font-size: 18px;
+                    font-weight: 600;
+                }
+                .feature-list { 
+                    list-style: none; 
+                    padding: 0; 
+                    margin: 0; 
+                }
+                .feature-list li { 
+                    padding: 8px 0; 
+                    font-size: 15px; 
+                    display: flex; 
+                    align-items: center; 
+                    color: #52525b;
+                }
+                .feature-list li::before { 
+                    content: "•"; 
+                    margin-right: 12px; 
+                    font-size: 16px; 
+                    color: #0a0a0a;
+                    font-weight: bold;
+                }
+                .cta-section { 
+                    text-align: center; 
+                    margin: 32px 0; 
+                }
+                .cta-button { 
+                    background-color: #0a0a0a; 
+                    color: #fafafa !important; 
+                    padding: 12px 24px; 
+                    text-decoration: none; 
+                    border-radius: 6px; 
+                    font-weight: 500; 
+                    display: inline-block; 
+                    border: 1px solid #0a0a0a;
+                    transition: all 0.2s ease;
+                }
+                .cta-button:hover {
+                    background-color: #18181b;
+                    border-color: #18181b;
+                }
+                .footer { 
+                    background-color: #f4f4f5; 
+                    padding: 24px; 
+                    text-align: center; 
+                    font-size: 14px; 
+                    color: #71717a; 
+                    border-top: 1px solid #e4e4e7; 
+                }
+                .footer a { 
+                    color: #0a0a0a; 
+                    text-decoration: none; 
+                    font-weight: 500;
+                }
+                .footer a:hover {
+                    text-decoration: underline;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🎉 Welcome to RHS Coding Club!</h1>
+                    <p>We're excited to have you join our community</p>
+                </div>
+                <div class="content">
+                    <h2>Hey ${name}!</h2>
+                    <p>We're thrilled to have you join our community of passionate student developers at Ripon High School.</p>
+                    
+                    <div class="features">
+                        <h3>What you can expect:</h3>
+                        <ul class="feature-list">
+                            <li>Weekly coding workshops and tutorials</li>
+                            <li>Collaborative project opportunities</li>
+                            <li>Coding competitions and challenges</li>
+                            <li>Networking with fellow students and industry professionals</li>
+                            <li>Mentorship and learning resources</li>
+                        </ul>
+                    </div>
+
+                    <p>Our next meeting is this Friday at 3:30 PM in Computer Lab 1. We can't wait to see you there!</p>
+                    
+                    <div class="cta-section">
+                        <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/events" class="cta-button">View Upcoming Events</a>
+                    </div>
+
+                    <p>Welcome to the team! 🚀</p>
+                </div>
+                <div class="footer">
+                    <p>© ${new Date().getFullYear()} RHS Coding Club. All rights reserved.</p>
+                    <p>
+                        <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}">Visit our website</a> |
+                        <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/contact">Contact us</a>
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
       `,
       textContent: `
-        Welcome to RHS Coding Club, ${name}!
+        🎉 Welcome to RHS Coding Club, ${name}!
         
         We're excited to have you join our community of passionate student developers.
         
         Here's what you can expect:
-        - Weekly coding workshops and tutorials
-        - Collaborative project opportunities
-        - Coding competitions and challenges
-        - Networking with fellow students and industry professionals
+        • Weekly coding workshops and tutorials
+        • Collaborative project opportunities
+        • Coding competitions and challenges
+        • Networking with fellow students and industry professionals
+        • Mentorship and learning resources
         
         Our next meeting is this Friday at 3:30 PM in Computer Lab 1. We can't wait to see you there!
         
+        Welcome to the team! 🚀
+        
         Best regards,
         The RHS Coding Club Team
+        
+        --
+        © ${new Date().getFullYear()} RHS Coding Club
+        Website: ${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}
       `,
     };
 
     return this.sendTransactionalEmail(welcomeEmailData);
+  }
+
+  /**
+   * Send welcome email to newsletter subscribers
+   */
+  async sendNewsletterWelcomeEmail(email: string): Promise<boolean> {
+    const welcomeEmailData: TransactionalEmail = {
+      to: [{ email }],
+      subject: 'Welcome to RHS Coding Club Newsletter! 🚀',
+      htmlContent: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to RHS Coding Club Newsletter</title>
+            <style>
+                body { 
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+                    background-color: #fafafa; 
+                    color: #0a0a0a; 
+                    margin: 0; 
+                    padding: 0; 
+                    line-height: 1.6;
+                }
+                .container { 
+                    max-width: 600px; 
+                    margin: 20px auto; 
+                    background-color: #ffffff; 
+                    border-radius: 8px; 
+                    overflow: hidden; 
+                    border: 1px solid #e4e4e7; 
+                    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+                }
+                .header { 
+                    background-color: #0a0a0a; 
+                    color: #fafafa; 
+                    padding: 32px 24px; 
+                    text-align: center; 
+                }
+                .header h1 { 
+                    margin: 0; 
+                    font-size: 28px; 
+                    font-weight: 600; 
+                    letter-spacing: -0.025em;
+                }
+                .header p { 
+                    margin: 8px 0 0 0; 
+                    font-size: 16px; 
+                    opacity: 0.8; 
+                    color: #a1a1aa;
+                }
+                .content { 
+                    padding: 32px 24px; 
+                }
+                .content h2 { 
+                    font-size: 24px; 
+                    margin-top: 0; 
+                    margin-bottom: 16px; 
+                    color: #0a0a0a; 
+                    font-weight: 600;
+                }
+                .content p { 
+                    font-size: 16px; 
+                    line-height: 1.6; 
+                    margin-bottom: 16px; 
+                    color: #52525b;
+                }
+                .features { 
+                    background-color: #f4f4f5; 
+                    border: 1px solid #e4e4e7;
+                    border-radius: 8px; 
+                    padding: 24px; 
+                    margin: 24px 0; 
+                }
+                .features h3 {
+                    margin-top: 0; 
+                    color: #0a0a0a; 
+                    font-size: 18px;
+                    font-weight: 600;
+                }
+                .feature-list { 
+                    list-style: none; 
+                    padding: 0; 
+                    margin: 0; 
+                }
+                .feature-list li { 
+                    padding: 8px 0; 
+                    font-size: 15px; 
+                    display: flex; 
+                    align-items: center; 
+                    color: #52525b;
+                }
+                .feature-list li::before { 
+                    content: "•"; 
+                    margin-right: 12px; 
+                    font-size: 16px; 
+                    color: #0a0a0a;
+                    font-weight: bold;
+                }
+                .cta-section { 
+                    text-align: center; 
+                    margin: 32px 0; 
+                }
+                .cta-button { 
+                    background-color: #0a0a0a; 
+                    color: #fafafa !important; 
+                    padding: 12px 24px; 
+                    text-decoration: none; 
+                    border-radius: 6px; 
+                    font-weight: 500; 
+                    display: inline-block; 
+                    border: 1px solid #0a0a0a;
+                    transition: all 0.2s ease;
+                }
+                .cta-button:hover {
+                    background-color: #18181b;
+                    border-color: #18181b;
+                }
+                .footer { 
+                    background-color: #f4f4f5; 
+                    padding: 24px; 
+                    text-align: center; 
+                    font-size: 14px; 
+                    color: #71717a; 
+                    border-top: 1px solid #e4e4e7; 
+                }
+                .footer a { 
+                    color: #0a0a0a; 
+                    text-decoration: none; 
+                    font-weight: 500;
+                }
+                .footer a:hover {
+                    text-decoration: underline;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🎉 Welcome to Our Newsletter!</h1>
+                    <p>You're now part of the RHS Coding Club community</p>
+                </div>
+                <div class="content">
+                    <h2>Thanks for subscribing!</h2>
+                    <p>We're thrilled to have you join our community of passionate student developers at Ripon High School.</p>
+                    
+                    <div class="features">
+                        <h3>What you'll receive:</h3>
+                        <ul class="feature-list">
+                            <li>Updates on upcoming coding workshops and events</li>
+                            <li>New coding challenges and competitions</li>
+                            <li>Featured student projects and achievements</li>
+                            <li>Programming tips and learning resources</li>
+                            <li>Club meeting reminders and announcements</li>
+                        </ul>
+                    </div>
+
+                    <p>Want to get more involved? Consider joining our club officially!</p>
+                    
+                    <div class="cta-section">
+                        <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/join" class="cta-button">Join RHS Coding Club</a>
+                    </div>
+
+                    <p>Follow us on our journey as we learn, build, and code together!</p>
+                </div>
+                <div class="footer">
+                    <p>© ${new Date().getFullYear()} RHS Coding Club. All rights reserved.</p>
+                    <p>
+                        <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}">Visit our website</a> |
+                        <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/contact">Contact us</a>
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #e4e4e7; margin: 16px 0;">
+                    <p style="font-size: 12px; color: #a1a1aa;">
+                        You received this email because you subscribed to the RHS Coding Club newsletter.<br>
+                        <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/newsletter-unsubscribe?email=${encodeURIComponent(email)}" style="color: #71717a; text-decoration: underline;">Unsubscribe</a> | 
+                        <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/newsletter/unsubscribe" style="color: #71717a; text-decoration: underline;">Manage preferences</a>
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+      `,
+      textContent: `
+        🎉 Welcome to RHS Coding Club Newsletter!
+
+        Thanks for subscribing!
+
+        We're thrilled to have you join our community of passionate student developers at Richmond High School.
+
+        What you'll receive:
+        ✨ Updates on upcoming coding workshops and events
+        ✨ New coding challenges and competitions  
+        ✨ Featured student projects and achievements
+        ✨ Programming tips and learning resources
+        ✨ Club meeting reminders and announcements
+
+        Want to get more involved? Consider joining our club officially!
+        Visit: ${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/join
+
+        Follow us on our journey as we learn, build, and code together!
+
+        Best regards,
+        The RHS Coding Club Team
+
+        --
+        © ${new Date().getFullYear()} RHS Coding Club
+        Website: ${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}
+      `,
+    };
+
+    return this.sendTransactionalEmail(welcomeEmailData);
+  }
+
+  /**
+   * Send new challenge notification to newsletter subscribers
+   */
+  async sendNewChallengeNotification(
+    subscriberEmails: string[],
+    challengeTitle: string,
+    challengeDescription: string,
+    challengeDifficulty: string,
+    challengePoints: number,
+    challengeUrl: string
+  ): Promise<boolean> {
+    const emailPromises = subscriberEmails.map(email => {
+      const notificationEmailData: TransactionalEmail = {
+        to: [{ email }],
+        subject: `🚀 New Coding Challenge: ${challengeTitle}`,
+        htmlContent: `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>New Coding Challenge</title>
+              <style>
+                  body { 
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+                      background-color: #fafafa; 
+                      color: #0a0a0a; 
+                      margin: 0; 
+                      padding: 0; 
+                      line-height: 1.6;
+                  }
+                  .container { 
+                      max-width: 600px; 
+                      margin: 20px auto; 
+                      background-color: #ffffff; 
+                      border-radius: 8px; 
+                      overflow: hidden; 
+                      border: 1px solid #e4e4e7; 
+                      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+                  }
+                  .header { 
+                      background-color: #0a0a0a; 
+                      color: #fafafa; 
+                      padding: 32px 24px; 
+                      text-align: center; 
+                  }
+                  .header h1 { 
+                      margin: 0; 
+                      font-size: 28px; 
+                      font-weight: 600; 
+                      letter-spacing: -0.025em;
+                  }
+                  .content { 
+                      padding: 32px 24px; 
+                  }
+                  .challenge-card {
+                      background-color: #f4f4f5;
+                      border: 1px solid #e4e4e7;
+                      border-radius: 8px;
+                      padding: 24px;
+                      margin: 24px 0;
+                  }
+                  .difficulty-badge {
+                      display: inline-block;
+                      padding: 4px 12px;
+                      border-radius: 16px;
+                      font-size: 12px;
+                      font-weight: 500;
+                      text-transform: uppercase;
+                      margin-bottom: 16px;
+                  }
+                  .difficulty-easy { background-color: #dcfce7; color: #166534; }
+                  .difficulty-medium { background-color: #fef3c7; color: #92400e; }
+                  .difficulty-hard { background-color: #fecaca; color: #dc2626; }
+                  .cta-button { 
+                      background-color: #0a0a0a; 
+                      color: #fafafa !important; 
+                      padding: 12px 24px; 
+                      text-decoration: none; 
+                      border-radius: 6px; 
+                      font-weight: 500; 
+                      display: inline-block; 
+                      margin: 16px 0;
+                  }
+                  .footer { 
+                      background-color: #f4f4f5; 
+                      padding: 24px; 
+                      text-align: center; 
+                      font-size: 14px; 
+                      color: #71717a; 
+                      border-top: 1px solid #e4e4e7; 
+                  }
+                  .footer a { 
+                      color: #0a0a0a; 
+                      text-decoration: none; 
+                      font-weight: 500;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="header">
+                      <h1>🚀 New Coding Challenge!</h1>
+                  </div>
+                  <div class="content">
+                      <h2>A new challenge is waiting for you!</h2>
+                      <p>Hey there, coder! We've just released a new coding challenge that we think you'll love.</p>
+                      
+                      <div class="challenge-card">
+                          <div class="difficulty-badge difficulty-${challengeDifficulty.toLowerCase()}">${challengeDifficulty}</div>
+                          <h3 style="margin: 0 0 8px 0; font-size: 20px; color: #0a0a0a;">${challengeTitle}</h3>
+                          <p style="margin: 0 0 16px 0; color: #52525b;">${challengeDescription}</p>
+                          <p style="margin: 0; font-weight: 600; color: #0a0a0a;">💎 ${challengePoints} points</p>
+                      </div>
+
+                      <p>Ready to test your skills? Click the button below to start the challenge!</p>
+                      
+                      <div style="text-align: center;">
+                          <a href="${challengeUrl}" class="cta-button">Start Challenge</a>
+                      </div>
+
+                      <p>Good luck, and happy coding! 🎯</p>
+                  </div>
+                  <div class="footer">
+                      <p>© ${new Date().getFullYear()} RHS Coding Club. All rights reserved.</p>
+                      <p>
+                          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}">Visit our website</a> |
+                          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/contact">Contact us</a>
+                      </p>
+                      <hr style="border: none; border-top: 1px solid #e4e4e7; margin: 16px 0;">
+                      <p style="font-size: 12px; color: #a1a1aa;">
+                          You received this email because you subscribed to the RHS Coding Club newsletter.<br>
+                          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/newsletter-unsubscribe?email=${encodeURIComponent(email)}" style="color: #71717a; text-decoration: underline;">Unsubscribe</a> | 
+                          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/newsletter/unsubscribe" style="color: #71717a; text-decoration: underline;">Manage preferences</a>
+                      </p>
+                  </div>
+              </div>
+          </body>
+          </html>
+        `,
+        textContent: `
+          🚀 New Coding Challenge: ${challengeTitle}
+
+          A new challenge is waiting for you!
+
+          Hey there, coder! We've just released a new coding challenge that we think you'll love.
+
+          Challenge: ${challengeTitle}
+          Difficulty: ${challengeDifficulty}
+          Points: ${challengePoints}
+          Description: ${challengeDescription}
+
+          Ready to test your skills? Visit: ${challengeUrl}
+
+          Good luck, and happy coding! 🎯
+
+          --
+          © ${new Date().getFullYear()} RHS Coding Club
+          Website: ${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}
+
+          You received this email because you subscribed to the RHS Coding Club newsletter.
+          Unsubscribe: ${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/newsletter-unsubscribe?email=${encodeURIComponent(email)}
+        `,
+      };
+
+      return this.sendTransactionalEmail(notificationEmailData);
+    });
+
+    try {
+      const results = await Promise.allSettled(emailPromises);
+      const successCount = results.filter(result => result.status === 'fulfilled' && result.value).length;
+      
+      return successCount > 0;
+    } catch (error) {
+      console.error('Error sending challenge notifications:', error);
+      return false;
+    }
   }
 
   /**
@@ -157,27 +735,106 @@ class BrevoService {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>New Contact Form Submission</title>
             <style>
-                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f7; color: #333; margin: 0; padding: 0; }
-                .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
-                .header { background-color: #4f46e5; color: #ffffff; padding: 24px; text-align: center; }
-                .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
-                .content { padding: 32px; }
-                .content h2 { font-size: 20px; margin-top: 0; margin-bottom: 16px; color: #4f46e5; }
-                .info-table { width: 100%; margin-bottom: 24px; border-collapse: collapse; }
-                .info-table td { padding: 8px 0; vertical-align: top; }
-                .info-table td:first-child { font-weight: 600; color: #4a5568; width: 80px; }
-                .message-box { background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; white-space: pre-wrap; word-wrap: break-word; font-size: 15px; line-height: 1.6; }
-                .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; border-top: 1px solid #e2e8f0; }
-                a { color: #4f46e5; text-decoration: none; }
+                body { 
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+                    background-color: #fafafa; 
+                    color: #0a0a0a; 
+                    margin: 0; 
+                    padding: 0; 
+                    line-height: 1.6;
+                }
+                .container { 
+                    max-width: 600px; 
+                    margin: 20px auto; 
+                    background-color: #ffffff; 
+                    border-radius: 8px; 
+                    overflow: hidden; 
+                    border: 1px solid #e4e4e7; 
+                    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+                }
+                .header { 
+                    background-color: #0a0a0a; 
+                    color: #fafafa; 
+                    padding: 32px 24px; 
+                    text-align: center; 
+                }
+                .header h1 { 
+                    margin: 0; 
+                    font-size: 28px; 
+                    font-weight: 600; 
+                    letter-spacing: -0.025em;
+                }
+                .content { 
+                    padding: 32px 24px; 
+                }
+                .content h2 { 
+                    font-size: 20px; 
+                    margin-top: 0; 
+                    margin-bottom: 16px; 
+                    color: #0a0a0a; 
+                    font-weight: 600;
+                }
+                .info-table { 
+                    width: 100%; 
+                    margin-bottom: 24px; 
+                    border-collapse: collapse; 
+                    background-color: #f4f4f5;
+                    border: 1px solid #e4e4e7;
+                    border-radius: 8px;
+                    overflow: hidden;
+                }
+                .info-table td { 
+                    padding: 12px 16px; 
+                    vertical-align: top; 
+                }
+                .info-table td:first-child { 
+                    font-weight: 600; 
+                    color: #0a0a0a; 
+                    width: 100px; 
+                    background-color: #f9fafb;
+                }
+                .info-table td:last-child {
+                    color: #52525b;
+                }
+                .info-table tr:not(:last-child) td {
+                    border-bottom: 1px solid #e4e4e7;
+                }
+                .message-box { 
+                    background-color: #f4f4f5; 
+                    border: 1px solid #e4e4e7; 
+                    border-radius: 8px; 
+                    padding: 20px; 
+                    white-space: pre-wrap; 
+                    word-wrap: break-word; 
+                    font-size: 15px; 
+                    line-height: 1.6; 
+                    color: #52525b;
+                }
+                .footer { 
+                    background-color: #f4f4f5; 
+                    padding: 24px; 
+                    text-align: center; 
+                    font-size: 14px; 
+                    color: #71717a; 
+                    border-top: 1px solid #e4e4e7; 
+                }
+                .footer a { 
+                    color: #0a0a0a; 
+                    text-decoration: none; 
+                    font-weight: 500;
+                }
+                .footer a:hover {
+                    text-decoration: underline;
+                }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>New Website Message</h1>
+                    <h1>📧 New Website Message</h1>
                 </div>
                 <div class="content">
-                    <h2>Submission Details</h2>
+                    <h2>Contact Form Submission</h2>
                     <table class="info-table">
                         <tr>
                             <td>From:</td>
@@ -185,7 +842,7 @@ class BrevoService {
                         </tr>
                         <tr>
                             <td>Email:</td>
-                            <td><a href="mailto:${senderEmail}">${senderEmail}</a></td>
+                            <td><a href="mailto:${senderEmail}" style="color: #0a0a0a; font-weight: 500;">${senderEmail}</a></td>
                         </tr>
                         <tr>
                             <td>Subject:</td>
@@ -206,18 +863,186 @@ class BrevoService {
         </html>
       `,
       textContent: `
-        New Contact Form Submission
+        📧 New Contact Form Submission
         
         From: ${senderName} (${senderEmail})
         Subject: ${subject}
         
         Message:
         ${message}
+        
+        --
+        This email was sent from the contact form on the RHS Coding Club website.
+        © ${new Date().getFullYear()} RHS Coding Club. All rights reserved.
       `,
       replyTo: { email: senderEmail, name: senderName },
     };
 
     return this.sendTransactionalEmail(notificationEmailData);
+  }
+
+  /**
+   * Send a custom newsletter to multiple recipients
+   */
+  async sendCustomNewsletter(recipients: string[], subject: string, message: string): Promise<boolean> {
+    if (!this.apiKey) {
+      console.error('BREVO_API_KEY is not configured');
+      return false;
+    }
+
+    try {
+      // Create newsletter-style HTML content
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${subject}</title>
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                    background-color: #fafafa;
+                    color: #0a0a0a;
+                    margin: 0;
+                    padding: 0;
+                    line-height: 1.6;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 20px auto;
+                    background-color: #ffffff;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    border: 1px solid #e4e4e7;
+                    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+                }
+                .header {
+                    background-color: #0a0a0a;
+                    color: #fafafa;
+                    text-align: center;
+                    padding: 32px 24px;
+                }
+                .header h1 {
+                    margin: 0;
+                    font-size: 28px;
+                    font-weight: 600;
+                    letter-spacing: -0.025em;
+                }
+                .header p {
+                    margin: 8px 0 0 0;
+                    font-size: 16px;
+                    opacity: 0.8;
+                    color: #a1a1aa;
+                }
+                .content {
+                    padding: 32px 24px;
+                }
+                .subject {
+                    font-size: 24px;
+                    font-weight: 600;
+                    color: #0a0a0a;
+                    margin-bottom: 24px;
+                    text-align: center;
+                    line-height: 1.3;
+                }
+                .message {
+                    font-size: 16px;
+                    line-height: 1.6;
+                    color: #52525b;
+                    white-space: pre-wrap;
+                    margin-bottom: 32px;
+                    background-color: #f4f4f5;
+                    border: 1px solid #e4e4e7;
+                    border-radius: 8px;
+                    padding: 24px;
+                }
+                .footer {
+                    background-color: #f4f4f5;
+                    text-align: center;
+                    padding: 24px;
+                    border-top: 1px solid #e4e4e7;
+                }
+                .footer p {
+                    margin: 0;
+                    color: #71717a;
+                    font-size: 14px;
+                }
+                .footer a {
+                    color: #0a0a0a;
+                    text-decoration: none;
+                    font-weight: 500;
+                }
+                .footer a:hover {
+                    text-decoration: underline;
+                }
+                .unsubscribe {
+                    margin-top: 16px;
+                    padding-top: 16px;
+                    border-top: 1px solid #e4e4e7;
+                }
+                .unsubscribe a {
+                    color: #71717a;
+                    font-size: 12px;
+                    text-decoration: underline;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>� RHS Coding Club Newsletter</h1>
+                    <p>Stay updated with the latest from our community</p>
+                </div>
+                <div class="content">
+                    <div class="subject">${subject}</div>
+                    <div class="message">${message}</div>
+                </div>
+                <div class="footer">
+                    <p>&copy; ${new Date().getFullYear()} RHS Coding Club. All rights reserved.</p>
+                    <p>
+                        <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}">Visit our website</a> |
+                        <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/contact">Contact us</a>
+                    </p>
+                    <div class="unsubscribe">
+                        <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/newsletter/unsubscribe">Unsubscribe from newsletter</a>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+      `;
+
+      // Create plain text version
+      const textContent = `
+        📧 RHS Coding Club Newsletter
+        
+        ${subject}
+        
+        ${message}
+        
+        ---
+        
+        © ${new Date().getFullYear()} RHS Coding Club. All rights reserved.
+        
+        Website: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}
+        To unsubscribe: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/newsletter/unsubscribe
+      `;
+
+      // Send email to all recipients
+      const emailData: TransactionalEmail = {
+        to: recipients.map(email => ({ email })),
+        subject: `📧 ${subject}`,
+        htmlContent,
+        textContent,
+        sender: { email: this.senderEmail, name: this.senderName },
+      };
+
+      return this.sendTransactionalEmail(emailData);
+    } catch (error) {
+      console.error('Error sending custom newsletter:', error);
+      return false;
+    }
   }
 }
 

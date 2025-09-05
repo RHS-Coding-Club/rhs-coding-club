@@ -7,6 +7,7 @@ import { PendingMember } from '@/lib/firebase-collections';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { brevoService } from '@/lib/brevo';
 import { Check, X } from 'lucide-react';
 
 export function PendingMemberManagement() {
@@ -54,6 +55,9 @@ export function PendingMemberManagement() {
       batch.update(pendingMemberRef, { status: 'approved' });
 
       await batch.commit();
+
+      // 3. Send welcome email
+      await brevoService.sendWelcomeEmail(member.email, member.name);
       
       toast.success(`${member.name} has been approved as a member.`);
       fetchPendingMembers(); // Refresh the list

@@ -83,11 +83,42 @@ export function ChallengeManagement({ challenges, onChallengeUpdate }: Challenge
         await challengesService.updateChallenge(editingChallenge.id, formData);
         toast.success('Challenge updated successfully');
       } else {
-        await challengesService.createChallenge({
+        const newChallengeId = await challengesService.createChallenge({
           ...formData,
           createdBy: userProfile.uid,
         });
-        toast.success('Challenge created successfully');
+        
+        // Send newsletter notification if challenge is published
+        if (formData.published && newChallengeId) {
+          try {
+            const challengeUrl = `${window.location.origin}/challenges/${newChallengeId}`;
+            const response = await fetch('/api/send-challenge-notification', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                challengeTitle: formData.title,
+                challengeDescription: formData.description,
+                challengeDifficulty: formData.difficulty,
+                challengePoints: formData.points,
+                challengeUrl,
+              }),
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              toast.success(`Challenge created and ${data.message}`);
+            } else {
+              toast.success('Challenge created successfully (notification failed to send)');
+            }
+          } catch (notificationError) {
+            console.error('Failed to send challenge notification:', notificationError);
+            toast.success('Challenge created successfully (notification failed to send)');
+          }
+        } else {
+          toast.success('Challenge created successfully');
+        }
       }
       
       setIsCreateDialogOpen(false);

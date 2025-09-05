@@ -44,6 +44,7 @@ import { Officer } from '@/lib/firebase-collections';
 import { ProjectManagement } from '@/components/admin/project-management';
 import { ResourceManagement } from '@/components/admin/resource-management';
 import { BlogManagement } from '@/components/admin/blog-management';
+import { NewsletterManagement } from '@/components/admin/newsletter-management';
 import { projectService } from '@/lib/services/projects';
 import { PendingMemberManagement } from '@/components/admin/pending-member-management';
 
@@ -464,6 +465,7 @@ export default function AdminPage() {
                 <TabsTrigger value="membership">Membership</TabsTrigger>
                 <TabsTrigger value="officers">Officers</TabsTrigger>
                 <TabsTrigger value="blog">Blog</TabsTrigger>
+                <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
                 <TabsTrigger value="projects">Projects</TabsTrigger>
                 <TabsTrigger value="resources">Resources</TabsTrigger>
                 <TabsTrigger value="events">Events</TabsTrigger>
@@ -935,6 +937,10 @@ export default function AdminPage() {
 
               <TabsContent value="blog" className="space-y-6">
                 <BlogManagement />
+              </TabsContent>
+
+              <TabsContent value="newsletter" className="space-y-6">
+                <NewsletterManagement />
               </TabsContent>
 
               <TabsContent value="projects" className="space-y-6">

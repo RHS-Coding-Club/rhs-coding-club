@@ -1,4 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
+import { collection } from 'firebase/firestore';
+import { db } from './firebase';
+
 
 export interface User {
   id: string;
@@ -142,3 +145,11 @@ export interface Attendance {
   userId: string;
   present: boolean;
 }
+
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  subscribedAt: Timestamp;
+}
+
+export const newsletterSubscribersCollection = collection(db, 'newsletterSubscribers');
