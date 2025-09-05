@@ -6,7 +6,7 @@ import { Container } from '@/components/container';
 import { ServerCrash, Home, RefreshCw } from 'lucide-react';
 
 export default function GlobalError({
-  error: _error,
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -17,6 +17,10 @@ export default function GlobalError({
       <body>
         <Container className="flex min-h-screen items-center justify-center">
           <div className="text-center space-y-6 max-w-lg mx-auto px-4">
+            {/* Error digest for debugging (visually hidden) */}
+            {error?.digest ? (
+              <span className="sr-only">Error digest: {error.digest}</span>
+            ) : null}
             {/* Server error icon */}
             <div className="flex justify-center">
               <div className="relative">

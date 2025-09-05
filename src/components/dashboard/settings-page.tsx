@@ -28,6 +28,9 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
+  const getErrorMessage = (err: unknown) =>
+    err instanceof Error ? err.message : 'An unexpected error occurred';
+
   // Set default values when userProfile is available
   useEffect(() => {
     if (userProfile) {
@@ -58,8 +61,8 @@ export default function SettingsPage() {
       await updateProfile(user, { displayName, photoURL });
       await updateDoc(doc(db, 'users', user.uid), { displayName, photoURL });
       toast.success('Profile updated successfully!');
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to update profile');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to update profile');
     }
     setLoading(false);
   };
@@ -85,8 +88,8 @@ export default function SettingsPage() {
       toast.success('Password updated successfully!');
       setPassword('');
       setConfirmPassword('');
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to update password');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to update password');
     }
     setLoading(false);
   };
@@ -118,8 +121,8 @@ export default function SettingsPage() {
       await updateProfile(user, { photoURL: url });
       await updateDoc(doc(db, 'users', user.uid), { photoURL: url });
       toast.success('Profile picture updated!');
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to upload profile picture');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to upload profile picture');
     }
     setUploadingPhoto(false);
   };

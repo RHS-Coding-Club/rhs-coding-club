@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, query, where, orderBy, limit, getDocs, getDoc, doc } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/auth-context';
-import { Event, Project, Challenge, Submission, Attendance } from '@/lib/firebase-collections';
+import { Event, Project, Submission } from '@/lib/firebase-collections';
 
 interface DashboardStats {
   eventsAttended: number;

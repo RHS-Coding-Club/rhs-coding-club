@@ -3,12 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Clock, ArrowRight } from 'lucide-react';
+import { Calendar, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNextEvent } from '@/hooks/useNextEvent';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 
 export function NextEventBanner() {
   const { nextEvent, loading, error } = useNextEvent();
@@ -18,79 +18,79 @@ export function NextEventBanner() {
   }
 
   const isWithinWeek = nextEvent.date.getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000;
+  const isToday = new Date().toDateString() === nextEvent.date.toDateString();
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.1 }}
-      className="mb-8"
+      className="mb-6"
     >
-      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20 overflow-hidden">
-        <CardContent className="p-4 md:p-6">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-3">
-                <Calendar className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Next Event</span>
-                {isWithinWeek && (
-                  <Badge variant="destructive" className="text-xs">
-                    This Week!
-                  </Badge>
-                )}
+      <Card className={`overflow-hidden transition-all duration-200 hover:shadow-md ${
+        isToday 
+          ? 'bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700' 
+          : isWithinWeek 
+            ? 'bg-gradient-to-r from-primary/8 to-primary/12 border-primary/30'
+            : 'bg-gradient-to-r from-primary/5 to-primary/8 border-primary/20'
+      }`}>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className={`p-2 rounded-full ${
+                isToday 
+                  ? 'bg-gray-100 dark:bg-gray-800' 
+                  : 'bg-primary/10'
+              }`}>
+                <Calendar className={`h-4 w-4 ${
+                  isToday 
+                    ? 'text-gray-600 dark:text-gray-400' 
+                    : 'text-primary'
+                }`} />
               </div>
               
-              <h3 className="text-lg md:text-xl font-bold mb-2">{nextEvent.title}</h3>
-              
-              <p className="text-muted-foreground mb-4 line-clamp-2 text-sm md:text-base">
-                {nextEvent.description}
-              </p>
-              
-              <div className="flex flex-col md:flex-row md:flex-wrap gap-2 md:gap-4 text-sm text-muted-foreground mb-4">
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  <span>{format(nextEvent.date, 'PPP')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>{nextEvent.location}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>{formatDistanceToNow(nextEvent.date, { addSuffix: true })}</span>
-                </div>
-              </div>
-              
-              {nextEvent.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4 lg:mb-0">
-                  {nextEvent.tags.slice(0, 3).map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {tag}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    {isToday ? 'Today' : 'Next Event'}
+                  </span>
+                  {isToday && (
+                    <Badge variant="default" className="text-xs px-2 py-0 h-5 bg-gray-800 text-white dark:bg-white dark:text-gray-900">
+                      Today!
                     </Badge>
-                  ))}
-                  {nextEvent.tags.length > 3 && (
-                    <span className="text-xs text-muted-foreground">
-                      +{nextEvent.tags.length - 3} more
-                    </span>
+                  )}
+                  {!isToday && isWithinWeek && (
+                    <Badge variant="secondary" className="text-xs px-2 py-0 h-5 bg-primary/10 text-primary">
+                      This Week
+                    </Badge>
                   )}
                 </div>
-              )}
+                
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-foreground truncate">
+                    {nextEvent.title}
+                  </h3>
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">
+                    {formatDistanceToNow(nextEvent.date, { addSuffix: true })}
+                  </span>
+                </div>
+              </div>
             </div>
             
-            <div className="flex flex-row lg:flex-col gap-2 w-full lg:w-auto">
-              <Button size="sm" className="flex-1 lg:flex-none" asChild>
-                <Link href={`/events/${nextEvent.id}`}>
-                  <span className="hidden md:inline">View Details</span>
-                  <span className="md:hidden">Details</span>
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="sm" variant="outline" className="flex-1 lg:flex-none" asChild>
-                <Link href="/events">
-                  All Events
-                </Link>
-              </Button>
-            </div>
+            <Button 
+              size="sm" 
+              className={`shrink-0 ${
+                isToday 
+                  ? 'bg-gray-800 hover:bg-gray-900 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100' 
+                  : ''
+              }`}
+              asChild
+            >
+              <Link href={`/events/${nextEvent.id}`}>
+                {isToday ? 'Join Now' : 'Learn More'}
+                <ArrowRight className="ml-1 h-3 w-3" />
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
