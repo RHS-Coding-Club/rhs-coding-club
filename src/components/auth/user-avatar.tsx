@@ -129,9 +129,11 @@ export function UserAvatar() {
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem className="cursor-pointer px-3 py-2">
-            <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">Settings</span>
+          <DropdownMenuItem asChild className="cursor-pointer">
+            <Link href="/dashboard/settings" className="flex items-center px-3 py-2 rounded-md">
+              <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Settings</span>
+            </Link>
           </DropdownMenuItem>
         </div>
 

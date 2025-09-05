@@ -14,6 +14,11 @@ service firebase.storage {
         (firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['admin', 'officer']);
     }
     
+    // Profile pictures - users can only access their own
+    match /profile-pictures/{userId} {
+      allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
     // Default rule - deny access
     match /{allPaths=**} {
       allow read, write: if false;

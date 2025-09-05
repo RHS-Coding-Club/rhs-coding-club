@@ -11,6 +11,7 @@ import { Container } from '@/components/container';
 import { StructuredData } from '@/components/structured-data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HomepageLoading } from '@/components/homepage-loading';
+import { NextEventBanner } from '@/components/next-event-banner';
 import { useHomepageData } from '@/hooks/useHomepageData';
 import {
   Carousel,
@@ -58,6 +59,15 @@ export default function Home() {
                   Empowering student developers through collaboration, innovation, and hands-on learning. 
                   Join our community and take your coding skills to the next level.
                 </p>
+              </motion.div>
+
+              {/* Next Event Banner */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+              >
+                <NextEventBanner />
               </motion.div>
 
               <motion.div
