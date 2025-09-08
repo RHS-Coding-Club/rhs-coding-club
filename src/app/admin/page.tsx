@@ -45,6 +45,7 @@ import { ProjectManagement } from '@/components/admin/project-management';
 import { ResourceManagement } from '@/components/admin/resource-management';
 import { BlogManagement } from '@/components/admin/blog-management';
 import { NewsletterManagement } from '@/components/admin/newsletter-management';
+import { SubmissionReview } from '@/components/admin/submission-review';
 import { projectService } from '@/lib/services/projects';
 import { PendingMemberManagement } from '@/components/admin/pending-member-management';
 
@@ -464,6 +465,7 @@ export default function AdminPage() {
                 <TabsTrigger value="users">User Management</TabsTrigger>
                 <TabsTrigger value="membership">Membership</TabsTrigger>
                 <TabsTrigger value="officers">Officers</TabsTrigger>
+                <TabsTrigger value="submissions">Submissions</TabsTrigger>
                 <TabsTrigger value="blog">Blog</TabsTrigger>
                 <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
                 <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -845,7 +847,7 @@ export default function AdminPage() {
                                 ) : (
                                   <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 flex items-center justify-center border-2 border-gray-100 dark:border-gray-700">
                                     <span className="text-xl font-semibold text-blue-600 dark:text-blue-400">
-                                      {officer.name.split(' ').map(n => n[0]).join('')}
+                                      {officer.name ? officer.name.split(' ').map(n => n[0]).join('') : 'O'}
                                     </span>
                                   </div>
                                 )}
@@ -933,6 +935,10 @@ export default function AdminPage() {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="submissions" className="space-y-6">
+                <SubmissionReview />
               </TabsContent>
 
               <TabsContent value="blog" className="space-y-6">

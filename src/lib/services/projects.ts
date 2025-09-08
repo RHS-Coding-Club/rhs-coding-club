@@ -98,7 +98,7 @@ export class ProjectService {
         
         return {
           ...project,
-          authorName: authorData?.name || 'Unknown',
+          authorName: authorData?.displayName || authorData?.name || 'Unknown',
           authorEmail: authorData?.email || '',
         } as ProjectWithAuthor;
       })
@@ -130,7 +130,7 @@ export class ProjectService {
 
     return {
       ...project,
-      authorName: authorData?.name || 'Unknown',
+      authorName: authorData?.displayName || authorData?.name || 'Unknown',
       authorEmail: authorData?.email || '',
     } as ProjectWithAuthor;
   }

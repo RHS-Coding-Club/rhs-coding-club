@@ -5,10 +5,12 @@ import { db } from './firebase';
 
 export interface User {
   id: string;
-  name: string;
+  displayName: string;
+  name?: string; // Keep as optional for backward compatibility
   email: string;
   role: 'member' | 'officer' | 'admin';
   avatar?: string;
+  photoURL?: string;
   bio?: string;
   gradYear?: number;
   skills?: string[];

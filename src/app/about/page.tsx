@@ -141,9 +141,9 @@ export default function AboutPage() {
                     <CardHeader className="space-y-4">
                       <div className="flex justify-center">
                         <Avatar className="w-24 h-24">
-                          <AvatarImage src={officer.imageUrl} alt={officer.name} />
+                          <AvatarImage src={officer.imageUrl} alt={officer.name || 'Officer'} />
                           <AvatarFallback className="text-xl">
-                            {officer.name.split(' ').map(n => n[0]).join('')}
+                            {officer.name ? officer.name.split(' ').map(n => n[0]).join('') : 'O'}
                           </AvatarFallback>
                         </Avatar>
                       </div>

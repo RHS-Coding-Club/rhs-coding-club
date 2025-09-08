@@ -128,6 +128,7 @@ export const challengesService = {
     feedback?: string
   ): Promise<void> {
     return runTransaction(db, async (transaction) => {
+      // READ PHASE - All reads must happen first
       const submissionRef = doc(db, 'submissions', submissionId);
       const submissionDoc = await transaction.get(submissionRef);
       
@@ -137,6 +138,12 @@ export const challengesService = {
       
       const submission = submissionDoc.data() as Submission;
       
+      // Get user document for point updates
+      const userRef = doc(db, 'users', submission.userId);
+      const userDoc = await transaction.get(userRef);
+      
+      // WRITE PHASE - All writes must happen after reads
+      
       // Update submission
       transaction.update(submissionRef, {
         status,
@@ -145,28 +152,20 @@ export const challengesService = {
         feedback: feedback || null,
       });
       
-      // If status is 'pass', award points to user
-      if (status === 'pass' && submission.status !== 'pass') {
-        const userRef = doc(db, 'users', submission.userId);
-        const userDoc = await transaction.get(userRef);
+      // Handle point updates if user exists
+      if (userDoc.exists()) {
+        const userData = userDoc.data() as User;
+        const currentPoints = userData.points || 0;
         
-        if (userDoc.exists()) {
-          const userData = userDoc.data() as User;
-          const currentPoints = userData.points || 0;
+        // If status is 'pass' and submission wasn't already passed, award points
+        if (status === 'pass' && submission.status !== 'pass') {
           transaction.update(userRef, {
             points: currentPoints + submission.points
           });
         }
-      }
-      
-      // If changing from 'pass' to 'fail', deduct points
-      if (status === 'fail' && submission.status === 'pass') {
-        const userRef = doc(db, 'users', submission.userId);
-        const userDoc = await transaction.get(userRef);
         
-        if (userDoc.exists()) {
-          const userData = userDoc.data() as User;
-          const currentPoints = userData.points || 0;
+        // If changing from 'pass' to 'fail', deduct points
+        if (status === 'fail' && submission.status === 'pass') {
           transaction.update(userRef, {
             points: Math.max(0, currentPoints - submission.points)
           });
@@ -181,8 +180,7 @@ export const challengesService = {
     const q = query(
       usersRef,
       where('points', '>', 0),
-      orderBy('points', 'desc'),
-      ...(limit > 0 ? [orderBy('name')] : [])
+      orderBy('points', 'desc')
     );
     const snapshot = await getDocs(q);
     const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);

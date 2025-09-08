@@ -74,15 +74,22 @@ export function Leaderboard({ users, currentUserId }: LeaderboardProps) {
                 </div>
                 
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage src={user.avatar || user.photoURL} alt={user.displayName || user.name || user.email || 'User'} />
                   <AvatarFallback>
-                    {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    {(user.displayName || user.name)
+                      ? (user.displayName || user.name)!.split(' ').map(n => n[0]).join('').toUpperCase()
+                      : user.email 
+                        ? user.email.substring(0, 2).toUpperCase()
+                        : 'U'
+                    }
                   </AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium truncate">{user.name}</p>
+                    <p className="font-medium truncate">
+                      {user.displayName || user.name || user.email?.split('@')[0] || `User ${user.id.substring(0, 6)}`}
+                    </p>
                     {isCurrentUser && <Badge variant="secondary">You</Badge>}
                   </div>
                   {user.gradYear && (
