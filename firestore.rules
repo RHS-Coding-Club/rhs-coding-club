@@ -47,7 +47,8 @@ service cloud.firestore {
     match /submissions/{submissionId} {
       allow read: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
       allow create: if request.auth.uid == request.resource.data.userId;
-      allow update: if request.auth.uid == resource.data.userId;
+  // Allow the owner or an admin/officer to update (e.g., mark pass/fail, add feedback)
+  allow update: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
       allow delete: if false;
     }
 

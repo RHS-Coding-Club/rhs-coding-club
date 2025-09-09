@@ -28,7 +28,7 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-responsive-2xl font-semibold mb-4">Membership Requirements</h2>
           <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li>Must be a current Richmond High School student</li>
+            <li>Must be a current Ripon High School student</li>
             <li>Must maintain good academic standing</li>
             <li>Must follow school policies and club guidelines</li>
             <li>Must treat all members with respect and kindness</li>
