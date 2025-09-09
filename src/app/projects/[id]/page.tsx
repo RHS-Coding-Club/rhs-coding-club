@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, use } from 'react';
+import { use } from 'react';
 import { Container } from '@/components/container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

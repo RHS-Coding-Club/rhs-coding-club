@@ -72,6 +72,7 @@ interface User {
   role: UserRole;
   createdAt: Date | null;
   lastLoginAt: Date | null;
+  photoURL?: string;
 }
 
 interface OfficerFormData {
@@ -97,6 +98,9 @@ export default function AdminPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [activeSection, setActiveSection] = useState<string>('users');
+  const [userSearch, setUserSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
   const [officerForm, setOfficerForm] = useState<OfficerFormData>({
     name: '',
     role: '',
@@ -356,6 +360,31 @@ export default function AdminPage() {
     }
   };
 
+  const canEditRole = (target: User) => {
+    if (!userProfile) return false;
+    if (target.uid === userProfile.uid) return false; // no self-edit
+    if (userProfile.role === 'officer' && target.role === 'admin') return false; // officers cannot change admins
+    return true;
+  };
+
+  const getUserInitials = (name?: string, email?: string) => {
+    const source = (name && name.trim()) || (email && email.trim()) || '';
+    if (!source) return 'U';
+    const parts = source.split(/\s|\.|@|_/).filter(Boolean);
+    const first = parts[0]?.[0] || '';
+    const second = parts[1]?.[0] || '';
+    return (first + second).toUpperCase() || 'U';
+  };
+
+  const filteredUsers = users.filter((u) => {
+    const matchesRole = roleFilter === 'all' || u.role === roleFilter;
+    const q = userSearch.toLowerCase().trim();
+    const matchesQuery = !q ||
+      (u.displayName && u.displayName.toLowerCase().includes(q)) ||
+      (u.email && u.email.toLowerCase().includes(q));
+    return matchesRole && matchesQuery;
+  });
+
   useEffect(() => {
     fetchUsers();
     fetchOfficers();
@@ -391,7 +420,7 @@ export default function AdminPage() {
     <ProtectedRoute requiredRoles={['admin', 'officer']}>
       <div className="py-20">
         <Container>
-          <div className="max-w-6xl mx-auto space-y-8">
+          <div className="max-w-7xl mx-auto space-y-8">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-4xl font-bold flex items-center gap-2">
@@ -410,80 +439,174 @@ export default function AdminPage() {
               </Badge>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+            {/* Stats Cards - modernized */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card className="relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-primary/10" />
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm text-muted-foreground">Total Users</CardTitle>
+                    <div className="p-2 rounded-md bg-primary/10 text-primary"><Users className="h-4 w-4" /></div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{users.length}</div>
+                  <div className="text-3xl font-semibold">{users.length}</div>
+                  <p className="text-xs text-muted-foreground mt-1">Across all roles</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Admins</CardTitle>
-                  <Shield className="h-4 w-4 text-red-500" />
+              <Card className="relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-red-500/10" />
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm text-muted-foreground">Admins</CardTitle>
+                    <div className="p-2 rounded-md bg-red-500/10 text-red-600 dark:text-red-400"><Shield className="h-4 w-4" /></div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.admin}</div>
+                  <div className="text-3xl font-semibold">{stats.admin}</div>
+                  <p className="text-xs text-muted-foreground mt-1">Full access</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Officers</CardTitle>
-                  <UserCheck className="h-4 w-4 text-blue-500" />
+              <Card className="relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-500/10" />
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm text-muted-foreground">Officers</CardTitle>
+                    <div className="p-2 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400"><UserCheck className="h-4 w-4" /></div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.officer}</div>
+                  <div className="text-3xl font-semibold">{stats.officer}</div>
+                  <p className="text-xs text-muted-foreground mt-1">Operational team</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Members</CardTitle>
-                  <Users className="h-4 w-4 text-green-500" />
+              <Card className="relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-500/10" />
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm text-muted-foreground">Members</CardTitle>
+                    <div className="p-2 rounded-md bg-green-500/10 text-green-600 dark:text-green-400"><Users className="h-4 w-4" /></div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.member}</div>
+                  <div className="text-3xl font-semibold">{stats.member}</div>
+                  <p className="text-xs text-muted-foreground mt-1">Active participants</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Projects</CardTitle>
-                  <FolderOpen className="h-4 w-4 text-purple-500" />
+              <Card className="relative overflow-hidden sm:col-span-2 lg:col-span-4">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400"><FolderOpen className="h-4 w-4" /></div>
+                      <CardTitle className="text-sm text-muted-foreground">Projects</CardTitle>
+                    </div>
+                    <span className="text-xs text-muted-foreground">featured & pending</span>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{projectStats.total}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {projectStats.pending} pending, {projectStats.featured} featured
-                  </p>
+                  <div className="flex items-center gap-6">
+                    <div className="text-3xl font-semibold">{projectStats.total}</div>
+                    <div className="text-xs text-muted-foreground">{projectStats.pending} pending • {projectStats.featured} featured</div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
-            <Tabs defaultValue="users" className="space-y-6">
-              <TabsList>
-                <TabsTrigger value="users">User Management</TabsTrigger>
-                <TabsTrigger value="membership">Membership</TabsTrigger>
-                <TabsTrigger value="officers">Officers</TabsTrigger>
-                <TabsTrigger value="submissions">Submissions</TabsTrigger>
-                <TabsTrigger value="blog">Blog</TabsTrigger>
-                <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
-                <TabsTrigger value="projects">Projects</TabsTrigger>
-                <TabsTrigger value="resources">Resources</TabsTrigger>
-                <TabsTrigger value="events">Events</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
-              </TabsList>
+            {/* Responsive navigation: Tabs on mobile, sidebar on desktop */}
+            <div className="lg:grid lg:grid-cols-12 lg:gap-6">
+              {/* Mobile Tabs */}
+              <div className="lg:hidden">
+                <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
+                  <TabsList className="flex-wrap">
+                    <TabsTrigger value="users">User Management</TabsTrigger>
+                    <TabsTrigger value="membership">Membership</TabsTrigger>
+                    <TabsTrigger value="officers">Officers</TabsTrigger>
+                    <TabsTrigger value="submissions">Submissions</TabsTrigger>
+                    <TabsTrigger value="blog">Blog</TabsTrigger>
+                    <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
+                    <TabsTrigger value="projects">Projects</TabsTrigger>
+                    <TabsTrigger value="resources">Resources</TabsTrigger>
+                    <TabsTrigger value="events">Events</TabsTrigger>
+                    <TabsTrigger value="settings">Settings</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+
+              {/* Sidebar */}
+              <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
+                <Card className="sticky top-24">
+                  <CardContent className="p-3">
+                    <nav className="space-y-1">
+                      {[
+                        { key: 'users', label: 'User Management', icon: Users },
+                        { key: 'membership', label: 'Membership', icon: UserCheck },
+                        { key: 'officers', label: 'Officers', icon: Users },
+                        { key: 'submissions', label: 'Submissions', icon: Eye },
+                        { key: 'blog', label: 'Blog', icon: Edit },
+                        { key: 'newsletter', label: 'Newsletter', icon: Mail },
+                        { key: 'projects', label: 'Projects', icon: FolderOpen },
+                        { key: 'resources', label: 'Resources', icon: FolderOpen },
+                        { key: 'events', label: 'Events', icon: Calendar },
+                        { key: 'settings', label: 'Settings', icon: Settings },
+                      ].map(({ key, label, icon: Icon }) => (
+                        <button
+                          key={key}
+                          onClick={() => setActiveSection(key)}
+                          className={`w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                            activeSection === key
+                              ? 'bg-primary/10 text-primary'
+                              : 'hover:bg-muted text-foreground'
+                          }`}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span>{label}</span>
+                        </button>
+                      ))}
+                    </nav>
+                  </CardContent>
+                </Card>
+              </aside>
+
+              {/* Content area */}
+              <div className="lg:col-span-9 xl:col-span-10 space-y-6 mt-6 lg:mt-0">
+                <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
+                  <TabsList className="lg:hidden" />
 
               <TabsContent value="users" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>User Management</CardTitle>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <CardTitle>User Management</CardTitle>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="md:col-span-2">
+                          <Input
+                            placeholder="Search by name or email..."
+                            value={userSearch}
+                            onChange={(e) => setUserSearch(e.target.value)}
+                          />
+                        </div>
+                        <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as UserRole | 'all')}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Filter by role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Roles</SelectItem>
+                            <SelectItem value="guest">Guest</SelectItem>
+                            <SelectItem value="member">Member</SelectItem>
+                            <SelectItem value="officer">Officer</SelectItem>
+                            {userProfile?.role === 'admin' && (
+                              <SelectItem value="admin">Admin</SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     {loading ? (
@@ -493,16 +616,26 @@ export default function AdminPage() {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {users.map((user) => (
+                        {filteredUsers.map((user) => (
                           <div
                             key={user.uid}
-                            className="flex items-center justify-between p-4 border rounded-lg"
+                            className="flex items-center justify-between p-4 border rounded-lg bg-card"
                           >
                             <div className="flex-1">
-                              <div className="flex items-center gap-3">
-                                <div>
-                                  <p className="font-medium">{user.displayName}</p>
-                                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                              <div className="flex items-center gap-4">
+                                {/* Avatar */}
+                                {user.photoURL ? (
+                                  <img src={user.photoURL} alt={user.displayName} className="h-10 w-10 rounded-full object-cover border" />
+                                ) : (
+                                  <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center border">
+                                    <span className="text-sm font-semibold">
+                                      {getUserInitials(user.displayName, user.email)}
+                                    </span>
+                                  </div>
+                                )}
+                                <div className="min-w-0">
+                                  <p className="font-medium truncate">{user.displayName || 'Unnamed User'}</p>
+                                  <p className="text-sm text-muted-foreground truncate">{user.email}</p>
                                 </div>
                                 <Badge className={getRoleColor(user.role)}>
                                   {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
@@ -516,9 +649,9 @@ export default function AdminPage() {
                               <Select
                                 value={user.role}
                                 onValueChange={(value: UserRole) => updateUserRole(user.uid, value)}
-                                disabled={updating === user.uid}
+                                disabled={updating === user.uid || !canEditRole(user)}
                               >
-                                <SelectTrigger className="w-32">
+                                <SelectTrigger className="w-36">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -998,7 +1131,9 @@ export default function AdminPage() {
                   </CardContent>
                 </Card>
               </TabsContent>
-            </Tabs>
+                </Tabs>
+              </div>
+            </div>
           </div>
         </Container>
       </div>
