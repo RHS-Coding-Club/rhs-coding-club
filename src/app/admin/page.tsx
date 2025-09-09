@@ -333,6 +333,12 @@ export default function AdminPage() {
       return;
     }
 
+    const targetUser = users.find(u => u.uid === uid);
+    if (userProfile?.role === 'officer' && targetUser?.role === 'admin') {
+        alert("Officers cannot change the role of an admin.");
+        return;
+    }
+
     setUpdating(uid);
     try {
       const userRef = doc(db, 'users', uid);

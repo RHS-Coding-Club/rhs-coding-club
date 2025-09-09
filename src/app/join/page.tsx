@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { CheckCircle, Code, Users, Zap } from 'lucide-react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
 
@@ -46,6 +46,24 @@ export default function JoinPage() {
 		}
 		setIsSubmitting(true);
 		try {
+			const existingPendingMemberQuery = query(collection(db, 'pendingMembers'), where('email', '==', email));
+			const existingUserQuery = query(collection(db, 'users'), where('email', '==', email));
+
+			const [pendingSnapshot, userSnapshot] = await Promise.all([
+				getDocs(existingPendingMemberQuery),
+				getDocs(existingUserQuery)
+			]);
+
+			if (!pendingSnapshot.empty) {
+				toast.error('You have already submitted an application with this email.');
+				return;
+			}
+
+			if (!userSnapshot.empty) {
+				toast.error('An account with this email already exists.');
+				return;
+			}
+
 			await addDoc(collection(db, 'pendingMembers'), {
 				name,
 				email,
