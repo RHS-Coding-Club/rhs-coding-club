@@ -139,6 +139,14 @@ export function Footer() {
             © 2025 RHS Coding Club. All rights reserved.
           </p>
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm">
+            <a
+              href="https://github.com/JashanMaan28"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Built by Jashanpreet Singh
+            </a>
             <Link
               href="/privacy"
               className="text-muted-foreground hover:text-foreground transition-colors"
