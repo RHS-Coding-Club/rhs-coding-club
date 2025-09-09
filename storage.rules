@@ -18,6 +18,12 @@ service firebase.storage {
     match /profile-pictures/{userId} {
       allow read, write, delete: if request.auth != null && request.auth.uid == userId;
     }
+
+    // Project images
+    match /project-images/{userId}/{allPaths=**} {
+      allow read: if true; // Public read access for displaying images
+      allow write, delete: if request.auth != null && request.auth.uid == userId;
+    }
     
     // Default rule - deny access
     match /{allPaths=**} {

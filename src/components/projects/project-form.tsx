@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Plus, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { projectService, CreateProjectData } from '@/lib/services/projects';
+import { storage } from '@/lib/firebase';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { useAuth } from '@/contexts/auth-context';
 
 interface ProjectFormProps {
@@ -20,6 +22,7 @@ interface ProjectFormProps {
 export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -33,6 +36,7 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
     year: new Date().getFullYear(),
     newTech: ''
   });
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
@@ -75,20 +79,22 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
     }
   };
 
-  const handleImageAdd = (url: string) => {
-    if (url && !formData.images?.includes(url)) {
-      setFormData(prev => ({
-        ...prev,
-        images: [...(prev.images || []), url]
-      }));
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const validFiles = files.filter(file => {
+        const isImage = file.type.startsWith('image/');
+        const isNotTooLarge = file.size <= 5 * 1024 * 1024; // 5MB
+        if (!isImage) toast.error('Please select image files only.');
+        if (!isNotTooLarge) toast.error('File size must be less than 5MB.');
+        return isImage && isNotTooLarge;
+      });
+      setImageFiles(prev => [...prev, ...validFiles]);
     }
   };
 
-  const handleImageRemove = (url: string) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images?.filter(img => img !== url) || []
-    }));
+  const handleImageFileRemove = (fileToRemove: File) => {
+    setImageFiles(prev => prev.filter(file => file !== fileToRemove));
   };
 
   const validateForm = (): string | null => {
@@ -130,8 +136,20 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
     setErrorMessage('');
 
     try {
+      setIsUploading(true);
+      const uploadedImageUrls = await Promise.all(
+        imageFiles.map(async (file) => {
+          const storageRef = ref(storage, `project-images/${user.uid}/${Date.now()}-${file.name}`);
+          await uploadBytes(storageRef, file);
+          return getDownloadURL(storageRef);
+        })
+      );
+      setIsUploading(false);
+
+      const finalImages = [...(formData.images || []), ...uploadedImageUrls];
+      
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { newTech: _, ...projectData } = formData;
+      const { newTech: _, ...projectData } = { ...formData, images: finalImages };
       await projectService.createProject(projectData, user.uid);
       
       setSubmitStatus('success');
@@ -144,6 +162,7 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
+      setIsUploading(false);
     }
   };
 
@@ -305,13 +324,13 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
           <div className="space-y-2">
             <Label>Project Images</Label>
             <div className="space-y-3">
-              {formData.images && formData.images.length > 0 && (
+              {(imageFiles.length > 0) && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {formData.images.map((image, index) => (
+                  {imageFiles.map((file, index) => (
                     <div key={index} className="relative group">
                       <img 
-                        src={image} 
-                        alt={`Project screenshot ${index + 1}`}
+                        src={URL.createObjectURL(file)} 
+                        alt={`Preview ${file.name}`}
                         className="w-full h-24 object-cover rounded-md"
                       />
                       <Button
@@ -319,7 +338,7 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
                         variant="destructive"
                         size="sm"
                         className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => handleImageRemove(image)}
+                        onClick={() => handleImageFileRemove(file)}
                       >
                         <X className="h-3 w-3" />
                       </Button>
@@ -328,31 +347,18 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
                 </div>
               )}
               
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Image URL (https://...)"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleImageAdd((e.target as HTMLInputElement).value);
-                      (e.target as HTMLInputElement).value = '';
-                    }
-                  }}
-                />
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={(e) => {
-                    const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                    handleImageAdd(input.value);
-                    input.value = '';
-                  }}
-                >
-                  <Upload className="h-4 w-4" />
-                </Button>
+              <div className="flex items-center justify-center w-full">
+                <Label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
+                        <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 5MB</p>
+                    </div>
+                    <Input id="image-upload" type="file" className="hidden" multiple onChange={handleImageFileChange} accept="image/png, image/jpeg, image/gif" />
+                </Label>
               </div>
               <p className="text-xs text-muted-foreground">
-                Add images by URL. Screenshots, logos, or demo GIFs work great!
+                Screenshots, logos, or demo GIFs work great!
               </p>
             </div>
           </div>
@@ -361,10 +367,10 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
-              disabled={isSubmitting || !user}
+              disabled={isSubmitting || !user || isUploading}
               className="flex-1"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Project'}
+              {isUploading ? 'Uploading images...' : isSubmitting ? 'Submitting...' : 'Submit Project'}
             </Button>
             {onCancel && (
               <Button type="button" variant="outline" onClick={onCancel}>

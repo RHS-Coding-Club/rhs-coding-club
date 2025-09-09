@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Calendar, ExternalLink, Github, ChevronDown } from 'lucide-react';
+import { ArrowRight, Calendar, ExternalLink, Github } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -105,14 +105,18 @@ export default function Home() {
           >
             <div className="flex flex-col items-center space-y-2 text-muted-foreground group-hover:text-foreground transition-colors duration-300">
               <span className="text-sm">Scroll to explore</span>
-              <motion.div
-                animate={{ y: [0, 4, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="flex flex-col items-center space-y-1"
-              >
-                <div className="w-px h-6 bg-gradient-to-b from-muted-foreground to-transparent" />
-                <ChevronDown className="w-4 h-4" />
-              </motion.div>
+              <div className="w-6 h-10 rounded-full border-2 border-muted-foreground flex justify-center items-start pt-2 group-hover:border-foreground transition-colors duration-300">
+                <motion.div
+                  className="w-1 h-2 rounded-full bg-muted-foreground group-hover:bg-foreground transition-colors duration-300"
+                  animate={{ y: [0, 8, 0] }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: 'loop',
+                    ease: 'easeInOut',
+                  }}
+                />
+              </div>
             </div>
           </motion.div>
         </section>

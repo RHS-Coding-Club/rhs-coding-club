@@ -1,12 +1,14 @@
 'use client';
 
-import { use } from 'react';
+import { useState, use } from 'react';
 import { Container } from '@/components/container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Github, ExternalLink, ArrowLeft, Calendar, User, Star, Loader2, AlertCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { Github, ExternalLink, ArrowLeft, Calendar, User, Star, Loader2, AlertCircle, Maximize } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useProject } from '@/hooks/useProjects';
@@ -56,11 +58,11 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
   const createdDate = project.createdAt.toDate();
 
   return (
-    <div className="py-20">
+    <div className="py-12 md:py-20 bg-muted/20">
       <Container>
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto">
           {/* Navigation */}
-          <div className="flex items-center gap-4">
+          <div className="mb-8">
             <Button variant="ghost" size="sm" asChild>
               <Link href="/projects">
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -69,80 +71,87 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
             </Button>
           </div>
 
-          {/* Header */}
-          <div className="space-y-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-2 flex-1">
-                <h1 className="text-4xl md:text-5xl font-bold">{project.title}</h1>
-                <div className="flex items-center gap-4 text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <User className="h-4 w-4" />
-                    {project.authorName}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    {formatDistanceToNow(createdDate, { addSuffix: true })}
-                  </div>
-                  {project.year && (
-                    <Badge variant="outline">{project.year}</Badge>
-                  )}
-                </div>
-              </div>
-              
-              {project.featured && (
-                <Badge className="bg-yellow-500 text-yellow-50">
-                  <Star className="h-3 w-3 mr-1" />
-                  Featured
-                </Badge>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              {project.repoUrl && (
-                <Button asChild>
-                  <Link href={project.repoUrl} target="_blank">
-                    <Github className="h-4 w-4 mr-2" />
-                    View Repository
-                  </Link>
-                </Button>
-              )}
-              {project.demoUrl && (
-                <Button variant="outline" asChild>
-                  <Link href={project.demoUrl} target="_blank">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Live Demo
-                  </Link>
-                </Button>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Project Images */}
-              {project.images && project.images.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Screenshots</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {project.images.map((image, index) => (
-                        <div key={index} className="relative aspect-video overflow-hidden rounded-lg border">
-                          <Image
-                            src={image}
-                            alt={`${project.title} screenshot ${index + 1}`}
-                            fill
-                            className="object-cover hover:scale-105 transition-transform duration-300"
-                          />
+              {/* Header */}
+              <Card className="overflow-hidden">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    {project.images && project.images.length > 0 && (
+                      <div className="md:w-1/3 flex-shrink-0">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <div className="relative aspect-video overflow-hidden rounded-lg border group cursor-pointer">
+                              <Image
+                                src={project.images[0]}
+                                alt={`${project.title} main screenshot`}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Maximize className="h-8 w-8 text-white" />
+                              </div>
+                            </div>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl p-0">
+                            <VisuallyHidden>
+                              <DialogTitle>Full-size image of {project.title}</DialogTitle>
+                            </VisuallyHidden>
+                            <Image
+                              src={project.images[0]}
+                              alt={`${project.title} main screenshot`}
+                              width={1200}
+                              height={675}
+                              className="w-full h-auto rounded-lg"
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    )}
+                    <div className="flex-1 space-y-3">
+                      {project.featured && (
+                        <Badge className="bg-yellow-400 text-yellow-900 hover:bg-yellow-400/90">
+                          <Star className="h-3 w-3 mr-1" />
+                          Featured Project
+                        </Badge>
+                      )}
+                      <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{project.title}</h1>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <User className="h-4 w-4" />
+                          <span>{project.authorName}</span>
                         </div>
-                      ))}
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="h-4 w-4" />
+                          <span>{formatDistanceToNow(createdDate, { addSuffix: true })}</span>
+                        </div>
+                        {project.year && (
+                          <Badge variant="outline">{project.year}</Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-3 pt-2">
+                        {project.repoUrl && (
+                          <Button asChild size="sm">
+                            <Link href={project.repoUrl} target="_blank">
+                              <Github className="h-4 w-4 mr-2" />
+                              Repository
+                            </Link>
+                          </Button>
+                        )}
+                        {project.demoUrl && (
+                          <Button variant="outline" asChild size="sm">
+                            <Link href={project.demoUrl} target="_blank">
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Live Demo
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Description */}
               <Card>
@@ -159,6 +168,48 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Project Images */}
+              {project.images && project.images.length > 1 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Screenshots</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {project.images.slice(1).map((image, index) => (
+                        <Dialog key={index}>
+                          <DialogTrigger asChild>
+                            <div className="relative aspect-video overflow-hidden rounded-lg border group cursor-pointer">
+                              <Image
+                                src={image}
+                                alt={`${project.title} screenshot ${index + 2}`}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Maximize className="h-6 w-6 text-white" />
+                              </div>
+                            </div>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl p-0">
+                            <VisuallyHidden>
+                              <DialogTitle>Full-size screenshot of {project.title}</DialogTitle>
+                            </VisuallyHidden>
+                            <Image
+                              src={image}
+                              alt={`${project.title} screenshot ${index + 2}`}
+                              width={1200}
+                              height={675}
+                              className="w-full h-auto rounded-lg"
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -184,25 +235,25 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
                 <CardHeader>
                   <CardTitle>Project Information</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Author</label>
-                    <p className="text-sm">{project.authorName}</p>
+                <CardContent className="space-y-4 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Author</span>
+                    <span className="font-medium">{project.authorName}</span>
                   </div>
                   
                   <Separator />
                   
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Created</label>
-                    <p className="text-sm">{createdDate.toLocaleDateString()}</p>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Created</span>
+                    <span className="font-medium">{createdDate.toLocaleDateString()}</span>
                   </div>
 
                   {project.year && (
                     <>
                       <Separator />
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Year</label>
-                        <p className="text-sm">{project.year}</p>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Year</span>
+                        <span className="font-medium">{project.year}</span>
                       </div>
                     </>
                   )}
@@ -210,59 +261,19 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
                   {project.featured && (
                     <>
                       <Separator />
-                      <div className="flex items-center gap-2 text-yellow-600">
-                        <Star className="h-4 w-4" />
-                        <span className="text-sm font-medium">Featured Project</span>
+                      <div className="flex items-center justify-between text-yellow-600">
+                        <span className="text-muted-foreground">Status</span>
+                        <div className="flex items-center gap-2">
+                          <Star className="h-4 w-4" />
+                          <span className="font-medium">Featured Project</span>
+                        </div>
                       </div>
                     </>
                   )}
                 </CardContent>
               </Card>
-
-              {/* Links */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Links</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {project.repoUrl && (
-                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                      <Link href={project.repoUrl} target="_blank">
-                        <Github className="h-4 w-4 mr-2" />
-                        Source Code
-                      </Link>
-                    </Button>
-                  )}
-                  {project.demoUrl && (
-                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                      <Link href={project.demoUrl} target="_blank">
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        Live Demo
-                      </Link>
-                    </Button>
-                  )}
-                  {!project.repoUrl && !project.demoUrl && (
-                    <p className="text-sm text-muted-foreground">No external links available</p>
-                  )}
-                </CardContent>
-              </Card>
             </div>
           </div>
-
-          {/* More Projects CTA */}
-          <Card>
-            <CardContent className="flex items-center justify-between p-6">
-              <div>
-                <h3 className="font-semibold mb-1">Explore More Projects</h3>
-                <p className="text-sm text-muted-foreground">
-                  Check out other amazing projects from our community
-                </p>
-              </div>
-              <Button asChild>
-                <Link href="/projects">View All Projects</Link>
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </Container>
     </div>
