@@ -16,6 +16,7 @@ export interface User {
   skills?: string[];
   badges?: string[];
   points?: number;
+  lastPointUpdate?: Timestamp;
 }
 
 export interface Officer {

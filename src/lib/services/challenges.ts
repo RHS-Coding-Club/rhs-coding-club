@@ -160,14 +160,16 @@ export const challengesService = {
         // If status is 'pass' and submission wasn't already passed, award points
         if (status === 'pass' && submission.status !== 'pass') {
           transaction.update(userRef, {
-            points: currentPoints + submission.points
+            points: currentPoints + submission.points,
+            lastPointUpdate: serverTimestamp()
           });
         }
         
         // If changing from 'pass' to 'fail', deduct points
         if (status === 'fail' && submission.status === 'pass') {
           transaction.update(userRef, {
-            points: Math.max(0, currentPoints - submission.points)
+            points: Math.max(0, currentPoints - submission.points),
+            lastPointUpdate: serverTimestamp()
           });
         }
       }
@@ -180,7 +182,8 @@ export const challengesService = {
     const q = query(
       usersRef,
       where('points', '>', 0),
-      orderBy('points', 'desc')
+      orderBy('points', 'desc'),
+      orderBy('lastPointUpdate', 'asc')
     );
     const snapshot = await getDocs(q);
     const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
