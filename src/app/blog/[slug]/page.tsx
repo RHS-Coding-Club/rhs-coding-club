@@ -9,10 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { usePost } from '@/hooks/usePosts';
 import { CalendarDays, User, ArrowLeft, Clock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import rehypeSanitize from 'rehype-sanitize';
+import Markdown from '@/components/blog/markdown';
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -136,59 +133,7 @@ export default function BlogPostPage() {
           {/* Article Content */}
           <Card>
             <CardContent className="p-8">
-              <article className="prose prose-lg dark:prose-invert max-w-none">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeRaw, rehypeSanitize]}
-                  components={{
-                    // Custom styling for code blocks
-                    pre: ({ children, ...props }) => (
-                      <pre className="bg-muted p-4 rounded-lg overflow-x-auto" {...props}>
-                        {children}
-                      </pre>
-                    ),
-                    // Custom styling for inline code
-                    code: ({ children, className, ...props }) => {
-                      const isInline = !className;
-                      return isInline ? (
-                        <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props}>
-                          {children}
-                        </code>
-                      ) : (
-                        <code className={className} {...props}>
-                          {children}
-                        </code>
-                      );
-                    },
-                    // Custom styling for tables
-                    table: ({ children, ...props }) => (
-                      <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-border" {...props}>
-                          {children}
-                        </table>
-                      </div>
-                    ),
-                    th: ({ children, ...props }) => (
-                      <th className="border border-border bg-muted p-2 text-left font-semibold" {...props}>
-                        {children}
-                      </th>
-                    ),
-                    td: ({ children, ...props }) => (
-                      <td className="border border-border p-2" {...props}>
-                        {children}
-                      </td>
-                    ),
-                    // Custom styling for blockquotes
-                    blockquote: ({ children, ...props }) => (
-                      <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground" {...props}>
-                        {children}
-                      </blockquote>
-                    ),
-                  }}
-                >
-                  {post.content}
-                </ReactMarkdown>
-              </article>
+              <Markdown content={post.content} size="lg" />
             </CardContent>
           </Card>
 

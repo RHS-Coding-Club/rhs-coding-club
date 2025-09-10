@@ -11,10 +11,7 @@ import { Post } from '@/lib/firebase-collections';
 import { generateSlug } from '@/lib/services/posts';
 import { useAuth } from '@/contexts/auth-context';
 import { X, Eye, FileText } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import rehypeSanitize from 'rehype-sanitize';
+import Markdown from './markdown';
 
 interface BlogPostFormProps {
   post?: Post;
@@ -233,14 +230,7 @@ export function BlogPostForm({ post, onSubmit, onCancel, loading }: BlogPostForm
               <TabsContent value="preview" className="mt-4">
                 <div className="border rounded-md p-4 min-h-[300px] max-h-[500px] overflow-y-auto">
                   {watchedContent ? (
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        rehypePlugins={[rehypeRaw, rehypeSanitize]}
-                      >
-                        {watchedContent}
-                      </ReactMarkdown>
-                    </div>
+                    <Markdown content={watchedContent} size="sm" />
                   ) : (
                     <p className="text-muted-foreground italic">No content to preview</p>
                   )}

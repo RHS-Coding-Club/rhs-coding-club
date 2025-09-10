@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+/* Syntax highlighting theme for code blocks */
+@import "highlight.js/styles/github-dark.css";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -139,6 +142,15 @@
 }
 
 @layer utilities {
+  /* Show heading link icon on hover */
+  .prose :is(h1,h2,h3,h4,h5,h6) a[aria-label="Link to section"] {
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+  }
+  .prose :is(h1,h2,h3,h4,h5,h6):hover a[aria-label="Link to section"] {
+    opacity: 1;
+  }
+
   .line-clamp-1 {
     overflow: hidden;
     display: -webkit-box;
