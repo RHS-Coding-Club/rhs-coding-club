@@ -2,10 +2,19 @@
 
 import { useState } from 'react';
 import { Container } from '@/components/container';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Code, Award } from 'lucide-react';
+import { 
+  Trophy, 
+  Code, 
+  Award, 
+  Target, 
+  Clock, 
+  Users, 
+  LayoutDashboard,
+  TrendingUp
+} from 'lucide-react';
 import Link from 'next/link';
 import { ChallengeCard, ChallengeFilters, Leaderboard } from '@/components/challenges';
 import { useChallenges, useSubmissions, useLeaderboard } from '@/hooks/useChallenges';
@@ -17,6 +26,7 @@ export default function ChallengesPage() {
   const { userProfile } = useAuth();
   const { submissions: userSubmissions } = useSubmissions(undefined, userProfile?.uid);
   const { leaderboard } = useLeaderboard(10);
+  const [activeSection, setActiveSection] = useState<string>('challenges');
 
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -74,7 +84,7 @@ export default function ChallengesPage() {
     return (
       <div className="py-20">
         <Container>
-          <div className="max-w-6xl mx-auto space-y-8">
+          <div className="max-w-7xl mx-auto space-y-8">
             <div className="text-center space-y-4">
               <h1 className="text-4xl md:text-5xl font-bold">Coding Challenges</h1>
               <p className="text-lg text-muted-foreground">Loading challenges...</p>
@@ -88,109 +98,232 @@ export default function ChallengesPage() {
   return (
     <div className="py-20">
       <Container>
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold">Coding Challenges</h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Test your programming skills with our weekly coding challenges.
+              Solve problems, earn points, and climb the leaderboard.
             </p>
           </div>
 
-          {userProfile && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3">
-                    <Code className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="text-2xl font-bold">{stats.completedChallenges}</p>
-                      <p className="text-sm text-muted-foreground">Challenges Completed</p>
-                    </div>
+          {/* Modern Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-500/10" />
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-muted-foreground">Total Challenges</CardTitle>
+                  <div className="p-2 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                    <Target className="h-4 w-4" />
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3">
-                    <Trophy className="h-8 w-8 text-yellow-500" />
-                    <div>
-                      <p className="text-2xl font-bold">{stats.totalPoints}</p>
-                      <p className="text-sm text-muted-foreground">Total Points</p>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-semibold">{challenges.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">Problems to solve</p>
+              </CardContent>
+            </Card>
+
+            {userProfile && (
+              <>
+                <Card className="relative overflow-hidden">
+                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-500/10" />
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm text-muted-foreground">Completed</CardTitle>
+                      <div className="p-2 rounded-md bg-green-500/10 text-green-600 dark:text-green-400">
+                        <Code className="h-4 w-4" />
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3">
-                    <Award className="h-8 w-8 text-purple-500" />
-                    <div>
-                      <p className="text-2xl font-bold">
-                        {stats.totalChallenges > 0 
-                          ? Math.round((stats.completedChallenges / stats.totalChallenges) * 100)
-                          : 0}%
-                      </p>
-                      <p className="text-sm text-muted-foreground">Success Rate</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-semibold">{stats.completedChallenges}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Your solutions</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="relative overflow-hidden">
+                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-500/10" />
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm text-muted-foreground">Points Earned</CardTitle>
+                      <div className="p-2 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                        <Trophy className="h-4 w-4" />
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-semibold">{stats.totalPoints}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Total score</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="relative overflow-hidden">
+                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-500/10" />
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm text-muted-foreground">Success Rate</CardTitle>
+                      <div className="p-2 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                        <Award className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-semibold">
+                      {stats.totalChallenges > 0 
+                        ? Math.round((stats.completedChallenges / stats.totalChallenges) * 100)
+                        : 0}%
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Accuracy</p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            {!userProfile && (
+              <>
+                <Card className="relative overflow-hidden">
+                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-500/10" />
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm text-muted-foreground">Active Users</CardTitle>
+                      <div className="p-2 rounded-md bg-green-500/10 text-green-600 dark:text-green-400">
+                        <Users className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-semibold">{leaderboard.length}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Participants</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="relative overflow-hidden">
+                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-500/10" />
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm text-muted-foreground">Weekly</CardTitle>
+                      <div className="p-2 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                        <Clock className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-semibold">New</div>
+                    <p className="text-xs text-muted-foreground mt-1">Fresh challenges</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="relative overflow-hidden">
+                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-500/10" />
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm text-muted-foreground">Competition</CardTitle>
+                      <div className="p-2 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                        <TrendingUp className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-semibold">Live</div>
+                    <p className="text-xs text-muted-foreground mt-1">Leaderboard</p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+          </div>
+
+          {/* Responsive navigation */}
+          <div className="lg:grid lg:grid-cols-12 lg:gap-6">
+            <div className="lg:hidden mb-4">
+              <Tabs value={activeSection} onValueChange={setActiveSection}>
+                <TabsList className="flex-wrap">
+                  <TabsTrigger value="challenges">Challenges ({filteredChallenges.length})</TabsTrigger>
+                  <TabsTrigger value="leaderboard">Leaderboard ({leaderboard.length})</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
-          )}
 
-          <Tabs defaultValue="challenges" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="challenges">Challenges</TabsTrigger>
-              <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-            </TabsList>
+            {/* Sidebar */}
+            <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
+              <Card className="sticky top-24">
+                <CardContent className="p-3">
+                  <nav className="space-y-1">
+                    {[
+                      { key: 'challenges', label: `Challenges (${filteredChallenges.length})`, icon: LayoutDashboard },
+                      { key: 'leaderboard', label: `Leaderboard (${leaderboard.length})`, icon: Trophy },
+                    ].map(({ key, label, icon: Icon }) => (
+                      <button
+                        key={key}
+                        onClick={() => setActiveSection(key)}
+                        className={`w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                          activeSection === key ? 'bg-primary/10 text-primary' : 'hover:bg-muted text-foreground'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{label}</span>
+                      </button>
+                    ))}
+                  </nav>
+                </CardContent>
+              </Card>
+            </aside>
 
-            <TabsContent value="challenges" className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <ChallengeFilters
-                  selectedDifficulty={selectedDifficulty}
-                  selectedStatus={selectedStatus}
-                  onDifficultyChange={setSelectedDifficulty}
-                  onStatusChange={setSelectedStatus}
-                  onClearFilters={clearFilters}
-                />
-                
-                {(userProfile?.role === 'admin' || userProfile?.role === 'officer') && (
-                  <Link href="/admin/challenges">
-                    <Button>Manage Challenges</Button>
-                  </Link>
-                )}
-              </div>
+            {/* Content */}
+            <div className="lg:col-span-9 xl:col-span-10 space-y-6 mt-6 lg:mt-0">
+              <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
+                <TabsList className="lg:hidden" />
 
-              <div className="grid gap-6">
-                {filteredChallenges.length === 0 ? (
-                  <Card>
-                    <CardContent className="py-8">
-                      <p className="text-center text-muted-foreground">
-                        No challenges found matching your filters.
-                      </p>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  filteredChallenges.map((challenge) => (
-                    <ChallengeCard
-                      key={challenge.id}
-                      challenge={challenge}
-                      userSubmission={submissionMap[challenge.id]}
+                <TabsContent value="challenges" className="space-y-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card p-6 rounded-lg border">
+                    <ChallengeFilters
+                      selectedDifficulty={selectedDifficulty}
+                      selectedStatus={selectedStatus}
+                      onDifficultyChange={setSelectedDifficulty}
+                      onStatusChange={setSelectedStatus}
+                      onClearFilters={clearFilters}
                     />
-                  ))
-                )}
-              </div>
-            </TabsContent>
+                    
+                    {(userProfile?.role === 'admin' || userProfile?.role === 'officer') && (
+                      <Link href="/admin/challenges">
+                        <Button>Manage Challenges</Button>
+                      </Link>
+                    )}
+                  </div>
 
-            <TabsContent value="leaderboard">
-              <Leaderboard 
-                users={leaderboard} 
-                currentUserId={userProfile?.uid}
-              />
-            </TabsContent>
-          </Tabs>
+                  <div className="grid gap-6">
+                    {filteredChallenges.length === 0 ? (
+                      <Card>
+                        <CardContent className="p-12 text-center">
+                          <Target className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                          <h3 className="text-lg font-semibold mb-2">No challenges found</h3>
+                          <p className="text-muted-foreground">
+                            No challenges found matching your filters. Try adjusting your criteria.
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      filteredChallenges.map((challenge) => (
+                        <ChallengeCard
+                          key={challenge.id}
+                          challenge={challenge}
+                          userSubmission={submissionMap[challenge.id]}
+                        />
+                      ))
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="leaderboard" className="space-y-6">
+                  <Leaderboard 
+                    users={leaderboard} 
+                    currentUserId={userProfile?.uid}
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
         </div>
       </Container>
     </div>

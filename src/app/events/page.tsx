@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { Container } from '@/components/container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CalendarDays, Users, Trophy, Coffee } from 'lucide-react';
+import { CalendarDays, Users, Trophy, Coffee, LayoutDashboard, Clock } from 'lucide-react';
 import { useEvents, useUpcomingEvents, usePastEvents } from '@/hooks/useEvents';
 import { EventCard } from '@/components/events/event-card';
 import { EventFilters, EventFilters as EventFiltersType } from '@/components/events/event-filters';
@@ -42,6 +42,7 @@ export default function EventsPage() {
     tags: [],
     timeFilter: 'all',
   });
+  const [activeSection, setActiveSection] = useState<string>('upcoming');
 
   const { events: allEvents, loading: allLoading, refetch: refetchAll } = useEvents();
   const { events: upcomingEvents, loading: upcomingLoading, refetch: refetchUpcoming } = useUpcomingEvents();
@@ -83,7 +84,7 @@ export default function EventsPage() {
   return (
     <div className="py-20">
       <Container>
-        <div className="max-w-6xl mx-auto space-y-12">
+        <div className="max-w-7xl mx-auto space-y-12">
           {/* Header */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold">Events</h1>
@@ -93,51 +94,114 @@ export default function EventsPage() {
             </p>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <CalendarDays className="h-8 w-8 mx-auto mb-2 text-primary" />
-                <div className="text-2xl font-bold">{totalUpcoming}</div>
-                <div className="text-sm text-muted-foreground">Upcoming Events</div>
+          {/* Modern Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-500/10" />
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-muted-foreground">Upcoming Events</CardTitle>
+                  <div className="p-2 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400"><CalendarDays className="h-4 w-4" /></div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-semibold">{totalUpcoming}</div>
+                <p className="text-xs text-muted-foreground mt-1">Don&apos;t miss out!</p>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
-                <div className="text-2xl font-bold">{totalGoing}</div>
-                <div className="text-sm text-muted-foreground">Total Attendees</div>
+
+            <Card className="relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-500/10" />
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-muted-foreground">Total Attendees</CardTitle>
+                  <div className="p-2 rounded-md bg-green-500/10 text-green-600 dark:text-green-400"><Users className="h-4 w-4" /></div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-semibold">{totalGoing}</div>
+                <p className="text-xs text-muted-foreground mt-1">Join the community</p>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Trophy className="h-8 w-8 mx-auto mb-2 text-primary" />
-                <div className="text-2xl font-bold">{pastEvents.length}</div>
-                <div className="text-sm text-muted-foreground">Events Completed</div>
+
+            <Card className="relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-500/10" />
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-muted-foreground">Events Completed</CardTitle>
+                  <div className="p-2 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400"><Trophy className="h-4 w-4" /></div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-semibold">{pastEvents.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">Learning sessions</p>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-500/10" />
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-muted-foreground">Event Types</CardTitle>
+                  <div className="p-2 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400"><Coffee className="h-4 w-4" /></div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-semibold">6+</div>
+                <p className="text-xs text-muted-foreground mt-1">Variety & fun</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Filters */}
-          <EventFilters
-            filters={filters}
-            onFiltersChange={setFilters}
-            className="bg-card p-6 rounded-lg border"
-          />
+          {/* Responsive navigation */}
+          <div className="lg:grid lg:grid-cols-12 lg:gap-6">
+            <div className="lg:hidden mb-4">
+              <Tabs value={activeSection} onValueChange={setActiveSection}>
+                <TabsList className="flex-wrap">
+                  <TabsTrigger value="upcoming">Upcoming ({filteredUpcomingEvents.length})</TabsTrigger>
+                  <TabsTrigger value="past">Past ({filteredPastEvents.length})</TabsTrigger>
+                  <TabsTrigger value="all">All ({filteredAllEvents.length})</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
 
-          {/* Events Tabs */}
-          <Tabs defaultValue="upcoming" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="upcoming">
-                Upcoming ({filteredUpcomingEvents.length})
-              </TabsTrigger>
-              <TabsTrigger value="past">
-                Past ({filteredPastEvents.length})
-              </TabsTrigger>
-              <TabsTrigger value="all">
-                All ({filteredAllEvents.length})
-              </TabsTrigger>
-            </TabsList>
+            {/* Sidebar */}
+            <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
+              <Card className="sticky top-24">
+                <CardContent className="p-3">
+                  <nav className="space-y-1">
+                    {[
+                      { key: 'upcoming', label: `Upcoming (${filteredUpcomingEvents.length})`, icon: Clock },
+                      { key: 'past', label: `Past (${filteredPastEvents.length})`, icon: Trophy },
+                      { key: 'all', label: `All (${filteredAllEvents.length})`, icon: LayoutDashboard },
+                    ].map(({ key, label, icon: Icon }) => (
+                      <button
+                        key={key}
+                        onClick={() => setActiveSection(key)}
+                        className={`w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                          activeSection === key ? 'bg-primary/10 text-primary' : 'hover:bg-muted text-foreground'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{label}</span>
+                      </button>
+                    ))}
+                  </nav>
+                </CardContent>
+              </Card>
+            </aside>
+
+            {/* Content */}
+            <div className="lg:col-span-9 xl:col-span-10 space-y-6 mt-6 lg:mt-0">
+              {/* Filters */}
+              <EventFilters
+                filters={filters}
+                onFiltersChange={setFilters}
+                className="bg-card p-6 rounded-lg border"
+              />
+
+              <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
+                <TabsList className="lg:hidden" />
 
             <TabsContent value="upcoming" className="space-y-6">
               {upcomingLoading ? (
@@ -245,12 +309,12 @@ export default function EventsPage() {
                 <li>All events are free for club members</li>
                 <li>Please RSVP in advance for capacity planning</li>
                 <li>Bring your laptop for hands-on workshops</li>
-                <li>Events are held every Friday after school (unless noted)</li>
-                <li>Food and refreshments will be provided</li>
                 <li>Join our Discord for real-time updates and discussions</li>
               </ul>
             </CardContent>
           </Card>
+          </div>
+          </div>
         </div>
       </Container>
     </div>
