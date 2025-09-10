@@ -5,7 +5,8 @@ service cloud.firestore {
 
     // Helper function to check if a user is an admin or officer
     function isAdminOrOfficer() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'officer'];
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'officer'];
     }
 
     // Users Collection
@@ -54,7 +55,8 @@ service cloud.firestore {
 
     // Posts Collection
     match /posts/{postId} {
-      allow read: if resource.data.published == true || isAdminOrOfficer();
+  // Publicly readable blog posts (listing and detail pages must be accessible to everyone)
+  allow read: if true;
       allow create, update, delete: if isAdminOrOfficer();
     }
 

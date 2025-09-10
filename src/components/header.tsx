@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthButton } from '@/components/auth/auth-button';
+import { useAuth } from '@/components/auth';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -25,6 +26,8 @@ const navigation = [
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { userProfile, loading } = useAuth();
+  const showJoinCta = !loading && (!userProfile || userProfile.role === 'guest');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -64,9 +67,11 @@ export function Header() {
             <AuthButton />
             <ThemeToggle />
             <div className="hidden md:flex items-center space-x-2">
-              <Button asChild size="sm">
-                <Link href="/join">Join Club</Link>
-              </Button>
+              {showJoinCta && (
+                <Button asChild size="sm">
+                  <Link href="/join">Join Club</Link>
+                </Button>
+              )}
             </div>
 
             {/* Mobile Menu */}
@@ -95,9 +100,11 @@ export function Header() {
                     ))}
                   </div>
                   <div className="mt-auto mb-8 px-2">
-                    <Button asChild className="w-full h-12 text-base">
-                      <Link href="/join">Join Club</Link>
-                    </Button>
+                    {showJoinCta && (
+                      <Button asChild className="w-full h-12 text-base">
+                        <Link href="/join">Join Club</Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </SheetContent>

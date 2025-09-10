@@ -1,11 +1,16 @@
+'use client';
+
 import Link from 'next/link';
 import { Code2, Github, Mail } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { NewsletterForm } from './newsletter-form';
+import { useAuth } from '@/components/auth';
 
 export function Footer() {
+  const { userProfile, loading } = useAuth();
+  const showJoinLink = !loading && (!userProfile || userProfile.role === 'guest');
   return (
     <footer className="border-t bg-muted/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -73,12 +78,14 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/join"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Join Club
-                </Link>
+                {showJoinLink && (
+                  <Link
+                    href="/join"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Join Club
+                  </Link>
+                )}
               </li>
             </ul>
           </div>

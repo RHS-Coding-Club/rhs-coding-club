@@ -20,9 +20,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { useAuth } from '@/components/auth';
 
 export default function Home() {
   const { stats, featuredProjects, featuredPosts, loading, error } = useHomepageData();
+  const { userProfile, loading: authLoading } = useAuth();
+  const showJoinCta = !authLoading && (!userProfile || userProfile.role === 'guest');
 
   // Show loading state while data is being fetched
   if (loading) {
@@ -76,12 +79,14 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6 md:pt-8"
               >
-                <Button size="lg" className="px-8 sm:px-10 w-full sm:w-auto min-h-[48px] text-lg" asChild>
-                  <Link href="/join">
-                    Join the Club
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
+                {showJoinCta && (
+                  <Button size="lg" className="px-8 sm:px-10 w-full sm:w-auto min-h-[48px] text-lg" asChild>
+                    <Link href="/join">
+                      Join the Club
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                )}
                 <Button size="lg" variant="outline" className="px-8 sm:px-10 w-full sm:w-auto min-h-[48px] text-lg" asChild>
                   <Link href="/about">
                     Learn More
@@ -432,12 +437,14 @@ export default function Home() {
                     View Events
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="px-6 sm:px-8 w-full sm:w-auto min-h-[44px] min-w-[44px]" asChild>
-                  <Link href="/join">
-                    Join the Club
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
+                {showJoinCta && (
+                  <Button size="lg" variant="outline" className="px-6 sm:px-8 w-full sm:w-auto min-h-[44px] min-w-[44px]" asChild>
+                    <Link href="/join">
+                      Join the Club
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                )}
               </div>
             </motion.div>
           </Container>

@@ -7,6 +7,7 @@ import { ArrowRight, Code, Users, Trophy, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Container } from '@/components/container';
+import { useAuth } from '@/components/auth';
 
 const features = [
   {
@@ -36,6 +37,8 @@ const features = [
 ];
 
 export default function Home() {
+  const { userProfile, loading } = useAuth();
+  const showJoinCta = !loading && (!userProfile || userProfile.role === 'guest');
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -64,12 +67,14 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <Button size="lg" className="text-lg px-8" asChild>
-                <Link href="/join">
-                  Join the Club
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+              {showJoinCta && (
+                <Button size="lg" className="text-lg px-8" asChild>
+                  <Link href="/join">
+                    Join the Club
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              )}
               <Button size="lg" variant="outline" className="text-lg px-8" asChild>
                 <Link href="/about">Learn More</Link>
               </Button>
@@ -143,12 +148,14 @@ export default function Home() {
               Join our community today and take your first step toward becoming
               a skilled developer.
             </p>
-            <Button size="lg" className="text-lg px-8" asChild>
-              <Link href="/join">
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+            {showJoinCta && (
+              <Button size="lg" className="text-lg px-8" asChild>
+                <Link href="/join">
+                  Get Started
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            )}
           </motion.div>
         </Container>
       </section>
