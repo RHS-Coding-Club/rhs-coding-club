@@ -1,18 +1,24 @@
-'use client';
+"use client";
 
 import { Container } from '@/components/container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { useAuth } from '@/contexts/auth-context';
 import { useDashboardData } from '@/hooks/useDashboardData';
-import { Calendar, Users, Trophy, BookOpen, Loader2, AlertCircle } from 'lucide-react';
+import { Calendar, Users, Trophy, BookOpen, Loader2, AlertCircle, LayoutDashboard, FolderOpen } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useState, useMemo } from 'react';
 
 export default function DashboardPage() {
   const { userProfile } = useAuth();
   const { stats, recentActivity, upcomingEvents, userProjects, userChallenges, loading, error } = useDashboardData();
+  const [activeSection, setActiveSection] = useState<string>('overview');
+  const [projectSearch, setProjectSearch] = useState('');
+  const [projectStatus, setProjectStatus] = useState<'all' | 'approved' | 'pending'>('all');
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -26,6 +32,18 @@ export default function DashboardPage() {
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   };
+
+  const filteredProjects = useMemo(() => {
+    const q = projectSearch.toLowerCase().trim();
+    return userProjects.filter((p) => {
+      const matchesQuery = !q ||
+        p.title.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        (p.tech || []).some((t) => t.toLowerCase().includes(q));
+      const matchesStatus = projectStatus === 'all' || (projectStatus === 'approved' ? p.approved : !p.approved);
+      return matchesQuery && matchesStatus;
+    });
+  }, [userProjects, projectSearch, projectStatus]);
 
   if (loading) {
     return (
@@ -65,7 +83,7 @@ export default function DashboardPage() {
     <ProtectedRoute requiredRoles={['admin', 'officer', 'member']}>
       <div className="py-20">
         <Container>
-          <div className="max-w-6xl mx-auto space-y-8">
+          <div className="max-w-7xl mx-auto space-y-8">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-4xl font-bold">Dashboard</h1>
@@ -81,67 +99,109 @@ export default function DashboardPage() {
               </Badge>
             </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Events Attended</CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
+          {/* Stats - modernized */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-500/10" />
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-muted-foreground">Events Attended</CardTitle>
+                  <div className="p-2 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400"><Calendar className="h-4 w-4" /></div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.eventsAttended}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stats.eventsAttended > 0 ? 'Active participant' : 'Join an event!'}
-                </p>
+                <div className="text-3xl font-semibold">{stats.eventsAttended}</div>
+                <p className="text-xs text-muted-foreground mt-1">{stats.eventsAttended > 0 ? 'Active participant' : 'Join an event!'}</p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Projects</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+            <Card className="relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-500/10" />
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-muted-foreground">Projects</CardTitle>
+                  <div className="p-2 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400"><Users className="h-4 w-4" /></div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalProjects}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stats.activeProjects} active, {stats.completedProjects} completed
-                </p>
+                <div className="text-3xl font-semibold">{stats.totalProjects}</div>
+                <p className="text-xs text-muted-foreground mt-1">{stats.activeProjects} active • {stats.completedProjects} completed</p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Challenge Points</CardTitle>
-                <Trophy className="h-4 w-4 text-muted-foreground" />
+            <Card className="relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-500/10" />
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-muted-foreground">Challenge Points</CardTitle>
+                  <div className="p-2 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400"><Trophy className="h-4 w-4" /></div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.challengePoints.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">
-                  Rank #{stats.userRank} of {stats.totalUsers}
-                </p>
+                <div className="text-3xl font-semibold">{stats.challengePoints.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground mt-1">Rank #{stats.userRank} of {stats.totalUsers}</p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Submissions</CardTitle>
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
+            <Card className="relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-500/10" />
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-muted-foreground">Submissions</CardTitle>
+                  <div className="p-2 rounded-md bg-green-500/10 text-green-600 dark:text-green-400"><BookOpen className="h-4 w-4" /></div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{userChallenges.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  {userChallenges.filter(c => c.status === 'pass').length} passed
-                </p>
+                <div className="text-3xl font-semibold">{userChallenges.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">{userChallenges.filter(c => c.status === 'pass').length} passed</p>
               </CardContent>
             </Card>
           </div>
 
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="projects">My Projects</TabsTrigger>
-              <TabsTrigger value="challenges">Challenges</TabsTrigger>
-              <TabsTrigger value="resources">Resources</TabsTrigger>
-            </TabsList>
+          {/* Responsive nav: Tabs for mobile, sidebar for desktop */}
+          <div className="lg:grid lg:grid-cols-12 lg:gap-6">
+            <div className="lg:hidden mb-4">
+              <Tabs value={activeSection} onValueChange={setActiveSection}>
+                <TabsList className="flex-wrap">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="projects">My Projects</TabsTrigger>
+                  <TabsTrigger value="challenges">Challenges</TabsTrigger>
+                  <TabsTrigger value="resources">Resources</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+
+            {/* Sidebar */}
+            <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
+              <Card className="sticky top-24">
+                <CardContent className="p-3">
+                  <nav className="space-y-1">
+                    {[
+                      { key: 'overview', label: 'Overview', icon: LayoutDashboard },
+                      { key: 'projects', label: 'My Projects', icon: FolderOpen },
+                      { key: 'challenges', label: 'Challenges', icon: Trophy },
+                      { key: 'resources', label: 'Resources', icon: BookOpen },
+                    ].map(({ key, label, icon: Icon }) => (
+                      <button
+                        key={key}
+                        onClick={() => setActiveSection(key)}
+                        className={`w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                          activeSection === key ? 'bg-primary/10 text-primary' : 'hover:bg-muted text-foreground'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{label}</span>
+                      </button>
+                    ))}
+                  </nav>
+                </CardContent>
+              </Card>
+            </aside>
+
+            {/* Content */}
+            <div className="lg:col-span-9 xl:col-span-10 space-y-6 mt-6 lg:mt-0">
+              <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-4">
+                <TabsList className="lg:hidden" />
 
             <TabsContent value="overview" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
@@ -199,9 +259,26 @@ export default function DashboardPage() {
                   <CardTitle>My Projects</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {/* Filters */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                    <div className="md:col-span-2">
+                      <Input placeholder="Search by title, description, or tech..." value={projectSearch} onChange={(e) => setProjectSearch(e.target.value)} />
+                    </div>
+                    <Select value={projectStatus} onValueChange={(v) => setProjectStatus(v as 'all' | 'approved' | 'pending')}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Filter by status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="approved">Approved</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   {userProjects.length > 0 ? (
                     <div className="space-y-4">
-                      {userProjects.map((project) => (
+                      {filteredProjects.map((project) => (
                         <div key={project.id} className="border rounded-lg p-4">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -302,7 +379,9 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </TabsContent>
-          </Tabs>
+              </Tabs>
+            </div>
+          </div>
         </div>
       </Container>
     </div>
