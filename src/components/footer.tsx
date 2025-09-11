@@ -27,7 +27,7 @@ export function Footer() {
             </p>
             <div className="flex space-x-2">
               <Button variant="ghost" size="icon" asChild>
-                <Link href="https://github.com" target="_blank">
+                <Link href="https://github.com/RHS-Coding-Club" target="_blank">
                   <Github className="h-4 w-4" />
                   <span className="sr-only">GitHub</span>
                 </Link>
