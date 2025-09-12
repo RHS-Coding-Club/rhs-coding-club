@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { Container } from '@/components/container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle, Code, Users, Zap } from 'lucide-react';
+import { CheckCircle, Code, Users, Zap, Github } from 'lucide-react';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
@@ -175,6 +176,18 @@ export default function JoinPage() {
 									<Button type="submit" className="w-full" disabled={isSubmitting}>
 										{isSubmitting ? 'Submitting...' : 'Submit Application'}
 									</Button>
+									
+									<div className="pt-4 border-t">
+										<div className="text-center space-y-2">
+											<p className="text-sm text-muted-foreground">Already a member?</p>
+											<Button variant="outline" className="w-full" asChild>
+												<Link href="/github-membership">
+													<Github className="h-4 w-4 mr-2" />
+													Join our GitHub Organization
+												</Link>
+											</Button>
+										</div>
+									</div>
 								</form>
 							</CardContent>
 						</Card>

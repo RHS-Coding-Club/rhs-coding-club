@@ -48,6 +48,7 @@ import { NewsletterManagement } from '@/components/admin/newsletter-management';
 import { SubmissionReview } from '@/components/admin/submission-review';
 import { projectService } from '@/lib/services/projects';
 import { PendingMemberManagement } from '@/components/admin/pending-member-management';
+import { GitHubMembershipManagement } from '@/components/admin/github-membership-management';
 
 // Predefined officer roles
 const OFFICER_ROLES = [
@@ -524,6 +525,7 @@ export default function AdminPage() {
                   <TabsList className="flex-wrap">
                     <TabsTrigger value="users">User Management</TabsTrigger>
                     <TabsTrigger value="membership">Membership</TabsTrigger>
+                    <TabsTrigger value="github">GitHub Org</TabsTrigger>
                     <TabsTrigger value="officers">Officers</TabsTrigger>
                     <TabsTrigger value="submissions">Submissions</TabsTrigger>
                     <TabsTrigger value="blog">Blog</TabsTrigger>
@@ -544,6 +546,7 @@ export default function AdminPage() {
                       {[
                         { key: 'users', label: 'User Management', icon: Users },
                         { key: 'membership', label: 'Membership', icon: UserCheck },
+                        { key: 'github', label: 'GitHub Org', icon: Github },
                         { key: 'officers', label: 'Officers', icon: Users },
                         { key: 'submissions', label: 'Submissions', icon: Eye },
                         { key: 'blog', label: 'Blog', icon: Edit },
@@ -674,6 +677,10 @@ export default function AdminPage() {
 
               <TabsContent value="membership" className="space-y-6">
                 <PendingMemberManagement />
+              </TabsContent>
+
+              <TabsContent value="github" className="space-y-6">
+                <GitHubMembershipManagement />
               </TabsContent>
 
               <TabsContent value="officers" className="space-y-6">

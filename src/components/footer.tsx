@@ -118,6 +118,16 @@ export function Footer() {
                   Blog
                 </Link>
               </li>
+              {!loading && userProfile && userProfile.role !== 'guest' && (
+                <li>
+                  <Link
+                    href="/github-membership"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Join GitHub Org
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link
                   href="/contact"

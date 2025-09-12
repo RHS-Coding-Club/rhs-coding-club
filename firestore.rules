@@ -98,5 +98,17 @@ service cloud.firestore {
       allow delete: if true; // Allow anyone to unsubscribe and server-side operations
       allow update: if isAdminOrOfficer(); // Only admins can update subscriber data
     }
+
+    // GitHub Membership Requests Collection
+    match /githubMembershipRequests/{requestId} {
+      // Users can read their own requests, admins can read all
+      allow read: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
+      // Authenticated users can create their own requests
+      allow create: if request.auth.uid != null && request.auth.uid == request.resource.data.userId;
+      // Only admins can update requests (for approval/denial)
+      allow update: if isAdminOrOfficer();
+      // No deletion allowed to maintain audit trail
+      allow delete: if false;
+    }
   }
 }

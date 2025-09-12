@@ -96,6 +96,27 @@ export interface Submission {
   feedback?: string;
 }
 
+// Allow Firestore FieldValue for timestamp fields during write operations by using a union
+type FirestoreDate = Timestamp | ReturnType<typeof import('firebase/firestore').serverTimestamp>;
+
+export interface GitHubMembershipRequest {
+  id: string;
+  userId: string;
+  userEmail: string;
+  githubUsername: string;
+  githubId?: number;
+  githubEmail?: string;
+  note?: string;
+  status: 'pending' | 'approved' | 'denied' | 'invite-sent' | 'already-member' | 'already-invited';
+  adminNotes?: string;
+  reviewedBy?: string; // Admin user ID
+  reviewedAt?: FirestoreDate;
+  inviteSentAt?: FirestoreDate;
+  inviteError?: string;
+  createdAt: FirestoreDate;
+  updatedAt: FirestoreDate;
+}
+
 export interface Post {
   id: string;
   title: string;
