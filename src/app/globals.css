@@ -122,6 +122,26 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Themed text selection colors (invert foreground/background) */
+  ::selection {
+    background: var(--foreground); /* light mode: dark highlight */
+    color: var(--background);      /* light mode: light text */
+    text-shadow: none;
+  }
+  ::-moz-selection {
+    background: var(--foreground);
+    color: var(--background);
+    text-shadow: none;
+  }
+  /* Dark mode selection (invert for readability) */
+  .dark ::selection {
+    background: var(--foreground); /* dark mode: light highlight */
+    color: var(--background);      /* dark mode: dark text */
+  }
+  .dark ::-moz-selection {
+    background: var(--foreground);
+    color: var(--background);
+  }
   
   /* Improved focus styles for accessibility */
   *:focus-visible {
