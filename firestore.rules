@@ -86,8 +86,9 @@ service cloud.firestore {
 
     // Pending Members Collection
     match /pendingMembers/{memberId} {
-      allow read, update, delete: if isAdminOrOfficer();
+      allow read: if true; // Allow reading to check for duplicate applications
       allow create: if true; // Anyone can apply to join
+      allow update, delete: if isAdminOrOfficer();
     }
 
     // Newsletter Subscribers Collection
