@@ -2,9 +2,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { updateProfile, updatePassword } from 'firebase/auth';
+import { updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider, deleteUser } from 'firebase/auth';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { storage, db } from '../../lib/firebase';
 import { useAuth } from '@/contexts/auth-context';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Container } from '@/components/container';
 import { toast } from 'sonner';
-import { Camera, User, Lock, Mail, Calendar, Shield } from 'lucide-react';
+import { Camera, User, Lock, Mail, Calendar, Shield, Trash2, AlertTriangle } from 'lucide-react';
 
 
 export default function SettingsPage() {
@@ -25,6 +25,9 @@ export default function SettingsPage() {
   const [photoURL, setPhotoURL] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
+  const [confirmDeleteText, setConfirmDeleteText] = useState('');
+  const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
@@ -125,6 +128,55 @@ export default function SettingsPage() {
       toast.error(getErrorMessage(err) || 'Failed to upload profile picture');
     }
     setUploadingPhoto(false);
+  };
+
+  const handleDeleteAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    if (confirmDeleteText !== 'DELETE') {
+      toast.error("You must type DELETE in uppercase to confirm.");
+      return;
+    }
+    setDeleting(true);
+    try {
+      // Re-authenticate if password provided and provider is password
+      if (user.email && deletePassword) {
+        const credential = EmailAuthProvider.credential(user.email, deletePassword);
+        await reauthenticateWithCredential(user, credential);
+      }
+
+      // Delete Firestore user document
+      try {
+        await deleteDoc(doc(db, 'users', user.uid));
+      } catch (innerErr) {
+        console.warn('Failed to delete user profile doc (continuing):', innerErr);
+      }
+
+      // (Optional) Delete profile picture from storage if exists
+      // NOTE: Skipping for now to avoid adding extra dependencies; can be implemented later.
+
+      // Delete auth user
+      await deleteUser(user);
+      toast.success('Account deleted. Sorry to see you go!');
+      // Redirect to home after short delay
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.location.href = '/';
+        }
+      }, 800);
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
+      if (msg.includes('auth/requires-recent-login')) {
+        toast.error('Please re-authenticate: sign out and sign back in, then try again.');
+      } else if (msg.includes('auth/invalid-credential') || msg.includes('auth/wrong-password')) {
+        toast.error('Password is incorrect.');
+      } else {
+        toast.error(msg || 'Failed to delete account');
+      }
+      setDeleting(false);
+      return;
+    }
+    setDeleting(false);
   };
 
   return (
@@ -284,6 +336,54 @@ export default function SettingsPage() {
                       className="w-full md:w-auto"
                     >
                       {loading ? 'Updating...' : 'Update Password'}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card className="border-destructive/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-destructive">
+                    <AlertTriangle className="h-5 w-5" />
+                    Danger Zone
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Deleting your account is irreversible. All your profile data will be permanently removed. This action cannot be undone.
+                  </p>
+                  <form onSubmit={handleDeleteAccount} className="space-y-4">
+                    {user?.email && (
+                      <div className="space-y-2">
+                        <Label htmlFor="deletePassword">Confirm Password</Label>
+                        <Input
+                          id="deletePassword"
+                          type="password"
+                          value={deletePassword}
+                          onChange={(e) => setDeletePassword(e.target.value)}
+                          placeholder="Enter your current password"
+                        />
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmDeleteText">Type DELETE to confirm</Label>
+                      <Input
+                        id="confirmDeleteText"
+                        type="text"
+                        value={confirmDeleteText}
+                        onChange={(e) => setConfirmDeleteText(e.target.value.toUpperCase())}
+                        placeholder="DELETE"
+                        className="uppercase"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      variant="destructive"
+                      disabled={Boolean(deleting || confirmDeleteText !== 'DELETE' || (user?.email && !deletePassword))}
+                      className="flex items-center gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {deleting ? 'Deleting Account...' : 'Delete Account'}
                     </Button>
                   </form>
                 </CardContent>

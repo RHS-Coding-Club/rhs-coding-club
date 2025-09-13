@@ -14,7 +14,9 @@ service cloud.firestore {
       allow read: if true;
       allow create: if request.auth.uid != null;
       allow update: if request.auth.uid == userId || isAdminOrOfficer();
-      allow delete: if false; // Prevent accidental deletion
+      // Allow a user to delete their own account document or an admin/officer to perform the deletion.
+      // Needed for the in-app account deletion feature. Frontend re-authenticates before calling.
+      allow delete: if request.auth != null && (request.auth.uid == userId || isAdminOrOfficer());
 
       // Bookmarked Resources Subcollection
       // Users can manage their own bookmarked resources.
