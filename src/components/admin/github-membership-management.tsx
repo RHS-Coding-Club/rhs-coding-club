@@ -31,6 +31,7 @@ import {
   User,
   Calendar
 } from 'lucide-react';
+import { RotateCw } from 'lucide-react';
 import {
   collection,
   query,
@@ -52,6 +53,7 @@ const STATUS_COLORS = {
   'invite-sent': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
   'already-member': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
   'already-invited': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  joined: 'bg-green-200 text-green-900 dark:bg-green-800/40 dark:text-green-300',
 };
 
 const STATUS_ICONS = {
@@ -61,6 +63,7 @@ const STATUS_ICONS = {
   'invite-sent': Mail,
   'already-member': CheckCircle,
   'already-invited': Mail,
+  joined: CheckCircle,
 };
 
 export function GitHubMembershipManagement() {
@@ -71,6 +74,8 @@ export function GitHubMembershipManagement() {
   const [adminNotes, setAdminNotes] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'review' | 'view'>('view');
 
   useEffect(() => {
     const q = query(
@@ -151,9 +156,10 @@ export function GitHubMembershipManagement() {
     }
   };
 
-  const openDialog = (request: GitHubMembershipRequest) => {
+  const openDialog = (request: GitHubMembershipRequest, mode: 'review' | 'view') => {
     setSelectedRequest(request);
     setAdminNotes(request.adminNotes || '');
+    setDialogMode(mode);
     setDialogOpen(true);
   };
 
@@ -191,6 +197,39 @@ export function GitHubMembershipManagement() {
   const getStatusIcon = (status: string) => {
     const Icon = STATUS_ICONS[status as keyof typeof STATUS_ICONS] || Clock;
     return <Icon className="h-4 w-4" />;
+  };
+
+  const canSyncStatus = (status: string) => ['invite-sent', 'already-invited', 'approved'].includes(status);
+
+  const handleSync = async (request: GitHubMembershipRequest) => {
+    setIsSyncing(true);
+    try {
+      const res = await fetch('/api/github/check-membership', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ githubUsername: request.githubUsername })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        toast.error(data.error || 'Failed to sync status');
+      } else if (data.status === 'joined') {
+        await updateDoc(doc(db, 'githubMembershipRequests', request.id), {
+          status: 'joined',
+          joinedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+        toast.success('Status updated to joined');
+      } else if (data.status === 'invite-sent') {
+        toast.info('Invitation still pending acceptance');
+      } else if (data.status === 'not-invited') {
+        toast.warning('User is neither invited nor a member; consider re-sending invite');
+      }
+    } catch (err) {
+      console.error('Error syncing membership status', err);
+      toast.error('Error syncing membership status');
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const pendingRequests = requests.filter(r => r.status === 'pending');
@@ -281,7 +320,7 @@ export function GitHubMembershipManagement() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => openDialog(request)}
+                        onClick={() => openDialog(request, 'review')}
                       >
                         Review
                       </Button>
@@ -337,7 +376,7 @@ export function GitHubMembershipManagement() {
                           href={`https://github.com/${request.githubUsername}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline flex items-center gap-1"
+                          className="text-white-600 hover:underline flex items-center gap-1"
                         >
                           {request.githubUsername}
                           <ExternalLink className="h-3 w-3" />
@@ -364,13 +403,30 @@ export function GitHubMembershipManagement() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openDialog(request)}
-                      >
-                        View
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openDialog(request, 'view')}
+                        >
+                          View
+                        </Button>
+                        {canSyncStatus(request.status) && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Sync Status"
+                            disabled={isSyncing}
+                            onClick={() => handleSync(request)}
+                          >
+                            {isSyncing ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+                            ) : (
+                              <RotateCw className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -467,12 +523,13 @@ export function GitHubMembershipManagement() {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   rows={3}
-                  className="resize-none"
+                  className={`resize-none ${dialogMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  disabled={dialogMode === 'view'}
                 />
               </div>
 
               {/* Action Buttons */}
-              {selectedRequest.status === 'pending' && (
+              {dialogMode === 'review' && selectedRequest.status === 'pending' && (
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
                   <Button
                     onClick={() => handleAction(selectedRequest, 'approve')}
@@ -503,7 +560,7 @@ export function GitHubMembershipManagement() {
                 </div>
               )}
 
-              {selectedRequest.status === 'approved' && (
+              {dialogMode === 'review' && selectedRequest.status === 'approved' && (
                 <div className="pt-4 border-t">
                   <Button
                     onClick={() => handleAction(selectedRequest, 'approve')}
@@ -522,6 +579,31 @@ export function GitHubMembershipManagement() {
                       </>
                     )}
                   </Button>
+                </div>
+              )}
+
+              {selectedRequest && canSyncStatus(selectedRequest.status) && (
+                <div className="pt-4 border-t flex flex-col gap-3">
+                  <Button
+                    type="button"
+                    onClick={() => handleSync(selectedRequest)}
+                    variant="outline"
+                    disabled={isSyncing}
+                    className="w-full"
+                  >
+                    {isSyncing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                        Syncing Status...
+                      </>
+                    ) : (
+                      <>
+                        <RotateCw className="h-4 w-4 mr-2" />
+                        Sync Status with GitHub
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center -mt-2">Checks GitHub org membership & invitation live</p>
                 </div>
               )}
             </div>

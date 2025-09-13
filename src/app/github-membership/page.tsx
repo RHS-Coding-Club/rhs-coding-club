@@ -35,7 +35,7 @@ import { db } from '@/lib/firebase';
 import { GitHubMembershipRequest } from '@/lib/firebase-collections';
 import { toast } from 'sonner';
 
-type RequestStatus = 'pending' | 'approved' | 'denied' | 'invite-sent' | 'already-member' | 'already-invited';
+type RequestStatus = 'pending' | 'approved' | 'denied' | 'invite-sent' | 'already-member' | 'already-invited' | 'joined';
 
 interface StatusInfo {
   title: string;
@@ -88,6 +88,13 @@ const STATUS_INFO: Record<RequestStatus, StatusInfo> = {
     color: 'text-red-700 dark:text-red-400',
     bgColor: 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800/50',
   },
+  joined: {
+    title: 'Joined 🎉',
+    description: 'You are an active member of the GitHub organization. Happy collaborating!',
+    icon: CheckCircle,
+    color: 'text-green-700 dark:text-green-400',
+    bgColor: 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800/50',
+  },
 };
 
 export default function GitHubMembershipPage() {
@@ -122,6 +129,42 @@ export default function GitHubMembershipPage() {
       return () => unsubscribe();
     }
   }, [user, userProfile]);
+
+  // Poll GitHub API when waiting for user to accept invite to transition to joined
+  useEffect(() => {
+    if (!currentRequest) return;
+    // Only poll if these statuses that could transition to joined
+    if (!['invite-sent', 'already-invited', 'approved'].includes(currentRequest.status)) return;
+
+    let cancelled = false;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/github/check-membership', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ githubUsername: currentRequest.githubUsername })
+        });
+        const data = await res.json();
+        if (!cancelled && data.success && data.status === 'joined') {
+          // Update Firestore status to joined
+          const { doc, updateDoc, serverTimestamp } = await import('firebase/firestore');
+          await updateDoc(doc(db, 'githubMembershipRequests', currentRequest.id), {
+            status: 'joined',
+            updatedAt: serverTimestamp(),
+          });
+          // Stop polling
+          clearInterval(interval);
+        }
+      } catch (err) {
+        console.error('Error polling membership status', err);
+      }
+    }, 15000); // every 15s
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [currentRequest]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

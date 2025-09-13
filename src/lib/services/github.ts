@@ -45,11 +45,19 @@ export class GitHubService {
         ...options.headers,
       },
     });
-
-    const data = await response.json();
+    // Some endpoints (like membership existence endpoint) may return 204 No Content on success
+    let data: unknown = null;
+    if (response.status !== 204) {
+      try {
+        data = await response.json();
+      } catch {
+        // ignore JSON parse issues for empty bodies
+        data = null;
+      }
+    }
 
     if (!response.ok) {
-      const error = data as GitHubError;
+      const error = (data || {}) as GitHubError;
       throw new Error(error.message || `GitHub API error: ${response.status}`);
     }
 
@@ -58,12 +66,15 @@ export class GitHubService {
 
   async getUserByUsername(username: string): Promise<GitHubUser | null> {
     try {
-      const user = await this.makeGitHubRequest(`/users/${username}`);
+      const userData = await this.makeGitHubRequest(`/users/${username}`);
+      if (!userData || typeof userData !== 'object') return null;
+      const user = userData as Record<string, unknown>;
+      if (typeof user.id !== 'number' || typeof user.login !== 'string') return null;
       return {
         id: user.id,
         login: user.login,
-        email: user.email,
-        name: user.name,
+        email: (typeof user.email === 'string' || user.email === null) ? (user.email as string | null) : null,
+        name: (typeof user.name === 'string' || user.name === null) ? (user.name as string | null) : null,
       };
     } catch (error) {
       console.error('Error fetching GitHub user:', error);
@@ -73,10 +84,43 @@ export class GitHubService {
 
   async isUserInOrganization(username: string): Promise<boolean> {
     try {
-      await this.makeGitHubRequest(`/orgs/${this.org}/members/${username}`);
-      return true;
-    } catch {
+      // GitHub returns 204 No Content for membership existence endpoint when user is a member
+      const url = `https://api.github.com/orgs/${this.org}/members/${username}`;
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `token ${this.token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'RHS-Coding-Club-App',
+        },
+      });
+      if (response.status === 204) return true; // definite member
+      if (response.status === 404) return false; // not a member
+      if (response.ok) return true; // fallback: some responses may be 200
       return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Returns detailed membership state using the memberships endpoint.
+   * Possible states: 'active', 'pending', 'inactive', 'none'
+   */
+  async getMembershipState(username: string): Promise<{ state: string; role?: string }> {
+    try {
+      const data = await this.makeGitHubRequest(`/orgs/${this.org}/memberships/${username}`);
+      if (data && typeof data === 'object' && 'state' in data) {
+        // Narrow the unknown "data" to the shape we expect from GitHub memberships endpoint
+        const membership = data as { state: string; role?: string };
+        return { state: membership.state, role: membership.role };
+      }
+      return { state: 'unknown' };
+    } catch (error) {
+      // 404 means no membership (not invited or invitation expired)
+      if (error instanceof Error && /404/.test(error.message)) {
+        return { state: 'none' };
+      }
+      return { state: 'error' };
     }
   }
 

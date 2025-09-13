@@ -107,12 +107,13 @@ export interface GitHubMembershipRequest {
   githubId?: number;
   githubEmail?: string;
   note?: string;
-  status: 'pending' | 'approved' | 'denied' | 'invite-sent' | 'already-member' | 'already-invited';
+  status: 'pending' | 'approved' | 'denied' | 'invite-sent' | 'already-member' | 'already-invited' | 'joined';
   adminNotes?: string;
   reviewedBy?: string; // Admin user ID
   reviewedAt?: FirestoreDate;
   inviteSentAt?: FirestoreDate;
   inviteError?: string;
+  joinedAt?: FirestoreDate; // timestamp when detected as member
   createdAt: FirestoreDate;
   updatedAt: FirestoreDate;
 }
