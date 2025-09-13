@@ -10,12 +10,15 @@ import { ProtectedRoute } from '@/components/auth/protected-route';
 import { useAuth } from '@/contexts/auth-context';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { Calendar, Users, Trophy, BookOpen, Loader2, AlertCircle, LayoutDashboard, FolderOpen } from 'lucide-react';
+import { ResourceCard } from '@/components/resources/resource-card';
+import { useResourceBookmarks } from '@/hooks/useResourceBookmarks';
 import { formatDistanceToNow } from 'date-fns';
 import { useState, useMemo } from 'react';
 
 export default function DashboardPage() {
   const { userProfile } = useAuth();
   const { stats, recentActivity, upcomingEvents, userProjects, userChallenges, loading, error } = useDashboardData();
+  const { bookmarkedResources, toggleBookmark, isBookmarked, loading: bookmarksLoading } = useResourceBookmarks();
   const [activeSection, setActiveSection] = useState<string>('overview');
   const [projectSearch, setProjectSearch] = useState('');
   const [projectStatus, setProjectStatus] = useState<'all' | 'approved' | 'pending'>('all');
@@ -367,15 +370,29 @@ export default function DashboardPage() {
             <TabsContent value="resources" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>My Learning Resources</CardTitle>
+                  <CardTitle>Bookmarked Resources</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
-                    Bookmarked resources and learning materials will appear here in a future update.
-                  </p>
-                  <div className="mt-4">
-                    <Badge variant="outline">Coming Soon</Badge>
-                  </div>
+                  {bookmarksLoading ? (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" /> Loading bookmarks...
+                    </div>
+                  ) : bookmarkedResources.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">
+                      You haven&apos;t bookmarked any resources yet. Browse the <span className="underline">Resources</span> page and click the star icon to save resources here.
+                    </p>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {bookmarkedResources.map(res => (
+                        <ResourceCard
+                          key={res.id}
+                          resource={res}
+                          isBookmarked={isBookmarked(res.id)}
+                          onToggleBookmark={toggleBookmark}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

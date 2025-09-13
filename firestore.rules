@@ -15,6 +15,15 @@ service cloud.firestore {
       allow create: if request.auth.uid != null;
       allow update: if request.auth.uid == userId || isAdminOrOfficer();
       allow delete: if false; // Prevent accidental deletion
+
+      // Bookmarked Resources Subcollection
+      // Users can manage their own bookmarked resources.
+      match /bookmarkedResources/{resourceId} {
+        // Allow read, create, and delete if the user is authenticated and accessing their own bookmarks.
+        allow read, create, delete: if request.auth.uid == userId;
+        // Updates are not allowed to keep the logic simple (bookmarks are either present or not).
+        allow update: if false;
+      }
     }
 
     // Events Collection

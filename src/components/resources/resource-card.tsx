@@ -2,11 +2,14 @@ import { Resource } from '@/lib/firebase-collections';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Star } from 'lucide-react';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 interface ResourceCardProps {
   resource: Resource;
+  isBookmarked?: boolean;
+  onToggleBookmark?: (id: string) => void;
 }
 
 const getLevelColor = (level: string) => {
@@ -22,12 +25,27 @@ const getLevelColor = (level: string) => {
   }
 };
 
-export function ResourceCard({ resource }: ResourceCardProps) {
+export function ResourceCard({ resource, isBookmarked, onToggleBookmark }: ResourceCardProps) {
   return (
     <Card className="h-full">
       <CardHeader>
         <div className="space-y-2">
-          <CardTitle className="text-lg line-clamp-2">{resource.title}</CardTitle>
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="text-lg line-clamp-2 flex-1">{resource.title}</CardTitle>
+            {onToggleBookmark && (
+              <button
+                type="button"
+                aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
+                onClick={() => onToggleBookmark(resource.id)}
+                className={cn(
+                  'p-1 rounded-md transition-colors border hover:bg-muted',
+                  isBookmarked ? 'text-yellow-500' : 'text-muted-foreground'
+                )}
+              >
+                <Star className={cn('h-4 w-4', isBookmarked ? 'fill-yellow-500/70' : 'fill-none')} />
+              </button>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2">
             <Badge className={getLevelColor(resource.level)}>
               {resource.level.charAt(0).toUpperCase() + resource.level.slice(1)}

@@ -19,11 +19,15 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useResources } from '@/hooks/useResources';
+import { useResourceBookmarks } from '@/hooks/useResourceBookmarks';
+import { useAuth } from '@/contexts/auth-context';
 import { ResourceCard, ResourceFilters } from '@/components/resources';
 import { Resource } from '@/lib/firebase-collections';
 
 export default function ResourcesPage() {
   const { resources, loading, error } = useResources();
+  const { user } = useAuth();
+  const { bookmarkedIds, toggleBookmark, isBookmarked } = useResourceBookmarks();
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -283,7 +287,12 @@ export default function ResourcesPage() {
                             
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                               {levelResources.map((resource) => (
-                                <ResourceCard key={resource.id} resource={resource} />
+                                <ResourceCard
+                                  key={resource.id}
+                                  resource={resource}
+                                  isBookmarked={isBookmarked(resource.id)}
+                                  onToggleBookmark={user ? toggleBookmark : undefined}
+                                />
                               ))}
                             </div>
                           </div>
@@ -305,7 +314,12 @@ export default function ResourcesPage() {
                   ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                       {resourcesByLevel.beginner.map((resource) => (
-                        <ResourceCard key={resource.id} resource={resource} />
+                        <ResourceCard
+                          key={resource.id}
+                          resource={resource}
+                          isBookmarked={isBookmarked(resource.id)}
+                          onToggleBookmark={user ? toggleBookmark : undefined}
+                        />
                       ))}
                     </div>
                   )}
@@ -323,7 +337,12 @@ export default function ResourcesPage() {
                   ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                       {resourcesByLevel.intermediate.map((resource) => (
-                        <ResourceCard key={resource.id} resource={resource} />
+                        <ResourceCard
+                          key={resource.id}
+                          resource={resource}
+                          isBookmarked={isBookmarked(resource.id)}
+                          onToggleBookmark={user ? toggleBookmark : undefined}
+                        />
                       ))}
                     </div>
                   )}
@@ -341,7 +360,12 @@ export default function ResourcesPage() {
                   ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                       {resourcesByLevel.advanced.map((resource) => (
-                        <ResourceCard key={resource.id} resource={resource} />
+                        <ResourceCard
+                          key={resource.id}
+                          resource={resource}
+                          isBookmarked={isBookmarked(resource.id)}
+                          onToggleBookmark={user ? toggleBookmark : undefined}
+                        />
                       ))}
                     </div>
                   )}
