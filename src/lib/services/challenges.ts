@@ -102,12 +102,23 @@ export const challengesService = {
     if (existingSubmission) {
       // Update existing submission
       const submissionRef = doc(db, 'submissions', existingSubmission.id);
-      await updateDoc(submissionRef, {
+      const updateData = {
         code: submissionData.code,
         language: submissionData.language,
-        status: 'pending',
+        status: 'pending' as const,
         submittedAt: serverTimestamp(),
-      });
+        submissionType: submissionData.submissionType,
+      } as Partial<Submission>;
+
+      // Add optional fields based on submission type
+      if (submissionData.fileNames) updateData.fileNames = submissionData.fileNames;
+      if (submissionData.fileUrls) updateData.fileUrls = submissionData.fileUrls;
+      if (submissionData.fileName) updateData.fileName = submissionData.fileName;
+      if (submissionData.fileUrl) updateData.fileUrl = submissionData.fileUrl;
+      if (submissionData.projectUrl) updateData.projectUrl = submissionData.projectUrl;
+      if (submissionData.platformType) updateData.platformType = submissionData.platformType;
+
+      await updateDoc(submissionRef, updateData);
       return existingSubmission.id;
     } else {
       // Create new submission

@@ -94,6 +94,17 @@ export interface Submission {
   reviewedAt?: Timestamp;
   reviewedBy?: string; // Officer/Admin user ID
   feedback?: string;
+  // Enhanced submission options
+  submissionType: 'code' | 'file' | 'link';
+  // Multiple file support
+  fileUrls?: string[]; // For multiple file uploads (stored in Firebase Storage)
+  fileNames?: string[]; // Original file names for multiple files
+  // Legacy single file support (for backward compatibility)
+  fileUrl?: string; 
+  fileName?: string;
+  // Project link support
+  projectUrl?: string; 
+  platformType?: string;
 }
 
 // Allow Firestore FieldValue for timestamp fields during write operations by using a union
