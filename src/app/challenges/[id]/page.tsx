@@ -121,7 +121,7 @@ export default function ChallengePage() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="prose prose-sm max-w-none">
-                    <div className="whitespace-pre-wrap">{challenge.prompt}</div>
+                    <div className="whitespace-pre-wrap text-foreground">{challenge.prompt}</div>
                   </div>
 
                   {(challenge.sampleInput || challenge.sampleOutput) && (

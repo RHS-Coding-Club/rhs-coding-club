@@ -175,7 +175,7 @@ export function SubmissionReview() {
                           {submission.fileNames && submission.fileNames.length > 0 ? (
                             <div>
                               <Label>Uploaded Files ({submission.fileNames.length}):</Label>
-                              <div className="space-y-1 mb-2">
+                              <div className="space-y-1 mb-2 text-foreground">
                                 {submission.fileNames.map((fileName, index) => (
                                   <div key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <FileText className="h-3 w-3" />
@@ -253,7 +253,7 @@ export function SubmissionReview() {
 
               <div className="space-y-2">
                 <Label className="font-semibold mb-2">Problem Statement:</Label>
-                <div className="bg-muted p-3 rounded-md text-sm max-h-32 overflow-y-auto">
+                <div className="bg-muted p-3 rounded-md text-sm max-h-32 overflow-y-auto text-foreground">
                   {challengeMap[selectedSubmission.challengeId]?.prompt || 'No prompt available'}
                 </div>
               </div>
