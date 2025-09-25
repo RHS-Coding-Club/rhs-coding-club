@@ -8,11 +8,11 @@ export function HomepageLoading() {
       <section className="py-20 lg:py-32">
         <Container>
           <div className="text-center space-y-8">
-            <div className="space-y-4">
-              <Skeleton className="h-16 sm:h-20 lg:h-24 w-3/4 mx-auto" />
-              <Skeleton className="h-6 w-2/3 mx-auto" />
+            <div className="space-y-4 max-w-3xl mx-auto px-4">
+              <Skeleton className="h-16 sm:h-20 lg:h-24 w-full max-w-3xl mx-auto" />
+              <Skeleton className="h-6 w-full max-w-2xl mx-auto" />
             </div>
-            <Skeleton className="h-12 w-40 mx-auto" />
+            <Skeleton className="h-12 w-full max-w-xs mx-auto" />
           </div>
         </Container>
       </section>
@@ -23,8 +23,8 @@ export function HomepageLoading() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="space-y-2">
-                <Skeleton className="h-12 w-20 mx-auto" />
-                <Skeleton className="h-4 w-32 mx-auto" />
+                <Skeleton className="h-12 w-full max-w-xs mx-auto" />
+                <Skeleton className="h-4 w-full max-w-sm mx-auto" />
               </div>
             ))}
           </div>
@@ -35,12 +35,12 @@ export function HomepageLoading() {
       <section className="py-20">
         <Container>
           <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <Skeleton className="h-10 w-64 mx-auto" />
-              <Skeleton className="h-6 w-96 mx-auto" />
+            <div className="text-center space-y-4 px-4">
+              <Skeleton className="h-10 w-full max-w-md mx-auto" />
+              <Skeleton className="h-6 w-full max-w-2xl mx-auto" />
             </div>
             
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto px-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="border rounded-lg p-6 space-y-4">
                   <div className="space-y-2">
@@ -81,7 +81,7 @@ export function HomepageLoading() {
             
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="border rounded-lg p-6 space-y-4">
+                <div key={i} className="border rounded-lg p-6 space-y-4 w-full">
                   <div className="space-y-2">
                     <div className="flex gap-2">
                       <Skeleton className="h-6 w-20" />
@@ -105,9 +105,9 @@ export function HomepageLoading() {
       {/* CTA Section Loading */}
       <section className="py-20">
         <Container>
-          <div className="text-center space-y-8">
-            <Skeleton className="h-10 w-80 mx-auto" />
-            <Skeleton className="h-6 w-96 mx-auto" />
+          <div className="text-center space-y-8 px-4">
+            <Skeleton className="h-10 w-full max-w-sm mx-auto" />
+            <Skeleton className="h-6 w-full max-w-2xl mx-auto" />
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Skeleton className="h-12 w-40" />
               <Skeleton className="h-12 w-40" />

@@ -622,7 +622,7 @@ export default function AdminPage() {
                         {filteredUsers.map((user) => (
                           <div
                             key={user.uid}
-                            className="flex items-center justify-between p-4 border rounded-lg bg-card"
+                            className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-card"
                           >
                             <div className="flex-1">
                               <div className="flex items-center gap-4">
@@ -645,7 +645,7 @@ export default function AdminPage() {
                                 </Badge>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex w-full sm:w-auto items-center gap-2 mt-3 sm:mt-0">
                               <Label htmlFor={`role-${user.uid}`} className="text-sm">
                                 Role:
                               </Label>
@@ -654,7 +654,7 @@ export default function AdminPage() {
                                 onValueChange={(value: UserRole) => updateUserRole(user.uid, value)}
                                 disabled={updating === user.uid || !canEditRole(user)}
                               >
-                                <SelectTrigger className="w-36">
+                                <SelectTrigger className="w-full sm:w-36">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>

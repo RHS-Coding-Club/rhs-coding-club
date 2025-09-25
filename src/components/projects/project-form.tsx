@@ -326,13 +326,14 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
             <Label>Project Images</Label>
             <div className="space-y-3">
               {(imageFiles.length > 0) && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4">
                   {imageFiles.map((file, index) => (
-                    <div key={index} className="relative group">
+                    <div key={index} className="relative group overflow-hidden rounded-md">
                       <img 
                         src={URL.createObjectURL(file)} 
                         alt={`Preview ${file.name}`}
-                        className="w-full h-24 object-cover rounded-md"
+                        className="w-full h-auto max-h-44 object-cover rounded-md block"
+                        style={{ width: '100%', height: 'auto' }}
                       />
                       <Button
                         type="button"
