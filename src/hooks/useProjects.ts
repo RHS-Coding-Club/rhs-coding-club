@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { projectService, ProjectWithAuthor, ProjectFilters } from '@/lib/services/projects';
 
 export function useProjects(filters?: ProjectFilters) {
@@ -8,7 +8,7 @@ export function useProjects(filters?: ProjectFilters) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadProjects = useCallback(async () => {
+  const loadProjects = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -20,11 +20,11 @@ export function useProjects(filters?: ProjectFilters) {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  };
 
   useEffect(() => {
     loadProjects();
-  }, [loadProjects]);
+  }, [JSON.stringify(filters)]);
 
   const refetch = () => {
     loadProjects();
@@ -43,25 +43,25 @@ export function useProject(id: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadProject = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await projectService.getProject(id);
-      setProject(data);
-    } catch (err) {
-      console.error('Error loading project:', err);
-      setError('Failed to load project');
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
   useEffect(() => {
+    const loadProject = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await projectService.getProject(id);
+        setProject(data);
+      } catch (err) {
+        console.error('Error loading project:', err);
+        setError('Failed to load project');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (id) {
       loadProject();
     }
-  }, [id, loadProject]);
+  }, [id]);
 
   return {
     project,
