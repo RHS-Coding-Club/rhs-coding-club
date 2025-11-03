@@ -40,6 +40,7 @@ import {
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { Users, Shield, Settings, UserCheck, Plus, Edit, Trash2, Save, Upload, X, Mail, Github, Calendar, Eye, FolderOpen } from 'lucide-react';
+import Image from 'next/image';
 import { Officer } from '@/lib/firebase-collections';
 import { ProjectManagement } from '@/components/admin/project-management';
 import { ResourceManagement } from '@/components/admin/resource-management';
@@ -47,8 +48,8 @@ import { BlogManagement } from '@/components/admin/blog-management';
 import { NewsletterManagement } from '@/components/admin/newsletter-management';
 import { SubmissionReview } from '@/components/admin/submission-review';
 import { projectService } from '@/lib/services/projects';
-import { PendingMemberManagement } from '@/components/admin/pending-member-management';
 import { GitHubMembershipManagement } from '@/components/admin/github-membership-management';
+import { MembershipApplicationReview } from '@/components/admin/membership-application-review';
 
 // Predefined officer roles
 const OFFICER_ROLES = [
@@ -524,7 +525,7 @@ export default function AdminPage() {
                 <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
                   <TabsList className="flex-wrap">
                     <TabsTrigger value="users">User Management</TabsTrigger>
-                    <TabsTrigger value="membership">Membership</TabsTrigger>
+                    <TabsTrigger value="applications">Applications</TabsTrigger>
                     <TabsTrigger value="github">GitHub Org</TabsTrigger>
                     <TabsTrigger value="officers">Officers</TabsTrigger>
                     <TabsTrigger value="submissions">Submissions</TabsTrigger>
@@ -545,7 +546,7 @@ export default function AdminPage() {
                     <nav className="space-y-1">
                       {[
                         { key: 'users', label: 'User Management', icon: Users },
-                        { key: 'membership', label: 'Membership', icon: UserCheck },
+                        { key: 'applications', label: 'Applications', icon: UserCheck },
                         { key: 'github', label: 'GitHub Org', icon: Github },
                         { key: 'officers', label: 'Officers', icon: Users },
                         { key: 'submissions', label: 'Submissions', icon: Eye },
@@ -628,7 +629,7 @@ export default function AdminPage() {
                               <div className="flex items-center gap-4">
                                 {/* Avatar */}
                                 {user.photoURL ? (
-                                  <img src={user.photoURL} alt={user.displayName} className="h-10 w-10 rounded-full object-cover border" />
+                                  <Image src={user.photoURL} alt={user.displayName} width={40} height={40} className="h-10 w-10 rounded-full object-cover border" />
                                 ) : (
                                   <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center border">
                                     <span className="text-sm font-semibold">
@@ -675,8 +676,8 @@ export default function AdminPage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="membership" className="space-y-6">
-                <PendingMemberManagement />
+              <TabsContent value="applications" className="space-y-6">
+                <MembershipApplicationReview />
               </TabsContent>
 
               <TabsContent value="github" className="space-y-6">
@@ -749,9 +750,11 @@ export default function AdminPage() {
                                 <div className="flex-shrink-0">
                                   {(previewUrl || officerForm.imageUrl) ? (
                                     <div className="relative group">
-                                      <img 
+                                      <Image 
                                         src={previewUrl || officerForm.imageUrl} 
                                         alt="Profile preview" 
+                                        width={80}
+                                        height={80}
                                         className="w-20 h-20 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700 shadow-sm"
                                       />
                                       <Button
@@ -985,9 +988,11 @@ export default function AdminPage() {
                               {/* Profile Image */}
                               <div className="flex-shrink-0">
                                 {officer.imageUrl ? (
-                                  <img 
+                                  <Image 
                                     src={officer.imageUrl} 
                                     alt={officer.name}
+                                    width={64}
+                                    height={64}
                                     className="w-16 h-16 rounded-xl object-cover border-2 border-gray-100 dark:border-gray-700"
                                   />
                                 ) : (

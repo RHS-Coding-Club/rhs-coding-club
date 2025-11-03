@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { eventService, EventWithRsvps, CreateEventData, UpdateEventData } from '@/lib/services/events';
 import { toast } from 'sonner';
@@ -11,7 +11,7 @@ export function useEvents() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -23,11 +23,11 @@ export function useEvents() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchEvents();
-  }, [user]);
+  }, [fetchEvents]);
 
   return {
     events,
@@ -43,7 +43,7 @@ export function useUpcomingEvents(limitCount = 10) {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -55,11 +55,11 @@ export function useUpcomingEvents(limitCount = 10) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, limitCount]);
 
   useEffect(() => {
     fetchEvents();
-  }, [user, limitCount]);
+  }, [fetchEvents]);
 
   return {
     events,
@@ -75,7 +75,7 @@ export function usePastEvents(limitCount = 10) {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -87,11 +87,11 @@ export function usePastEvents(limitCount = 10) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, limitCount]);
 
   useEffect(() => {
     fetchEvents();
-  }, [user, limitCount]);
+  }, [fetchEvents]);
 
   return {
     events,
@@ -107,7 +107,7 @@ export function useEvent(eventId: string) {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const fetchEvent = async () => {
+  const fetchEvent = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -119,13 +119,13 @@ export function useEvent(eventId: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [eventId, user]);
 
   useEffect(() => {
     if (eventId) {
       fetchEvent();
     }
-  }, [eventId, user]);
+  }, [eventId, fetchEvent]);
 
   return {
     event,

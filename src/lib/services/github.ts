@@ -97,7 +97,8 @@ export class GitHubService {
       if (response.status === 404) return false; // not a member
       if (response.ok) return true; // fallback: some responses may be 200
       return false;
-    } catch (e) {
+    } catch (error) {
+      console.error(`Error checking membership for ${username}:`, error);
       return false;
     }
   }

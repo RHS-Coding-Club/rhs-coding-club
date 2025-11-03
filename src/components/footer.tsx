@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Code2, Github, Mail } from 'lucide-react';
+import Image from 'next/image';
+import { Github, Mail } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -18,7 +19,14 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4 md:col-span-1 lg:col-span-1">
             <div className="flex items-center space-x-2">
-              <Code2 className="h-6 w-6" />
+              <div className="relative h-10 w-10">
+                <Image
+                  src="/icon.png"
+                  alt="RHS Coding Club Logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
               <span className="text-lg font-bold">RHS Coding Club</span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs">

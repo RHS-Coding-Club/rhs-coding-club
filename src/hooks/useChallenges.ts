@@ -98,11 +98,7 @@ export function useLeaderboard(limit: number = 10) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadLeaderboard();
-  }, [limit]);
-
-  const loadLeaderboard = async () => {
+  const loadLeaderboard = useCallback(async () => {
     try {
       setLoading(true);
       const data = await challengesService.getLeaderboard(limit);
@@ -113,7 +109,11 @@ export function useLeaderboard(limit: number = 10) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit]);
+
+  useEffect(() => {
+    loadLeaderboard();
+  }, [loadLeaderboard]);
 
   return { leaderboard, loading, error, refetch: loadLeaderboard };
 }

@@ -6,22 +6,25 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ProtectedRoute } from '@/components/auth/protected-route';
 import { useAuth } from '@/contexts/auth-context';
 import { useDashboardData } from '@/hooks/useDashboardData';
-import { Calendar, Users, Trophy, BookOpen, Loader2, AlertCircle, LayoutDashboard, FolderOpen } from 'lucide-react';
+import { Calendar, Users, Trophy, BookOpen, Loader2, AlertCircle, LayoutDashboard, FolderOpen, UserPlus } from 'lucide-react';
 import { ResourceCard } from '@/components/resources/resource-card';
 import { useResourceBookmarks } from '@/hooks/useResourceBookmarks';
 import { formatDistanceToNow } from 'date-fns';
 import { useState, useMemo } from 'react';
+import { MembershipApplication } from '@/components/dashboard/membership-application';
+import { AuthForm } from '@/components/auth';
 
 export default function DashboardPage() {
-  const { userProfile } = useAuth();
+  const { user, userProfile } = useAuth();
   const { stats, recentActivity, upcomingEvents, userProjects, userChallenges, loading, error } = useDashboardData();
   const { bookmarkedResources, toggleBookmark, isBookmarked, loading: bookmarksLoading } = useResourceBookmarks();
-  const [activeSection, setActiveSection] = useState<string>('overview');
+  const [activeSection, setActiveSection] = useState<string>(userProfile?.role === 'guest' || !userProfile ? 'apply' : 'overview');
   const [projectSearch, setProjectSearch] = useState('');
   const [projectStatus, setProjectStatus] = useState<'all' | 'approved' | 'pending'>('all');
+
+  const isGuest = !userProfile || userProfile.role === 'guest';
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -48,42 +51,100 @@ export default function DashboardPage() {
     });
   }, [userProjects, projectSearch, projectStatus]);
 
-  if (loading) {
+  // If not signed in at all, show auth form
+  if (!user) {
     return (
-      <ProtectedRoute requiredRoles={['admin', 'officer', 'member']}>
-        <div className="py-20">
-          <Container>
-            <div className="flex items-center justify-center min-h-[400px]">
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span>Loading dashboard...</span>
-              </div>
+      <div className="py-20">
+        <Container>
+          <div className="max-w-md mx-auto space-y-8">
+            <div className="text-center space-y-2">
+              <h1 className="text-4xl font-bold">Dashboard</h1>
+              <p className="text-muted-foreground">
+                Sign in to access your dashboard
+              </p>
             </div>
-          </Container>
-        </div>
-      </ProtectedRoute>
+            <AuthForm />
+          </div>
+        </Container>
+      </div>
     );
   }
 
-  if (error) {
+  if (loading) {
     return (
-      <ProtectedRoute requiredRoles={['admin', 'officer', 'member']}>
-        <div className="py-20">
-          <Container>
-            <div className="flex items-center justify-center min-h-[400px]">
-              <div className="flex items-center gap-2 text-destructive">
-                <AlertCircle className="h-6 w-6" />
-                <span>{error}</span>
-              </div>
+      <div className="py-20">
+        <Container>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span>Loading dashboard...</span>
             </div>
-          </Container>
-        </div>
-      </ProtectedRoute>
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  if (error && !isGuest) {
+    return (
+      <div className="py-20">
+        <Container>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-6 w-6" />
+              <span>{error}</span>
+            </div>
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  // Guest user view - show only membership application
+  if (isGuest) {
+    return (
+      <div className="py-20">
+        <Container>
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-4xl font-bold">Dashboard</h1>
+                <p className="text-muted-foreground mt-2">
+                  Welcome, {userProfile?.displayName || user.displayName || user.email}!
+                </p>
+              </div>
+              <Badge 
+                variant="outline" 
+                className={getRoleColor('guest')}
+              >
+                Guest
+              </Badge>
+            </div>
+
+            <Card className="bg-muted/50">
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="p-3 rounded-full bg-primary/10">
+                    <UserPlus className="h-8 w-8 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-semibold">Become a Member</h2>
+                    <p className="text-muted-foreground mt-1">
+                      Apply for membership to unlock full access to the dashboard, events, challenges, and more!
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <MembershipApplication />
+          </div>
+        </Container>
+      </div>
     );
   }
 
   return (
-    <ProtectedRoute requiredRoles={['admin', 'officer', 'member']}>
       <div className="py-20">
         <Container>
           <div className="max-w-7xl mx-auto space-y-8">
@@ -402,6 +463,5 @@ export default function DashboardPage() {
         </div>
       </Container>
     </div>
-    </ProtectedRoute>
   );
 }

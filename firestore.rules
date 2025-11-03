@@ -95,13 +95,6 @@ service cloud.firestore {
       allow create: if true; // Anyone can send a message
     }
 
-    // Pending Members Collection
-    match /pendingMembers/{memberId} {
-      allow read: if true; // Allow reading to check for duplicate applications
-      allow create: if true; // Anyone can apply to join
-      allow update, delete: if isAdminOrOfficer();
-    }
-
     // Newsletter Subscribers Collection
     match /newsletterSubscribers/{subscriberId} {
       allow read: if true; // Allow server-side reading for newsletter sending
@@ -120,6 +113,18 @@ service cloud.firestore {
       allow update: if isAdminOrOfficer();
       // No deletion allowed to maintain audit trail
       allow delete: if false;
+    }
+
+    // Membership Applications Collection
+    match /membershipApplications/{applicationId} {
+      // Users can read their own applications, admins can read all
+      allow read: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
+      // Authenticated users can create their own applications
+      allow create: if request.auth.uid != null && request.auth.uid == request.resource.data.userId;
+      // Only admins can update applications (for approval/rejection)
+      allow update: if isAdminOrOfficer();
+      // Only admins can delete applications
+      allow delete: if isAdminOrOfficer();
     }
   }
 }

@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, Code2 } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -37,10 +38,17 @@ export function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <motion.div
-                whileHover={{ rotate: 180 }}
+                whileHover={{ scale: 1.1 }}
                 transition={{ duration: 0.3 }}
+                className="relative h-10 w-10"
               >
-                <Code2 className="h-6 w-6" />
+                <Image
+                  src="/icon.png"
+                  alt="RHS Coding Club Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
               </motion.div>
               <span className="text-xl font-bold">RHS Coding Club</span>
             </Link>

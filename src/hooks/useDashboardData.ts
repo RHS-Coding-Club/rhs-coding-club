@@ -62,6 +62,12 @@ export function useDashboardData(): DashboardData {
   useEffect(() => {
     if (!user || !userProfile) return;
 
+    // Skip data fetching for guest users
+    if (!userProfile.role || userProfile.role === 'guest') {
+      setLoading(false);
+      return;
+    }
+
     const fetchDashboardData = async () => {
       try {
         setLoading(true);

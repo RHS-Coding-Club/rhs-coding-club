@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Resource } from '@/lib/firebase-collections';
 import { resourceService } from '@/lib/services/resources';
 
@@ -38,7 +38,7 @@ export function useResourcesByLevel(level: 'beginner' | 'intermediate' | 'advanc
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchResourcesByLevel = async () => {
+  const fetchResourcesByLevel = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -50,11 +50,11 @@ export function useResourcesByLevel(level: 'beginner' | 'intermediate' | 'advanc
     } finally {
       setLoading(false);
     }
-  };
+  }, [level]);
 
   useEffect(() => {
     fetchResourcesByLevel();
-  }, [level]);
+  }, [fetchResourcesByLevel]);
 
   return {
     resources,

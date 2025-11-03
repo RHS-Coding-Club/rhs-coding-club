@@ -27,7 +27,7 @@ import { Resource } from '@/lib/firebase-collections';
 export default function ResourcesPage() {
   const { resources, loading, error } = useResources();
   const { user } = useAuth();
-  const { bookmarkedIds, toggleBookmark, isBookmarked } = useResourceBookmarks();
+  const { toggleBookmark, isBookmarked } = useResourceBookmarks();
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');

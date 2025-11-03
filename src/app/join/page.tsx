@@ -1,17 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 import { Container } from '@/components/container';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle, Code, Users, Zap, Github } from 'lucide-react';
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { toast } from 'sonner';
+import { CheckCircle, Code, Users, Zap, Github, ArrowRight } from 'lucide-react';
+import { SignUpForm } from '@/components/auth';
 
 const benefits = [
 	{
@@ -32,62 +26,6 @@ const benefits = [
 ];
 
 export default function JoinPage() {
-	const [name, setName] = useState('');
-	const [email, setEmail] = useState('');
-	const [grade, setGrade] = useState('');
-	const [experience, setExperience] = useState('');
-	const [interests, setInterests] = useState('');
-	const [isSubmitting, setIsSubmitting] = useState(false);
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!name || !email || !grade) {
-			toast.error('Please fill out all required fields.');
-			return;
-		}
-		setIsSubmitting(true);
-		try {
-			const existingPendingMemberQuery = query(collection(db, 'pendingMembers'), where('email', '==', email));
-			const existingUserQuery = query(collection(db, 'users'), where('email', '==', email));
-
-			const [pendingSnapshot, userSnapshot] = await Promise.all([
-				getDocs(existingPendingMemberQuery),
-				getDocs(existingUserQuery)
-			]);
-
-			if (!pendingSnapshot.empty) {
-				toast.error('You have already submitted an application with this email.');
-				return;
-			}
-
-			if (!userSnapshot.empty) {
-				toast.error('An account with this email already exists.');
-				return;
-			}
-
-			await addDoc(collection(db, 'pendingMembers'), {
-				name,
-				email,
-				grade,
-				experience,
-				interests,
-				status: 'pending',
-				submittedAt: serverTimestamp(),
-			});
-			toast.success('Application submitted successfully!');
-			setName('');
-			setEmail('');
-			setGrade('');
-			setExperience('');
-			setInterests('');
-		} catch (error) {
-			console.error('Error submitting application: ', error);
-			toast.error('There was an error submitting your application. Please try again.');
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
 	return (
 		<div className="py-20">
 			<Container>
@@ -118,77 +56,42 @@ export default function JoinPage() {
 					<div className="grid md:grid-cols-2 gap-12">
 						<Card>
 							<CardHeader>
-								<CardTitle>Membership Application</CardTitle>
+								<CardTitle>Create Your Account</CardTitle>
+								<CardDescription>
+									Sign up to access the platform and explore our features
+								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<form onSubmit={handleSubmit} className="space-y-4">
-									<div className="space-y-2">
-										<Label htmlFor="name">Full Name</Label>
-										<Input
-											id="name"
-											placeholder="Enter your full name"
-											value={name}
-											onChange={(e) => setName(e.target.value)}
-											required
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="email">Email</Label>
-										<Input
-											id="email"
-											type="email"
-											placeholder="Enter your email"
-											value={email}
-											onChange={(e) => setEmail(e.target.value)}
-											required
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="grade">Grade Level</Label>
-										<Input
-											id="grade"
-											placeholder="e.g., 10th Grade"
-											value={grade}
-											onChange={(e) => setGrade(e.target.value)}
-											required
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="experience">Programming Experience</Label>
-										<Textarea
-											id="experience"
-											placeholder="Tell us about your programming background (or lack thereof - beginners welcome!)"
-											className="min-h-[100px]"
-											value={experience}
-											onChange={(e) => setExperience(e.target.value)}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="interests">Areas of Interest</Label>
-										<Textarea
-											id="interests"
-											placeholder="What areas of programming interest you? (e.g., web development, mobile apps, AI, etc.)"
-											className="min-h-[100px]"
-											value={interests}
-											onChange={(e) => setInterests(e.target.value)}
-										/>
-									</div>
-									<Button type="submit" className="w-full" disabled={isSubmitting}>
-										{isSubmitting ? 'Submitting...' : 'Submit Application'}
-									</Button>
-									
-									<div className="pt-4 border-t">
-										<div className="text-center space-y-2">
-											<p className="text-sm text-muted-foreground">Already a member?</p>
-											<Button variant="outline" className="w-full" asChild>
-												<Link href="/github-membership">
-													<Github className="h-4 w-4 mr-2" />
-													Join our GitHub Organization
+								<SignUpForm />
+								
+								<div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
+									<div className="flex items-start gap-3">
+										<ArrowRight className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+										<div className="space-y-1">
+											<h4 className="font-medium text-sm">Apply for Membership</h4>
+											<p className="text-sm text-muted-foreground">
+												After signing up, go to your dashboard to submit your official membership application
+											</p>
+											<Button variant="link" className="h-auto p-0 text-sm" asChild>
+												<Link href="/dashboard">
+													Go to Dashboard <ArrowRight className="ml-1 h-3 w-3" />
 												</Link>
 											</Button>
 										</div>
 									</div>
-								</form>
+								</div>
+								
+								<div className="pt-4 border-t mt-6">
+									<div className="text-center space-y-2">
+										<p className="text-sm text-muted-foreground">Already a member?</p>
+										<Button variant="outline" className="w-full" asChild>
+											<Link href="/github-membership">
+												<Github className="h-4 w-4 mr-2" />
+												Join our GitHub Organization
+											</Link>
+										</Button>
+									</div>
+								</div>
 							</CardContent>
 						</Card>
 

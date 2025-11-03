@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -329,9 +330,11 @@ export function ProjectForm({ onSuccess, onCancel }: ProjectFormProps) {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4">
                   {imageFiles.map((file, index) => (
                     <div key={index} className="relative group overflow-hidden rounded-md">
-                      <img 
+                      <Image 
                         src={URL.createObjectURL(file)} 
                         alt={`Preview ${file.name}`}
+                        width={200}
+                        height={176}
                         className="w-full h-auto max-h-44 object-cover rounded-md block"
                         style={{ width: '100%', height: 'auto' }}
                       />
