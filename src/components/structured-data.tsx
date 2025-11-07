@@ -6,7 +6,7 @@ export function StructuredData() {
     name: 'RHS Coding Club',
     alternateName: ['RHS Programming Club', 'Richmond High School Coding Club'],
     url: 'https://rhscodingclub.com',
-    logo: 'https://rhscodingclub.com/icon.png',
+    logo: 'https://rhscodingclub.com/logo.svg',
     image: 'https://rhscodingclub.com/opengraph-image.png',
     description: 'Student-led coding club at Richmond High School focused on programming education, project development, and technology innovation.',
     foundingDate: '2020',
@@ -82,7 +82,7 @@ export function StructuredData() {
     publisher: {
       '@type': 'Organization',
       name: 'RHS Coding Club',
-      logo: 'https://rhscodingclub.com/icon.png',
+      logo: 'https://rhscodingclub.com/logo.svg',
     },
     potentialAction: [
       {

@@ -39,7 +39,9 @@ export default function RootLayout({
           src="https://tweakcn.com/live-preview.min.js"
         />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+        <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="RHS Coding Club" />
@@ -50,7 +52,6 @@ export default function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
         <meta name="theme-color" content="#667eea" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#667eea" />
-        <link rel="shortcut icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
       </head>
       <body

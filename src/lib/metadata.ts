@@ -182,7 +182,7 @@ export function generateStructuredData(type: 'Organization' | 'WebSite' | 'Artic
         '@type': 'Organization',
         name: 'RHS Coding Club',
         url: baseUrl,
-        logo: `${baseUrl}/icon.png`,
+        logo: `${baseUrl}/logo.svg`,
         description: defaultMetadata.description,
         sameAs: [
           // Add social media links here
@@ -212,7 +212,7 @@ export function generateStructuredData(type: 'Organization' | 'WebSite' | 'Artic
         publisher: {
           '@type': 'Organization',
           name: 'RHS Coding Club',
-          logo: `${baseUrl}/icon.png`,
+          logo: `${baseUrl}/logo.svg`,
         },
         ...data,
       };

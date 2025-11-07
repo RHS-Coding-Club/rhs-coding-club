@@ -62,6 +62,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@sendinblue/client": "^3.3.1",
+    "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^20",

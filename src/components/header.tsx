@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Menu } from 'lucide-react';
@@ -12,6 +11,7 @@ import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthButton } from '@/components/auth/auth-button';
 import { useAuth } from '@/components/auth';
+import { Logo } from '@/components/logo';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -40,15 +40,9 @@ export function Header() {
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 transition={{ duration: 0.3 }}
-                className="relative h-10 w-10"
+                className="h-10 w-10"
               >
-                <Image
-                  src="/icon.png"
-                  alt="RHS Coding Club Logo"
-                  fill
-                  className="object-contain"
-                  priority
-                />
+                <Logo />
               </motion.div>
               <span className="text-xl font-bold">RHS Coding Club</span>
             </Link>
