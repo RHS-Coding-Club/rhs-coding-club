@@ -20,15 +20,15 @@ export function usePosts(includeUnpublished: boolean = false) {
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | undefined>();
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchPosts = useCallback(async (reset: boolean = false) => {
+  const fetchPosts = useCallback(async (reset: boolean = false, currentLastDoc?: QueryDocumentSnapshot<DocumentData>) => {
     try {
       setLoading(true);
       setError(null);
 
-      const currentLastDoc = reset ? undefined : lastDoc;
+      const docToUse = reset ? undefined : currentLastDoc;
       const result = includeUnpublished
-        ? await getAllPosts(10, currentLastDoc)
-        : await getPublishedPosts(10, currentLastDoc);
+        ? await getAllPosts(10, docToUse)
+        : await getPublishedPosts(10, docToUse);
 
       if (reset) {
         setPosts(result.posts);
@@ -43,7 +43,7 @@ export function usePosts(includeUnpublished: boolean = false) {
     } finally {
       setLoading(false);
     }
-  }, [includeUnpublished, lastDoc]);
+  }, [includeUnpublished]);
 
   const refreshPosts = useCallback(() => {
     setLastDoc(undefined);
@@ -53,13 +53,13 @@ export function usePosts(includeUnpublished: boolean = false) {
 
   const loadMorePosts = useCallback(() => {
     if (!loading && hasMore) {
-      fetchPosts(false);
+      fetchPosts(false, lastDoc);
     }
-  }, [loading, hasMore, fetchPosts]);
+  }, [loading, hasMore, fetchPosts, lastDoc]);
 
   useEffect(() => {
     fetchPosts(true);
-  }, [fetchPosts]);
+  }, [includeUnpublished]);
 
   return {
     posts,
