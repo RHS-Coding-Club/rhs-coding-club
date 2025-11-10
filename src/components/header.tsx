@@ -3,117 +3,120 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
-import { VisuallyHidden } from '@/components/ui/visually-hidden';
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  MobileNav,
+  NavbarButton,
+  MobileNavHeader,
+  MobileNavToggle,
+  MobileNavMenu,
+} from '@/components/ui/resizable-navbar';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthButton } from '@/components/auth/auth-button';
 import { useAuth } from '@/components/auth';
 import { Logo } from '@/components/logo';
 
 const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'About', href: '/about' },
-  { name: 'Events', href: '/events' },
-  { name: 'Projects', href: '/projects' },
-  { name: 'Resources', href: '/resources' },
-  { name: 'Challenges', href: '/challenges' },
-  { name: 'Leaderboard', href: '/leaderboard' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Contact', href: '/contact' },
+  { name: 'Home', link: '/' },
+  { name: 'About', link: '/about' },
+  { name: 'Events', link: '/events' },
+  { name: 'Projects', link: '/projects' },
+  { name: 'Resources', link: '/resources' },
+  { name: 'Challenges', link: '/challenges' },
+  { name: 'Leaderboard', link: '/leaderboard' },
+  { name: 'Blog', link: '/blog' },
+  { name: 'Contact', link: '/contact' },
 ];
 
+const NavbarLogo = () => {
+  return (
+    <Link href="/" className="relative z-20 flex items-center space-x-2.5 px-2 py-1 group">
+      <motion.div
+        whileHover={{ scale: 1.05, rotate: 5 }}
+        transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+        className="h-9 w-9"
+      >
+        <Logo />
+      </motion.div>
+      <span className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-200">
+        RHS Coding Club
+      </span>
+    </Link>
+  );
+};
+
 export function Header() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { userProfile, loading } = useAuth();
   const showJoinCta = !loading && (!userProfile || userProfile.role === 'guest');
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.3 }}
-                className="h-10 w-10"
-              >
-                <Logo />
-              </motion.div>
-              <span className="text-xl font-bold">RHS Coding Club</span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation - Centered */}
-          <nav className="hidden lg:flex items-center justify-center flex-1 mx-8">
-            <div className="flex items-center space-x-8">
-              {navigation.map(item => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-sm font-medium transition-colors hover:text-primary relative group"
-                >
-                  {item.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-                </Link>
-              ))}
+    <div className="relative w-full">
+      <Navbar>
+        {/* Desktop Navigation */}
+        <NavBody>
+          <NavbarLogo />
+          <NavItems items={navigation} />
+          <div className="flex items-center gap-2">
+            <div className="relative z-[70]">
+              <ThemeToggle />
             </div>
-          </nav>
-
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-3">
             <AuthButton />
-            <ThemeToggle />
-            <div className="hidden md:flex items-center space-x-2">
+            {showJoinCta && (
+              <NavbarButton as={Link} href="/join" variant="primary">
+                Join Club
+              </NavbarButton>
+            )}
+          </div>
+        </NavBody>
+
+        {/* Mobile Navigation */}
+        <MobileNav>
+          <MobileNavHeader>
+            <NavbarLogo />
+            <div className="flex items-center gap-2 relative z-[70]">
+              <ThemeToggle />
+              <MobileNavToggle
+                isOpen={isMobileMenuOpen}
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              />
+            </div>
+          </MobileNavHeader>
+
+          <MobileNavMenu
+            isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
+          >
+            {navigation.map((item, idx) => (
+              <Link
+                key={`mobile-link-${idx}`}
+                href={item.link}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full relative text-foreground/80 hover:text-foreground text-base font-medium py-2 px-3 rounded-[calc(var(--radius)-0.25rem)] hover:bg-accent transition-all duration-200"
+              >
+                <span className="block">{item.name}</span>
+              </Link>
+            ))}
+            <div className="flex w-full flex-col gap-2 pt-3 mt-2 border-t border-border/40">
+              <AuthButton />
               {showJoinCta && (
-                <Button asChild size="sm">
-                  <Link href="/join">Join Club</Link>
-                </Button>
+                <NavbarButton
+                  as={Link}
+                  href="/join"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  variant="primary"
+                  className="w-full justify-center"
+                >
+                  Join Club
+                </NavbarButton>
               )}
             </div>
-
-            {/* Mobile Menu */}
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild className="lg:hidden">
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">Toggle menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[min(92vw,20rem)] sm:w-80">
-                <VisuallyHidden>
-                  <SheetTitle>Navigation Menu</SheetTitle>
-                </VisuallyHidden>
-                <div className="flex flex-col h-full">
-                  <div className="flex flex-col space-y-6 mt-12 px-2">
-                    {navigation.map(item => (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className="text-lg font-medium transition-colors hover:text-primary py-3 px-4 rounded-lg hover:bg-accent/50 border-b border-border/20 last:border-b-0"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                  <div className="mt-auto mb-8 px-2">
-                    {showJoinCta && (
-                      <Button asChild className="w-full h-12 text-base">
-                        <Link href="/join">Join Club</Link>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </div>
-    </header>
+          </MobileNavMenu>
+        </MobileNav>
+      </Navbar>
+    </div>
   );
 }
