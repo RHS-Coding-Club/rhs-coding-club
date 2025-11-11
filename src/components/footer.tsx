@@ -8,9 +8,11 @@ import { Separator } from '@/components/ui/separator';
 import { NewsletterForm } from './newsletter-form';
 import { useAuth } from '@/components/auth';
 import { Logo } from '@/components/logo';
+import { useClubSettings } from '@/contexts/club-settings-context';
 
 export function Footer() {
   const { userProfile, loading } = useAuth();
+  const { settings: clubSettings } = useClubSettings();
   const showJoinLink = !loading && (!userProfile || userProfile.role === 'guest');
   return (
     <footer className="border-t bg-muted/50">
@@ -22,11 +24,10 @@ export function Footer() {
               <div className="h-10 w-10">
                 <Logo />
               </div>
-              <span className="text-lg font-bold">RHS Coding Club</span>
+              <span className="text-lg font-bold">{clubSettings?.clubName || 'RHS Coding Club'}</span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Empowering students to learn, create, and innovate through
-              programming and technology.
+              {clubSettings?.tagline || 'Empowering students to learn, create, and innovate through programming and technology.'}
             </p>
             <div className="flex space-x-2">
               <Button variant="ghost" size="icon" asChild>
@@ -44,7 +45,7 @@ export function Footer() {
                 </Link>
               </Button>
               <Button variant="ghost" size="icon" asChild>
-                <Link href="mailto:contact@rhscodingclub.com">
+                <Link href={`mailto:${clubSettings?.contactEmail || 'contact@rhscodingclub.com'}`}>
                   <Mail className="h-4 w-4" />
                   <span className="sr-only">Email</span>
                 </Link>
@@ -156,7 +157,7 @@ export function Footer() {
 
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-center md:text-left">
           <p className="text-sm text-muted-foreground">
-            © 2025 RHS Coding Club. All rights reserved.
+            © 2025 {clubSettings?.clubName || 'RHS Coding Club'}. All rights reserved.
           </p>
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm">
             <a

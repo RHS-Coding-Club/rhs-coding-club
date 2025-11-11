@@ -21,10 +21,12 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { useAuth } from '@/components/auth';
+import { useClubSettings } from '@/contexts/club-settings-context';
 
 export default function Home() {
   const { stats, featuredProjects, featuredPosts, loading, error } = useHomepageData();
   const { userProfile, loading: authLoading } = useAuth();
+  const { settings: clubSettings } = useClubSettings();
   const showJoinCta = !authLoading && (!userProfile || userProfile.role === 'guest');
 
   // Show loading state while data is being fetched
@@ -56,11 +58,10 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
               >
                 <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight">
-                  <span className="gradient-text">RHS Coding Club</span>
+                  <span className="gradient-text">{clubSettings?.clubName || 'RHS Coding Club'}</span>
                 </h1>
                 <p className="mt-6 md:mt-8 text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                  Empowering student developers through collaboration, innovation, and hands-on learning. 
-                  Join our community and take your coding skills to the next level.
+                  {clubSettings?.description || 'Empowering student developers through collaboration, innovation, and hands-on learning. Join our community and take your coding skills to the next level.'}
                 </p>
               </motion.div>
 

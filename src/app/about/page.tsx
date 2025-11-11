@@ -10,10 +10,12 @@ import { Github, Mail } from 'lucide-react';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Officer } from '@/lib/firebase-collections';
+import { useClubSettings } from '@/contexts/club-settings-context';
 
 export default function AboutPage() {
   const [officers, setOfficers] = useState<Officer[]>([]);
   const [loading, setLoading] = useState(true);
+  const { settings: clubSettings } = useClubSettings();
 
   useEffect(() => {
     const fetchOfficers = async () => {
@@ -44,10 +46,9 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto space-y-16">
           {/* Hero Section */}
           <div className="text-center space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold">About RHS Coding Club</h1>
+            <h1 className="text-4xl md:text-5xl font-bold">About {clubSettings?.clubName || 'RHS Coding Club'}</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Empowering the next generation of developers through collaborative learning, 
-              innovative projects, and a supportive community.
+              {clubSettings?.description || 'Empowering the next generation of developers through collaborative learning, innovative projects, and a supportive community.'}
             </p>
           </div>
           
@@ -61,10 +62,7 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-center text-lg leading-relaxed">
-                  The RHS Coding Club is dedicated to fostering a community of passionate student developers 
-                  who are eager to learn, innovate, and create through programming. We provide a supportive 
-                  environment where students can develop their technical skills, collaborate on projects, 
-                  and prepare for future careers in technology.
+                  {clubSettings?.missionStatement || 'The RHS Coding Club is dedicated to fostering a community of passionate student developers who are eager to learn, innovate, and create through programming. We provide a supportive environment where students can develop their technical skills, collaborate on projects, and prepare for future careers in technology.'}
                 </p>
               </CardContent>
             </Card>

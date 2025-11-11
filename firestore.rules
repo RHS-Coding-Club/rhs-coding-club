@@ -126,5 +126,31 @@ service cloud.firestore {
       // Only admins can delete applications
       allow delete: if isAdminOrOfficer();
     }
+
+    // Settings Collection
+    match /settings/{settingId} {
+      // Anyone can read settings (needed for public display)
+      allow read: if true;
+      // Only admins can create, update, or delete settings
+      allow create, update, delete: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Badges Collection
+    match /badges/{badgeId} {
+      // Anyone can read badges
+      allow read: if true;
+      // Only admins and officers can manage badges
+      allow create, update, delete: if isAdminOrOfficer();
+    }
+
+    // Policies Collection
+    match /policies/{policyId} {
+      // Anyone can read policies
+      allow read: if true;
+      // Only admins can manage policies
+      allow create, update, delete: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
   }
 }

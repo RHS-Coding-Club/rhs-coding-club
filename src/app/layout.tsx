@@ -4,6 +4,7 @@ import './globals.css';
 
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/contexts/auth-context';
+import { ClubSettingsProvider } from '@/contexts/club-settings-context';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Toaster } from 'sonner';
@@ -64,13 +65,15 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <Toaster position="bottom-right" />
-            {/* Vercel Speed Insights */}
-            <SpeedInsights />
-            <Analytics />
+            <ClubSettingsProvider>
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <Toaster position="bottom-right" />
+              {/* Vercel Speed Insights */}
+              <SpeedInsights />
+              <Analytics />
+            </ClubSettingsProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

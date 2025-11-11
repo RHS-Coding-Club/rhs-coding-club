@@ -50,6 +50,7 @@ import { SubmissionReview } from '@/components/admin/submission-review';
 import { projectService } from '@/lib/services/projects';
 import { GitHubMembershipManagement } from '@/components/admin/github-membership-management';
 import { MembershipApplicationReview } from '@/components/admin/membership-application-review';
+import { ClubInfoSettings } from '@/components/admin/settings/club-info-settings';
 
 // Predefined officer roles
 const OFFICER_ROLES = [
@@ -1132,16 +1133,7 @@ export default function AdminPage() {
               </TabsContent>
 
               <TabsContent value="settings" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Club Settings</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Club settings and configuration options will be available here.
-                    </p>
-                  </CardContent>
-                </Card>
+                <ClubInfoSettings />
               </TabsContent>
                 </Tabs>
               </div>
