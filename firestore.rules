@@ -6,6 +6,7 @@ service cloud.firestore {
     // Helper function to check if a user is an admin or officer
     function isAdminOrOfficer() {
       return request.auth != null &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'officer'];
     }
 
@@ -142,6 +143,16 @@ service cloud.firestore {
       allow read: if true;
       // Only admins and officers can manage badges
       allow create, update, delete: if isAdminOrOfficer();
+    }
+
+    // User Badges Collection (awarded badges)
+    match /user-badges/{userBadgeId} {
+      // Users can read their own badges, anyone can read to display on profiles
+      allow read: if true;
+      // Only admins and officers can award or revoke badges
+      allow create, delete: if isAdminOrOfficer();
+      // No updates allowed (badges are either awarded or not)
+      allow update: if false;
     }
 
     // Policies Collection

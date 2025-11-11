@@ -25,6 +25,13 @@ service firebase.storage {
       allow write, delete: if request.auth != null && request.auth.uid == userId;
     }
     
+    // Badge images
+    match /badges/{allPaths=**} {
+      allow read: if true; // Public read access for displaying badge images
+      allow write, delete: if request.auth != null && 
+        (firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['admin', 'officer']);
+    }
+    
     // Default rule - deny access
     match /{allPaths=**} {
       allow read, write: if false;

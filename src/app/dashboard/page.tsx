@@ -8,13 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/auth-context';
 import { useDashboardData } from '@/hooks/useDashboardData';
-import { Calendar, Users, Trophy, BookOpen, Loader2, AlertCircle, LayoutDashboard, FolderOpen, UserPlus } from 'lucide-react';
+import { Calendar, Users, Trophy, BookOpen, Loader2, AlertCircle, LayoutDashboard, FolderOpen, UserPlus, Award } from 'lucide-react';
 import { ResourceCard } from '@/components/resources/resource-card';
 import { useResourceBookmarks } from '@/hooks/useResourceBookmarks';
 import { formatDistanceToNow } from 'date-fns';
 import { useState, useMemo } from 'react';
 import { MembershipApplication } from '@/components/dashboard/membership-application';
 import { AuthForm } from '@/components/auth';
+import { BadgeDisplay } from '@/components/ui/badge-display';
 
 export default function DashboardPage() {
   const { user, userProfile } = useAuth();
@@ -268,6 +269,21 @@ export default function DashboardPage() {
                 <TabsList className="lg:hidden" />
 
             <TabsContent value="overview" className="space-y-4">
+              {/* Achievements/Badges Section */}
+              {user && (
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <Award className="h-5 w-5 text-amber-500" />
+                      <CardTitle>My Badges</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <BadgeDisplay userId={user.uid} maxDisplay={8} size="md" showCount={true} />
+                  </CardContent>
+                </Card>
+              )}
+
               <div className="grid gap-4 md:grid-cols-2">
                 <Card>
                   <CardHeader>

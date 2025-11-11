@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Trophy, Medal, Award } from 'lucide-react';
 import { User } from '@/lib/firebase-collections';
+import { BadgeDisplay } from '@/components/ui/badge-display';
 
 interface LeaderboardProps {
   users: User[];
@@ -95,6 +96,10 @@ export function Leaderboard({ users, currentUserId }: LeaderboardProps) {
                   {user.gradYear && (
                     <p className="text-sm text-muted-foreground">Class of {user.gradYear}</p>
                   )}
+                  {/* Display user badges */}
+                  <div className="mt-2">
+                    <BadgeDisplay userId={user.id} maxDisplay={3} size="sm" showCount={false} />
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-2">

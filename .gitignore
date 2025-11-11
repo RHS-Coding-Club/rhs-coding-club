@@ -42,3 +42,4 @@ next-env.d.ts
 
 # Project planning and internal documents
 ADMIN_SETTINGS_CHECKLIST.md
+/docs

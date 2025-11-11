@@ -402,3 +402,25 @@ export async function getPointsForDifficulty(difficulty: 'easy' | 'medium' | 'ha
     return DEFAULT_POINTS_SETTINGS.challenges[difficulty];
   }
 }
+
+// ==================== BADGE SYSTEM ====================
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  criteria: {
+    type: 'points' | 'challenges' | 'events' | 'projects' | 'custom';
+    threshold?: number;
+    condition?: string;
+  };
+  autoAward: boolean;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  createdBy: string;
+  updatedBy: string;
+}

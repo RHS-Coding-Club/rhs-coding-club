@@ -53,6 +53,8 @@ import { MembershipApplicationReview } from '@/components/admin/membership-appli
 import { ClubInfoSettings } from '@/components/admin/settings/club-info-settings';
 import { SocialMediaSettings } from '@/components/admin/settings/social-media-settings';
 import { PointsSettingsComponent } from '@/components/admin/settings/points-settings';
+import { BadgeManagement } from '@/components/admin/settings/badge-management';
+import { ManualBadgeAward } from '@/components/admin/settings/manual-badge-award';
 
 // Predefined officer roles
 const OFFICER_ROLES = [
@@ -1144,10 +1146,12 @@ export default function AdminPage() {
                   </div>
                   
                   <Tabs defaultValue="club-info" className="w-full">
-                    <TabsList className="grid w-full max-w-3xl grid-cols-3">
+                    <TabsList className="grid w-full max-w-5xl grid-cols-5">
                       <TabsTrigger value="club-info">Club Information</TabsTrigger>
                       <TabsTrigger value="social-media">Social Media</TabsTrigger>
                       <TabsTrigger value="points-system">Points & Gamification</TabsTrigger>
+                      <TabsTrigger value="badges">Badges</TabsTrigger>
+                      <TabsTrigger value="award-badges">Award Badges</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="club-info" className="mt-6">
@@ -1160,6 +1164,14 @@ export default function AdminPage() {
                     
                     <TabsContent value="points-system" className="mt-6">
                       <PointsSettingsComponent />
+                    </TabsContent>
+                    
+                    <TabsContent value="badges" className="mt-6">
+                      <BadgeManagement />
+                    </TabsContent>
+                    
+                    <TabsContent value="award-badges" className="mt-6">
+                      <ManualBadgeAward />
                     </TabsContent>
                   </Tabs>
                 </div>
