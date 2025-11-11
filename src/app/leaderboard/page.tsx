@@ -16,13 +16,32 @@ import {
 import { Leaderboard } from '@/components/challenges';
 import { useLeaderboard } from '@/hooks/useChallenges';
 import { useAuth } from '@/contexts/auth-context';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getPointsSettingsWithDefaults } from '@/lib/services/settings';
 
 export default function LeaderboardPage() {
   const { userProfile } = useAuth();
-  const { leaderboard: topUsers, loading: topLoading } = useLeaderboard(10);
+  const [topLimit, setTopLimit] = useState(10);
+  const [displayType, setDisplayType] = useState<'weekly' | 'monthly' | 'all-time' | 'all'>('all');
+  const { leaderboard: topUsers, loading: topLoading } = useLeaderboard(topLimit);
   const { leaderboard: allUsers } = useLeaderboard(0);
   const [activeSection, setActiveSection] = useState<string>('top10');
+
+  // Load points settings on mount
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const settings = await getPointsSettingsWithDefaults();
+      const limit = settings.leaderboardOptions.showTop || 10;
+      setTopLimit(limit);
+      setDisplayType(settings.leaderboardOptions.displayType || 'all');
+    } catch (error) {
+      console.error('Error loading leaderboard settings:', error);
+    }
+  };
 
   if (topLoading) {
     return (
@@ -181,7 +200,7 @@ export default function LeaderboardPage() {
             <div className="lg:hidden mb-4">
               <Tabs value={activeSection} onValueChange={setActiveSection}>
                 <TabsList className="flex-wrap">
-                  <TabsTrigger value="top10">Top 10 ({Math.min(topUsers.length, 10)})</TabsTrigger>
+                  <TabsTrigger value="top10">Top {topLimit} ({Math.min(topUsers.length, topLimit)})</TabsTrigger>
                   <TabsTrigger value="all">All Members ({allUsers.length})</TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -193,7 +212,7 @@ export default function LeaderboardPage() {
                 <CardContent className="p-3">
                   <nav className="space-y-1">
                     {[
-                      { key: 'top10', label: `Top 10 (${Math.min(topUsers.length, 10)})`, icon: LayoutDashboard },
+                      { key: 'top10', label: `Top ${topLimit} (${Math.min(topUsers.length, topLimit)})`, icon: LayoutDashboard },
                       { key: 'all', label: `All Members (${allUsers.length})`, icon: Users },
                     ].map(({ key, label, icon: Icon }) => (
                       <button

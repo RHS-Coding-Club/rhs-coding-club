@@ -256,3 +256,149 @@ export async function getSocialMediaSettingsWithDefaults(): Promise<SocialMediaS
     };
   }
 }
+
+// ==================== POINTS & GAMIFICATION SETTINGS ====================
+
+// Points System Settings Interface
+export interface PointsSettings {
+  id: string;
+  challenges: {
+    easy: number;
+    medium: number;
+    hard: number;
+  };
+  projectSubmission: number;
+  eventAttendance: number;
+  leaderboardOptions: {
+    displayType: 'weekly' | 'monthly' | 'all-time' | 'all';
+    resetSchedule?: string; // cron expression
+    showTop?: number; // top N users to display
+  };
+  updatedAt: Timestamp;
+  updatedBy: string; // Admin user ID
+}
+
+// Default points settings
+const DEFAULT_POINTS_SETTINGS: Omit<PointsSettings, 'id' | 'updatedAt' | 'updatedBy'> = {
+  challenges: {
+    easy: 50,
+    medium: 100,
+    hard: 200,
+  },
+  projectSubmission: 150,
+  eventAttendance: 25,
+  leaderboardOptions: {
+    displayType: 'all',
+    showTop: 10,
+  },
+};
+
+/**
+ * Get points system settings from Firestore
+ */
+export async function getPointsSettings(): Promise<PointsSettings | null> {
+  try {
+    const settingsRef = doc(db, 'settings', 'points-system');
+    const settingsDoc = await getDoc(settingsRef);
+
+    if (settingsDoc.exists()) {
+      return {
+        id: settingsDoc.id,
+        ...settingsDoc.data(),
+      } as PointsSettings;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching points settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update or create points system settings
+ */
+export async function updatePointsSettings(
+  settings: Partial<Omit<PointsSettings, 'id' | 'updatedAt' | 'updatedBy'>>,
+  userId: string
+): Promise<void> {
+  try {
+    const settingsRef = doc(db, 'settings', 'points-system');
+    
+    const updatedSettings = {
+      ...settings,
+      updatedAt: Timestamp.now(),
+      updatedBy: userId,
+    };
+
+    await setDoc(settingsRef, updatedSettings, { merge: true });
+  } catch (error) {
+    console.error('Error updating points settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Initialize points settings with default values
+ */
+export async function initializePointsSettings(userId: string): Promise<void> {
+  try {
+    const settingsRef = doc(db, 'settings', 'points-system');
+    const settingsDoc = await getDoc(settingsRef);
+
+    if (!settingsDoc.exists()) {
+      await setDoc(settingsRef, {
+        ...DEFAULT_POINTS_SETTINGS,
+        updatedAt: Timestamp.now(),
+        updatedBy: userId,
+      });
+    }
+  } catch (error) {
+    console.error('Error initializing points settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get points settings or return defaults if not found
+ */
+export async function getPointsSettingsWithDefaults(): Promise<PointsSettings> {
+  try {
+    const settings = await getPointsSettings();
+    
+    if (settings) {
+      return settings;
+    }
+
+    // Return defaults if no settings exist
+    return {
+      id: 'points-system',
+      ...DEFAULT_POINTS_SETTINGS,
+      updatedAt: Timestamp.now(),
+      updatedBy: 'system',
+    };
+  } catch (error) {
+    console.error('Error fetching points settings with defaults:', error);
+    // Return defaults on error
+    return {
+      id: 'points-system',
+      ...DEFAULT_POINTS_SETTINGS,
+      updatedAt: Timestamp.now(),
+      updatedBy: 'system',
+    };
+  }
+}
+
+/**
+ * Get points for a challenge based on difficulty
+ */
+export async function getPointsForDifficulty(difficulty: 'easy' | 'medium' | 'hard'): Promise<number> {
+  try {
+    const settings = await getPointsSettingsWithDefaults();
+    return settings.challenges[difficulty];
+  } catch (error) {
+    console.error('Error fetching points for difficulty:', error);
+    // Return defaults on error
+    return DEFAULT_POINTS_SETTINGS.challenges[difficulty];
+  }
+}

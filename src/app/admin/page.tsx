@@ -52,6 +52,7 @@ import { GitHubMembershipManagement } from '@/components/admin/github-membership
 import { MembershipApplicationReview } from '@/components/admin/membership-application-review';
 import { ClubInfoSettings } from '@/components/admin/settings/club-info-settings';
 import { SocialMediaSettings } from '@/components/admin/settings/social-media-settings';
+import { PointsSettingsComponent } from '@/components/admin/settings/points-settings';
 
 // Predefined officer roles
 const OFFICER_ROLES = [
@@ -1143,9 +1144,10 @@ export default function AdminPage() {
                   </div>
                   
                   <Tabs defaultValue="club-info" className="w-full">
-                    <TabsList className="grid w-full max-w-md grid-cols-2">
+                    <TabsList className="grid w-full max-w-3xl grid-cols-3">
                       <TabsTrigger value="club-info">Club Information</TabsTrigger>
                       <TabsTrigger value="social-media">Social Media</TabsTrigger>
+                      <TabsTrigger value="points-system">Points & Gamification</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="club-info" className="mt-6">
@@ -1154,6 +1156,10 @@ export default function AdminPage() {
                     
                     <TabsContent value="social-media" className="mt-6">
                       <SocialMediaSettings />
+                    </TabsContent>
+                    
+                    <TabsContent value="points-system" className="mt-6">
+                      <PointsSettingsComponent />
                     </TabsContent>
                   </Tabs>
                 </div>

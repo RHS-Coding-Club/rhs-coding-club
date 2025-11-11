@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { challengesService } from '@/lib/services/challenges';
 import { useAuth } from '@/contexts/auth-context';
 import { Challenge } from '@/lib/firebase-collections';
 import { toast } from 'sonner';
+import { getPointsSettingsWithDefaults } from '@/lib/services/settings';
 
 interface ChallengeManagementProps {
   challenges: Challenge[];
@@ -25,6 +26,11 @@ export function ChallengeManagement({ challenges, onChallengeUpdate }: Challenge
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pointsSettings, setPointsSettings] = useState<{
+    easy: number;
+    medium: number;
+    hard: number;
+  }>({ easy: 50, medium: 100, hard: 200 });
 
   const [formData, setFormData] = useState({
     title: '',
@@ -38,6 +44,25 @@ export function ChallengeManagement({ challenges, onChallengeUpdate }: Challenge
     published: false,
   });
 
+  // Load points settings on component mount
+  useEffect(() => {
+    loadPointsSettings();
+  }, []);
+
+  const loadPointsSettings = async () => {
+    try {
+      const settings = await getPointsSettingsWithDefaults();
+      setPointsSettings(settings.challenges);
+      // Update form data with default points for current difficulty
+      setFormData(prev => ({
+        ...prev,
+        points: settings.challenges[prev.difficulty],
+      }));
+    } catch (error) {
+      console.error('Error loading points settings:', error);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -46,9 +71,17 @@ export function ChallengeManagement({ challenges, onChallengeUpdate }: Challenge
       difficulty: 'easy',
       sampleInput: '',
       sampleOutput: '',
-      points: 100,
+      points: pointsSettings.easy, // Use points from settings
       weekNo: 1,
       published: false,
+    });
+  };
+
+  const handleDifficultyChange = (difficulty: 'easy' | 'medium' | 'hard') => {
+    setFormData({
+      ...formData,
+      difficulty,
+      points: pointsSettings[difficulty], // Auto-update points based on difficulty
     });
   };
 
@@ -241,14 +274,17 @@ export function ChallengeManagement({ challenges, onChallengeUpdate }: Challenge
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="difficulty">Difficulty</Label>
-                    <Select value={formData.difficulty} onValueChange={(value) => setFormData({ ...formData, difficulty: value as 'easy' | 'medium' | 'hard' })}>
+                    <Select 
+                      value={formData.difficulty} 
+                      onValueChange={(value) => handleDifficultyChange(value as 'easy' | 'medium' | 'hard')}
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="easy">Easy</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="hard">Hard</SelectItem>
+                        <SelectItem value="easy">Easy ({pointsSettings.easy} pts)</SelectItem>
+                        <SelectItem value="medium">Medium ({pointsSettings.medium} pts)</SelectItem>
+                        <SelectItem value="hard">Hard ({pointsSettings.hard} pts)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -262,6 +298,9 @@ export function ChallengeManagement({ challenges, onChallengeUpdate }: Challenge
                       onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) })}
                       required
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Auto-set based on difficulty
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="published">Status</Label>
