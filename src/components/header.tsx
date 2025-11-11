@@ -33,15 +33,15 @@ const navigation = [
 
 const NavbarLogo = () => {
   return (
-    <Link href="/" className="relative z-20 flex items-center space-x-2.5 px-2 py-1 group">
+    <Link href="/" className="relative z-20 flex items-center space-x-2 xl:space-x-2.5 px-1 xl:px-2 py-1 group">
       <motion.div
         whileHover={{ scale: 1.05, rotate: 5 }}
         transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
-        className="h-9 w-9"
+        className="h-8 w-8 xl:h-9 xl:w-9 flex-shrink-0"
       >
         <Logo />
       </motion.div>
-      <span className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-200">
+      <span className="text-base xl:text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-200 whitespace-nowrap">
         RHS Coding Club
       </span>
     </Link>
@@ -60,13 +60,13 @@ export function Header() {
         <NavBody>
           <NavbarLogo />
           <NavItems items={navigation} />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 xl:gap-2">
             <div className="relative z-[70]">
               <ThemeToggle />
             </div>
             <AuthButton />
             {showJoinCta && (
-              <NavbarButton as={Link} href="/join" variant="primary">
+              <NavbarButton as={Link} href="/join" variant="primary" className="text-xs xl:text-sm px-3 xl:px-4">
                 Join Club
               </NavbarButton>
             )}

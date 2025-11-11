@@ -1,6 +1,8 @@
 import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
+// ==================== CLUB INFORMATION SETTINGS ====================
+
 // Club Information Settings Interface
 export interface ClubSettings {
   id: string;
@@ -120,6 +122,135 @@ export async function getClubSettingsWithDefaults(): Promise<ClubSettings> {
     return {
       id: 'club-info',
       ...DEFAULT_CLUB_SETTINGS,
+      updatedAt: Timestamp.now(),
+      updatedBy: 'system',
+    };
+  }
+}
+
+// ==================== SOCIAL MEDIA SETTINGS ====================
+
+// Social Media Settings Interface
+export interface CustomSocialLink {
+  name: string;
+  url: string;
+  icon?: string;
+}
+
+export interface SocialMediaSettings {
+  id: string;
+  instagram?: string;
+  twitter?: string;
+  linkedin?: string;
+  discord?: string;
+  github?: string;
+  youtube?: string;
+  customLinks?: CustomSocialLink[];
+  updatedAt: Timestamp;
+  updatedBy: string; // Admin user ID
+}
+
+// Default social media settings
+const DEFAULT_SOCIAL_MEDIA_SETTINGS: Omit<SocialMediaSettings, 'id' | 'updatedAt' | 'updatedBy'> = {
+  instagram: '',
+  twitter: '',
+  linkedin: '',
+  discord: 'https://discord.gg/UQR79bn6ZZ',
+  github: 'https://github.com/RHS-Coding-Club',
+  youtube: '',
+  customLinks: [],
+};
+
+/**
+ * Get social media settings from Firestore
+ */
+export async function getSocialMediaSettings(): Promise<SocialMediaSettings | null> {
+  try {
+    const settingsRef = doc(db, 'settings', 'social-media');
+    const settingsDoc = await getDoc(settingsRef);
+
+    if (settingsDoc.exists()) {
+      return {
+        id: settingsDoc.id,
+        ...settingsDoc.data(),
+      } as SocialMediaSettings;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching social media settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update or create social media settings
+ */
+export async function updateSocialMediaSettings(
+  settings: Partial<Omit<SocialMediaSettings, 'id' | 'updatedAt' | 'updatedBy'>>,
+  userId: string
+): Promise<void> {
+  try {
+    const settingsRef = doc(db, 'settings', 'social-media');
+    
+    const updatedSettings = {
+      ...settings,
+      updatedAt: Timestamp.now(),
+      updatedBy: userId,
+    };
+
+    await setDoc(settingsRef, updatedSettings, { merge: true });
+  } catch (error) {
+    console.error('Error updating social media settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Initialize social media settings with default values
+ */
+export async function initializeSocialMediaSettings(userId: string): Promise<void> {
+  try {
+    const settingsRef = doc(db, 'settings', 'social-media');
+    const settingsDoc = await getDoc(settingsRef);
+
+    if (!settingsDoc.exists()) {
+      await setDoc(settingsRef, {
+        ...DEFAULT_SOCIAL_MEDIA_SETTINGS,
+        updatedAt: Timestamp.now(),
+        updatedBy: userId,
+      });
+    }
+  } catch (error) {
+    console.error('Error initializing social media settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get social media settings or return defaults if not found
+ */
+export async function getSocialMediaSettingsWithDefaults(): Promise<SocialMediaSettings> {
+  try {
+    const settings = await getSocialMediaSettings();
+    
+    if (settings) {
+      return settings;
+    }
+
+    // Return defaults if no settings exist
+    return {
+      id: 'social-media',
+      ...DEFAULT_SOCIAL_MEDIA_SETTINGS,
+      updatedAt: Timestamp.now(),
+      updatedBy: 'system',
+    };
+  } catch (error) {
+    console.error('Error fetching social media settings with defaults:', error);
+    // Return defaults on error
+    return {
+      id: 'social-media',
+      ...DEFAULT_SOCIAL_MEDIA_SETTINGS,
       updatedAt: Timestamp.now(),
       updatedBy: 'system',
     };

@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Github, Mail, Send, MapPin, Clock, Calendar as CalendarIcon } from 'lucide-react';
+import { Github, Mail, Send, MapPin, Clock, Calendar as CalendarIcon, Instagram, Twitter, Linkedin, Youtube, MessageSquare, ExternalLink } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
 import { useClubSettings } from '@/contexts/club-settings-context';
+import { useSocialMedia } from '@/contexts/social-media-context';
 
 export default function ContactPage() {
   const [name, setName] = useState('');
@@ -20,6 +21,17 @@ export default function ContactPage() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { settings: clubSettings } = useClubSettings();
+  const { settings: socialMedia } = useSocialMedia();
+
+  // Social media platforms
+  const socialPlatforms = [
+    { key: 'instagram', icon: Instagram, label: 'Instagram', url: socialMedia?.instagram, color: 'text-pink-600' },
+    { key: 'twitter', icon: Twitter, label: 'Twitter / X', url: socialMedia?.twitter, color: 'text-blue-500' },
+    { key: 'linkedin', icon: Linkedin, label: 'LinkedIn', url: socialMedia?.linkedin, color: 'text-blue-700' },
+    { key: 'discord', icon: MessageSquare, label: 'Discord', url: socialMedia?.discord, color: 'text-indigo-600' },
+    { key: 'github', icon: Github, label: 'GitHub', url: socialMedia?.github, color: 'text-gray-800 dark:text-gray-300' },
+    { key: 'youtube', icon: Youtube, label: 'YouTube', url: socialMedia?.youtube, color: 'text-red-600' },
+  ].filter(platform => platform.url);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,24 +142,53 @@ export default function ContactPage() {
                       </div>
                     </a>
                   )}
-                  <a href="https://discord.gg/UQR79bn6ZZ" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="h-6 w-6 text-primary" viewBox="0 0 16 16">
-                      <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
-                    </svg>
-                    <div>
-                      <h4 className="font-medium">Discord</h4>
-                      <p className="text-sm text-muted-foreground">Join our server</p>
-                    </div>
-                  </a>
-                  <a href="#" className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors">
-                    <Github className="h-6 w-6 text-primary" />
-                    <div>
-                      <h4 className="font-medium">GitHub</h4>
-                      <p className="text-sm text-muted-foreground">Follow our projects</p>
-                    </div>
-                  </a>
                 </CardContent>
               </Card>
+
+              {/* Social Media Links */}
+              {(socialPlatforms.length > 0 || (socialMedia?.customLinks && socialMedia.customLinks.length > 0)) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Follow Us Online</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {socialPlatforms.map(({ key, icon: Icon, label, url, color }) => (
+                      <a 
+                        key={key}
+                        href={url || '#'} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors group"
+                      >
+                        <Icon className={`h-6 w-6 ${color} group-hover:scale-110 transition-transform`} />
+                        <div className="flex-1">
+                          <h4 className="font-medium">{label}</h4>
+                          <p className="text-xs text-muted-foreground truncate">{url}</p>
+                        </div>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </a>
+                    ))}
+                    
+                    {socialMedia?.customLinks && socialMedia.customLinks.map((link, index) => (
+                      link.url && link.name && (
+                        <a 
+                          key={`custom-${index}`}
+                          href={link.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors group"
+                        >
+                          <ExternalLink className="h-6 w-6 text-primary group-hover:scale-110 transition-transform" />
+                          <div className="flex-1">
+                            <h4 className="font-medium">{link.name}</h4>
+                            <p className="text-xs text-muted-foreground truncate">{link.url}</p>
+                          </div>
+                        </a>
+                      )
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Meeting Information */}
               {(clubSettings?.meetingLocation || clubSettings?.meetingSchedule || clubSettings?.officeHours) && (

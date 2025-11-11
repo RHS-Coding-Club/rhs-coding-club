@@ -105,7 +105,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
     <motion.div
       animate={{
         backdropFilter: visible ? "blur(20px) saturate(180%)" : "none",
-        width: visible ? "60%" : "100%",
+        width: visible ? "96%" : "100%",
         y: visible ? 16 : 0,
       }}
       transition={{
@@ -113,23 +113,20 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         stiffness: 260,
         damping: 30,
       }}
-      style={{
-        minWidth: "900px",
-      }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl items-center justify-between self-start bg-transparent px-6 py-3 lg:flex",
+        "relative z-[60] mx-auto hidden w-full max-w-7xl items-center justify-between self-start bg-transparent px-4 py-3 xl:px-6 lg:flex",
         visible && "bg-background/50 border border-border/30 backdrop-blur-xl",
         visible ? "rounded-[calc(var(--radius)+0.5rem)]" : "rounded-none",
         className,
       )}
     >
-      <div className="flex items-center flex-shrink-0 relative z-30">
+      <div className="flex items-center flex-shrink-0 relative z-30 min-w-0">
         {childrenArray[0]}
       </div>
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center min-w-0 overflow-x-auto">
         {childrenArray[1]}
       </div>
-      <div className="flex items-center gap-2 flex-shrink-0 relative z-30">
+      <div className="flex items-center gap-1.5 xl:gap-2 flex-shrink-0 relative z-30 min-w-0">
         {childrenArray[2]}
       </div>
     </motion.div>
@@ -143,7 +140,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "flex flex-row items-center justify-center space-x-1 text-sm font-medium",
+        "flex flex-row items-center justify-center space-x-0.5 xl:space-x-1 text-sm font-medium",
         className,
       )}
     >
@@ -151,7 +148,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
         <a
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
-          className="relative px-3 py-2 text-foreground/80 hover:text-foreground transition-colors duration-200"
+          className="relative px-2 xl:px-3 py-2 text-foreground/80 hover:text-foreground transition-colors duration-200 whitespace-nowrap"
           key={`link-${idx}`}
           href={item.link}
         >
@@ -300,7 +297,7 @@ export const NavbarButton = ({
   | React.ComponentPropsWithoutRef<"button">
 )) => {
   const baseStyles =
-    "px-4 py-2 text-sm font-medium relative cursor-pointer transition-all duration-200 inline-flex items-center justify-center";
+    "h-8 xl:h-9 px-3 xl:px-4 py-2 text-xs xl:text-sm font-medium relative cursor-pointer transition-all duration-200 inline-flex items-center justify-center whitespace-nowrap";
 
   const variantStyles = {
     primary:

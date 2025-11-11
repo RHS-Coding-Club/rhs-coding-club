@@ -51,6 +51,7 @@ import { projectService } from '@/lib/services/projects';
 import { GitHubMembershipManagement } from '@/components/admin/github-membership-management';
 import { MembershipApplicationReview } from '@/components/admin/membership-application-review';
 import { ClubInfoSettings } from '@/components/admin/settings/club-info-settings';
+import { SocialMediaSettings } from '@/components/admin/settings/social-media-settings';
 
 // Predefined officer roles
 const OFFICER_ROLES = [
@@ -1133,7 +1134,29 @@ export default function AdminPage() {
               </TabsContent>
 
               <TabsContent value="settings" className="space-y-6">
-                <ClubInfoSettings />
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2">Club Settings</h2>
+                    <p className="text-muted-foreground">
+                      Configure your club&apos;s information, branding, and online presence
+                    </p>
+                  </div>
+                  
+                  <Tabs defaultValue="club-info" className="w-full">
+                    <TabsList className="grid w-full max-w-md grid-cols-2">
+                      <TabsTrigger value="club-info">Club Information</TabsTrigger>
+                      <TabsTrigger value="social-media">Social Media</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="club-info" className="mt-6">
+                      <ClubInfoSettings />
+                    </TabsContent>
+                    
+                    <TabsContent value="social-media" className="mt-6">
+                      <SocialMediaSettings />
+                    </TabsContent>
+                  </Tabs>
+                </div>
               </TabsContent>
                 </Tabs>
               </div>

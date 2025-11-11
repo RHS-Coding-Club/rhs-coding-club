@@ -35,7 +35,7 @@ export function AuthButton() {
         <Button 
           variant="outline" 
           size="sm" 
-          className="h-9 px-4 rounded-lg border-muted-foreground/20 hover:bg-muted/50 transition-all duration-200 font-medium"
+          className="h-8 xl:h-9 px-3 xl:px-4 rounded-lg border-muted-foreground/20 hover:bg-muted/50 transition-all duration-200 font-medium text-xs xl:text-sm"
         >
           Sign In
         </Button>

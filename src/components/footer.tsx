@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Github, Mail } from 'lucide-react';
+import { Github, Mail, Instagram, Twitter, Linkedin, Youtube, MessageSquare, ExternalLink } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -9,11 +9,24 @@ import { NewsletterForm } from './newsletter-form';
 import { useAuth } from '@/components/auth';
 import { Logo } from '@/components/logo';
 import { useClubSettings } from '@/contexts/club-settings-context';
+import { useSocialMedia } from '@/contexts/social-media-context';
 
 export function Footer() {
   const { userProfile, loading } = useAuth();
   const { settings: clubSettings } = useClubSettings();
+  const { settings: socialMedia } = useSocialMedia();
   const showJoinLink = !loading && (!userProfile || userProfile.role === 'guest');
+
+  // Define social media platforms with icons
+  const socialPlatforms = [
+    { key: 'github', icon: Github, label: 'GitHub', url: socialMedia?.github },
+    { key: 'discord', icon: MessageSquare, label: 'Discord', url: socialMedia?.discord },
+    { key: 'instagram', icon: Instagram, label: 'Instagram', url: socialMedia?.instagram },
+    { key: 'twitter', icon: Twitter, label: 'Twitter', url: socialMedia?.twitter },
+    { key: 'linkedin', icon: Linkedin, label: 'LinkedIn', url: socialMedia?.linkedin },
+    { key: 'youtube', icon: Youtube, label: 'YouTube', url: socialMedia?.youtube },
+  ].filter(platform => platform.url); // Only show platforms with URLs
+
   return (
     <footer className="border-t bg-muted/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -29,27 +42,56 @@ export function Footer() {
             <p className="text-sm text-muted-foreground max-w-xs">
               {clubSettings?.tagline || 'Empowering students to learn, create, and innovate through programming and technology.'}
             </p>
-            <div className="flex space-x-2">
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="https://github.com/RHS-Coding-Club" target="_blank">
-                  <Github className="h-4 w-4" />
-                  <span className="sr-only">GitHub</span>
-                </Link>
-              </Button>
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="https://discord.gg/UQR79bn6ZZ" target="_blank">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
-                  </svg>
-                  <span className="sr-only">Discord</span>
-                </Link>
-              </Button>
+            <div className="flex flex-wrap gap-2">
+              {/* Show dynamic social links or fallback */}
+              {socialPlatforms.length > 0 ? (
+                socialPlatforms.map(({ key, icon: Icon, label, url }) => (
+                  <Button key={key} variant="ghost" size="icon" asChild>
+                    <Link href={url || '#'} target="_blank" rel="noopener noreferrer">
+                      <Icon className="h-4 w-4" />
+                      <span className="sr-only">{label}</span>
+                    </Link>
+                  </Button>
+                ))
+              ) : (
+                <>
+                  {/* Fallback icons if no social media configured */}
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href="https://github.com/RHS-Coding-Club" target="_blank">
+                      <Github className="h-4 w-4" />
+                      <span className="sr-only">GitHub</span>
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href="https://discord.gg/UQR79bn6ZZ" target="_blank">
+                      <MessageSquare className="h-4 w-4" />
+                      <span className="sr-only">Discord</span>
+                    </Link>
+                  </Button>
+                </>
+              )}
+              
+              {/* Email button (always show) */}
               <Button variant="ghost" size="icon" asChild>
                 <Link href={`mailto:${clubSettings?.contactEmail || 'contact@rhscodingclub.com'}`}>
                   <Mail className="h-4 w-4" />
                   <span className="sr-only">Email</span>
                 </Link>
               </Button>
+              
+              {/* Custom links */}
+              {socialMedia?.customLinks && socialMedia.customLinks.length > 0 && (
+                socialMedia.customLinks.map((link, index) => (
+                  link.url && link.name && (
+                    <Button key={`custom-${index}`} variant="ghost" size="icon" asChild>
+                      <Link href={link.url} target="_blank" rel="noopener noreferrer" title={link.name}>
+                        <ExternalLink className="h-4 w-4" />
+                        <span className="sr-only">{link.name}</span>
+                      </Link>
+                    </Button>
+                  )
+                ))
+              )}
             </div>
           </div>
 
