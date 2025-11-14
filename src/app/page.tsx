@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/carousel';
 import { useAuth } from '@/components/auth';
 import { useClubSettings } from '@/contexts/club-settings-context';
+import { RecentBadgeActivity } from '@/components/ui/recent-badge-activity';
 
 export default function Home() {
   const { stats, featuredProjects, featuredPosts, loading, error } = useHomepageData();
@@ -412,7 +413,22 @@ export default function Home() {
             </motion.div>
           </div>
         </Container>
-      </section>
+        </section>
+
+        {/* Recent Badge Activity Section */}
+        <section className="py-24 bg-muted/30">
+          <Container>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true, margin: "-100px" }}
+              className="max-w-3xl mx-auto"
+            >
+              <RecentBadgeActivity maxItems={8} />
+            </motion.div>
+          </Container>
+        </section>
 
         {/* CTA Section */}
         <section className="py-24">

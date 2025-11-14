@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Trophy, Medal, Award } from 'lucide-react';
 import { User } from '@/lib/firebase-collections';
 import { BadgeDisplay } from '@/components/ui/badge-display';
+import Link from 'next/link';
 
 interface LeaderboardProps {
   users: User[];
@@ -74,23 +75,28 @@ export function Leaderboard({ users, currentUserId }: LeaderboardProps) {
                   {getRankIcon(rank)}
                 </div>
                 
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={user.avatar || user.photoURL} alt={user.displayName || user.name || user.email || 'User'} />
-                  <AvatarFallback>
-                    {(user.displayName || user.name)
-                      ? (user.displayName || user.name)!.split(' ').map(n => n[0]).join('').toUpperCase()
-                      : user.email 
-                        ? user.email.substring(0, 2).toUpperCase()
-                        : 'U'
-                    }
-                  </AvatarFallback>
-                </Avatar>
+                <Link href={`/members/${user.id}`} className="flex-shrink-0">
+                  <Avatar className="h-10 w-10 hover:ring-2 hover:ring-primary transition-all cursor-pointer">
+                    <AvatarImage src={user.avatar || user.photoURL} alt={user.displayName || user.name || user.email || 'User'} />
+                    <AvatarFallback>
+                      {(user.displayName || user.name)
+                        ? (user.displayName || user.name)!.split(' ').map(n => n[0]).join('').toUpperCase()
+                        : user.email 
+                          ? user.email.substring(0, 2).toUpperCase()
+                          : 'U'
+                      }
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium truncate">
+                    <Link 
+                      href={`/members/${user.id}`}
+                      className="font-medium truncate hover:text-primary transition-colors"
+                    >
                       {user.displayName || user.name || user.email?.split('@')[0] || `User ${user.id.substring(0, 6)}`}
-                    </p>
+                    </Link>
                     {isCurrentUser && <Badge variant="secondary">You</Badge>}
                   </div>
                   {user.gradYear && (

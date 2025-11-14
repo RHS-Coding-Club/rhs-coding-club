@@ -16,6 +16,7 @@ import { useState, useMemo } from 'react';
 import { MembershipApplication } from '@/components/dashboard/membership-application';
 import { AuthForm } from '@/components/auth';
 import { BadgeDisplay } from '@/components/ui/badge-display';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const { user, userProfile } = useAuth();
@@ -273,9 +274,17 @@ export default function DashboardPage() {
               {user && (
                 <Card>
                   <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <Award className="h-5 w-5 text-amber-500" />
-                      <CardTitle>My Badges</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Award className="h-5 w-5 text-amber-500" />
+                        <CardTitle>My Badges</CardTitle>
+                      </div>
+                      <Link 
+                        href={`/members/${user.uid}`}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        View Profile →
+                      </Link>
                     </div>
                   </CardHeader>
                   <CardContent>

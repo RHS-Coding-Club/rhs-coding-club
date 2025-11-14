@@ -44,10 +44,20 @@ service cloud.firestore {
 
     // Projects Collection
     match /projects/{projectId} {
-      allow read: if resource.data.approved == true || request.auth.uid == resource.data.authorId || isAdminOrOfficer();
+      // Allow reading approved projects, or if user is the author (supports both authorId and userId fields)
+      allow read: if resource.data.approved == true || 
+                     request.auth.uid == resource.data.authorId || 
+                     request.auth.uid == resource.data.userId || 
+                     isAdminOrOfficer();
       allow create: if request.auth.uid != null;
-      allow update: if request.auth.uid == resource.data.authorId || isAdminOrOfficer();
-      allow delete: if request.auth.uid == resource.data.authorId || isAdminOrOfficer();
+      // Allow update if user is the author (supports both authorId and userId fields)
+      allow update: if request.auth.uid == resource.data.authorId || 
+                       request.auth.uid == resource.data.userId || 
+                       isAdminOrOfficer();
+      // Allow delete if user is the author (supports both authorId and userId fields)
+      allow delete: if request.auth.uid == resource.data.authorId || 
+                       request.auth.uid == resource.data.userId || 
+                       isAdminOrOfficer();
     }
 
     // Challenges Collection
@@ -62,6 +72,16 @@ service cloud.firestore {
       allow create: if request.auth.uid == request.resource.data.userId;
   // Allow the owner or an admin/officer to update (e.g., mark pass/fail, add feedback)
   allow update: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
+      allow delete: if false;
+    }
+
+    // Challenge Submissions Collection (alternative naming)
+    match /challenge-submissions/{submissionId} {
+      // Allow users to read their own submissions, admins/officers can read all
+      allow read: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
+      allow create: if request.auth.uid == request.resource.data.userId;
+      // Allow the owner or an admin/officer to update (e.g., mark pass/fail, add feedback)
+      allow update: if request.auth.uid == resource.data.userId || isAdminOrOfficer();
       allow delete: if false;
     }
 

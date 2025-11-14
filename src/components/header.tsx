@@ -27,6 +27,7 @@ const navigation = [
   { name: 'Resources', link: '/resources' },
   { name: 'Challenges', link: '/challenges' },
   { name: 'Leaderboard', link: '/leaderboard' },
+  { name: 'Hall of Fame', link: '/hall-of-fame' },
   { name: 'Blog', link: '/blog' },
   { name: 'Contact', link: '/contact' },
 ];
