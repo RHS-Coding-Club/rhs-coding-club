@@ -53,7 +53,7 @@ export function ThemeToggle({ className, ...props }: ThemeToggleProps) {
       <Button 
         variant="outline" 
         size="icon"
-        className={cn("cursor-pointer", className)} 
+        className={cn("cursor-pointer self-center", className)} 
         disabled
         aria-label="Toggle theme"
       >
@@ -70,7 +70,7 @@ export function ThemeToggle({ className, ...props }: ThemeToggleProps) {
     <Button 
       variant="outline" 
       size="icon"
-      className={cn("cursor-pointer relative overflow-hidden", className)} 
+      className={cn("cursor-pointer relative overflow-hidden self-center", className)} 
       {...props} 
       onClick={handleThemeToggle}
       aria-label="Toggle theme"

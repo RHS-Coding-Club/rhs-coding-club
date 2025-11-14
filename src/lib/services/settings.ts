@@ -542,6 +542,153 @@ export async function getGitHubOrgSettingsWithDefaults(): Promise<GitHubOrgSetti
   }
 }
 
+// ==================== EMAIL & NOTIFICATION SETTINGS ====================
+
+// Email & Notification Settings Interface
+export interface EmailSettings {
+  id: string;
+  senderName: string;
+  senderEmail: string;
+  replyToEmail: string;
+  notifications: {
+    newChallenge: boolean;
+    challengeReminder: boolean;
+    eventReminder: boolean;
+    weeklyDigest: boolean;
+    projectApproval: boolean;
+  };
+  reminderTiming: {
+    challengeDeadline: number; // hours before
+    eventStart: number; // hours before
+  };
+  templates: {
+    welcome: string;
+    challengeNotification: string;
+    eventReminder: string;
+  };
+  updatedAt: Timestamp;
+  updatedBy: string; // Admin user ID
+}
+
+// Default email settings
+const DEFAULT_EMAIL_SETTINGS: Omit<EmailSettings, 'id' | 'updatedAt' | 'updatedBy'> = {
+  senderName: 'RHS Coding Club',
+  senderEmail: process.env.BREVO_SENDER_EMAIL || 'noreply@rhscodingclub.com',
+  replyToEmail: 'rhscodingclub@example.com',
+  notifications: {
+    newChallenge: true,
+    challengeReminder: true,
+    eventReminder: true,
+    weeklyDigest: false,
+    projectApproval: true,
+  },
+  reminderTiming: {
+    challengeDeadline: 24, // 24 hours before
+    eventStart: 2, // 2 hours before
+  },
+  templates: {
+    welcome: 'Welcome to {{clubName}}! We\'re excited to have you join our community of passionate developers.',
+    challengeNotification: 'A new challenge "{{challengeName}}" has been posted! Check it out and submit your solution.',
+    eventReminder: 'Reminder: {{eventName}} is coming up on {{eventDate}}. Don\'t forget to RSVP!',
+  },
+};
+
+/**
+ * Get email settings from Firestore
+ */
+export async function getEmailSettings(): Promise<EmailSettings | null> {
+  try {
+    const settingsRef = doc(db, 'settings', 'email');
+    const settingsDoc = await getDoc(settingsRef);
+
+    if (settingsDoc.exists()) {
+      return {
+        id: settingsDoc.id,
+        ...settingsDoc.data(),
+      } as EmailSettings;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching email settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update or create email settings
+ */
+export async function updateEmailSettings(
+  settings: Partial<Omit<EmailSettings, 'id' | 'updatedAt' | 'updatedBy'>>,
+  userId: string
+): Promise<void> {
+  try {
+    const settingsRef = doc(db, 'settings', 'email');
+    
+    const updatedSettings = {
+      ...settings,
+      updatedAt: Timestamp.now(),
+      updatedBy: userId,
+    };
+
+    await setDoc(settingsRef, updatedSettings, { merge: true });
+  } catch (error) {
+    console.error('Error updating email settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Initialize email settings with default values
+ */
+export async function initializeEmailSettings(userId: string): Promise<void> {
+  try {
+    const settingsRef = doc(db, 'settings', 'email');
+    const settingsDoc = await getDoc(settingsRef);
+
+    if (!settingsDoc.exists()) {
+      await setDoc(settingsRef, {
+        ...DEFAULT_EMAIL_SETTINGS,
+        updatedAt: Timestamp.now(),
+        updatedBy: userId,
+      });
+    }
+  } catch (error) {
+    console.error('Error initializing email settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get email settings or return defaults if not found
+ */
+export async function getEmailSettingsWithDefaults(): Promise<EmailSettings> {
+  try {
+    const settings = await getEmailSettings();
+    
+    if (settings) {
+      return settings;
+    }
+
+    // Return defaults if no settings exist
+    return {
+      id: 'email',
+      ...DEFAULT_EMAIL_SETTINGS,
+      updatedAt: Timestamp.now(),
+      updatedBy: 'system',
+    };
+  } catch (error) {
+    console.error('Error fetching email settings with defaults:', error);
+    // Return defaults on error
+    return {
+      id: 'email',
+      ...DEFAULT_EMAIL_SETTINGS,
+      updatedAt: Timestamp.now(),
+      updatedBy: 'system',
+    };
+  }
+}
+
 // ==================== BADGE SYSTEM ====================
 
 export interface Badge {

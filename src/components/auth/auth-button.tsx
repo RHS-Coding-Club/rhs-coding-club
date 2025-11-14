@@ -40,7 +40,7 @@ export function AuthButton() {
           Sign In
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px] p-0">
+      <DialogContent className="sm:max-w-[480px] p-0 pb-6">
         <DialogHeader className="px-8 pt-8 pb-0">
           <DialogTitle className="sr-only">Sign In to RHS Coding Club</DialogTitle>
         </DialogHeader>

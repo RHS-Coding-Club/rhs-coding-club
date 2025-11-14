@@ -56,6 +56,7 @@ import { PointsSettingsComponent } from '@/components/admin/settings/points-sett
 import { BadgeManagement } from '@/components/admin/settings/badge-management';
 import { ManualBadgeAward } from '@/components/admin/settings/manual-badge-award';
 import { GitHubOrgSettings } from '@/components/admin/settings/github-org-settings';
+import { EmailSettingsComponent } from '@/components/admin/settings/email-settings';
 
 // Predefined officer roles
 const OFFICER_ROLES = [
@@ -1147,13 +1148,14 @@ export default function AdminPage() {
                   </div>
                   
                   <Tabs defaultValue="club-info" className="w-full">
-                    <TabsList className="grid w-full max-w-5xl grid-cols-6">
+                    <TabsList className="grid w-full max-w-5xl grid-cols-7">
                       <TabsTrigger value="club-info">Club Information</TabsTrigger>
                       <TabsTrigger value="social-media">Social Media</TabsTrigger>
                       <TabsTrigger value="points-system">Points & Gamification</TabsTrigger>
                       <TabsTrigger value="badges">Badges</TabsTrigger>
                       <TabsTrigger value="award-badges">Award Badges</TabsTrigger>
                       <TabsTrigger value="github-org">GitHub Org</TabsTrigger>
+                      <TabsTrigger value="email">Email & Notifications</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="club-info" className="mt-6">
@@ -1178,6 +1180,10 @@ export default function AdminPage() {
                     
                     <TabsContent value="github-org" className="mt-6">
                       <GitHubOrgSettings />
+                    </TabsContent>
+                    
+                    <TabsContent value="email" className="mt-6">
+                      <EmailSettingsComponent />
                     </TabsContent>
                   </Tabs>
                 </div>

@@ -1,10 +1,11 @@
 // Brevo API integration using official SDK
 import { 
   TransactionalEmailsApi, 
-  ContactsApi,
+  ContactsApi, 
   TransactionalEmailsApiApiKeys,
   ContactsApiApiKeys
 } from '@getbrevo/brevo';
+import { getEmailSettingsWithDefaults } from './services/settings';
 
 export interface NewsletterSubscriber {
   email: string;
@@ -24,8 +25,6 @@ export interface TransactionalEmail {
 
 class BrevoService {
   private readonly apiKey = process.env.BREVO_API_KEY;
-  private readonly senderEmail = process.env.BREVO_SENDER_EMAIL || '';
-  private readonly senderName = process.env.BREVO_SENDER_NAME || 'RHS Coding Club';
   private apiInstance: TransactionalEmailsApi | null = null;
   private contactsApiInstance: ContactsApi | null = null;
 
@@ -52,6 +51,25 @@ class BrevoService {
   }
 
   /**
+   * Get email settings from Firestore (server-side only)
+   */
+  private async getEmailSettings() {
+    try {
+      const settings = await getEmailSettingsWithDefaults();
+      return {
+        senderEmail: settings.senderEmail || process.env.BREVO_SENDER_EMAIL || '',
+        senderName: settings.senderName || process.env.BREVO_SENDER_NAME || 'RHS Coding Club',
+        replyToEmail: settings.replyToEmail || settings.senderEmail,
+      };
+    } catch (error) {
+      console.error('Error fetching email settings, using defaults:', error);
+      return {
+        senderEmail: process.env.BREVO_SENDER_EMAIL || '',
+        senderName: process.env.BREVO_SENDER_NAME || 'RHS Coding Club',
+        replyToEmail: process.env.BREVO_SENDER_EMAIL || '',
+      };
+    }
+  }  /**
    * Subscribe a user to the newsletter
    */
   async subscribeToNewsletter(subscriber: NewsletterSubscriber): Promise<boolean> {
@@ -105,16 +123,21 @@ class BrevoService {
     }
 
     try {
+      const emailSettings = await this.getEmailSettings();
+      
       const sendSmtpEmail = {
         to: emailData.to,
         subject: emailData.subject,
         htmlContent: emailData.htmlContent,
         textContent: emailData.textContent,
         sender: emailData.sender || {
-          email: this.senderEmail,
-          name: this.senderName,
+          email: emailSettings.senderEmail,
+          name: emailSettings.senderName,
         },
-        replyTo: emailData.replyTo,
+        replyTo: emailData.replyTo || {
+          email: emailSettings.replyToEmail,
+          name: emailSettings.senderName,
+        },
       };
 
       await this.apiInstance.sendTransacEmail(sendSmtpEmail);
@@ -728,8 +751,10 @@ class BrevoService {
     subject: string,
     message: string
   ): Promise<boolean> {
+    const emailSettings = await this.getEmailSettings();
+    
     const notificationEmailData: TransactionalEmail = {
-      to: [{ email: this.senderEmail, name: this.senderName }],
+      to: [{ email: emailSettings.replyToEmail, name: emailSettings.senderName }],
       subject: `New Contact Form Submission: ${subject}`,
       htmlContent: `
         <!DOCTYPE html>
@@ -1032,13 +1057,15 @@ class BrevoService {
         To unsubscribe: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/newsletter/unsubscribe
       `;
 
+      const emailSettings = await this.getEmailSettings();
+
       // Send email to all recipients
       const emailData: TransactionalEmail = {
         to: recipients.map(email => ({ email })),
         subject: `📧 ${subject}`,
         htmlContent,
         textContent,
-        sender: { email: this.senderEmail, name: this.senderName },
+        sender: { email: emailSettings.senderEmail, name: emailSettings.senderName },
       };
 
       return this.sendTransactionalEmail(emailData);

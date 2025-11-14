@@ -10,6 +10,7 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,6 +39,7 @@ export function AuthForm({ onClose }: AuthFormProps) {
     confirmPassword: '',
     displayName: '',
   });
+  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(true);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +75,27 @@ export function AuthForm({ onClose }: AuthFormProps) {
 
     try {
       await signUpWithEmail(signUpData.email, signUpData.password, signUpData.displayName);
+      
+      // Subscribe to newsletter if checkbox is checked
+      if (subscribeToNewsletter) {
+        try {
+          await fetch('/api/newsletter-signup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: signUpData.email,
+              firstName: signUpData.displayName.split(' ')[0] || '',
+              lastName: signUpData.displayName.split(' ').slice(1).join(' ') || '',
+            }),
+          });
+        } catch (newsletterError) {
+          console.error('Failed to subscribe to newsletter:', newsletterError);
+          // Don't block signup if newsletter subscription fails
+        }
+      }
+      
       onClose?.();
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to create account');
@@ -324,6 +347,26 @@ export function AuthForm({ onClose }: AuthFormProps) {
                             }
                             required
                           />
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-3 rounded-lg border border-border bg-muted/30 p-4">
+                        <Checkbox
+                          id="newsletter-signup-modal"
+                          checked={subscribeToNewsletter}
+                          onCheckedChange={(checked) => setSubscribeToNewsletter(checked === true)}
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1 space-y-1">
+                          <Label
+                            htmlFor="newsletter-signup-modal"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            Subscribe to our newsletter
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Get updates about coding challenges, events, and club news
+                          </p>
                         </div>
                       </div>
 

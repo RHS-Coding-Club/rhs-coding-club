@@ -61,9 +61,7 @@ export function Header() {
           <NavbarLogo />
           <NavItems items={navigation} />
           <div className="flex items-center gap-1.5 xl:gap-2">
-            <div className="relative z-[70]">
-              <ThemeToggle />
-            </div>
+            <ThemeToggle />
             <AuthButton />
             {showJoinCta && (
               <NavbarButton as={Link} href="/join" variant="primary" className="text-xs xl:text-sm px-3 xl:px-4">
@@ -77,7 +75,7 @@ export function Header() {
         <MobileNav>
           <MobileNavHeader>
             <NavbarLogo />
-            <div className="flex items-center gap-2 relative z-[70]">
+            <div className="flex items-center gap-2">
               <ThemeToggle />
               <MobileNavToggle
                 isOpen={isMobileMenuOpen}

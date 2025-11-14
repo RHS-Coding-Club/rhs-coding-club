@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff, Mail, Lock, User, CheckCircle2 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { motion } from 'framer-motion';
@@ -26,6 +27,7 @@ export function SignUpForm() {
     confirmPassword: '',
     displayName: '',
   });
+  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(true);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +48,26 @@ export function SignUpForm() {
 
     try {
       await signUpWithEmail(signUpData.email, signUpData.password, signUpData.displayName);
+      
+      // Subscribe to newsletter if checkbox is checked
+      if (subscribeToNewsletter) {
+        try {
+          await fetch('/api/newsletter-signup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: signUpData.email,
+              firstName: signUpData.displayName.split(' ')[0] || '',
+              lastName: signUpData.displayName.split(' ').slice(1).join(' ') || '',
+            }),
+          });
+        } catch (newsletterError) {
+          console.error('Failed to subscribe to newsletter:', newsletterError);
+          // Don't block signup if newsletter subscription fails
+        }
+      }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to create account');
     } finally {
@@ -59,6 +81,10 @@ export function SignUpForm() {
 
     try {
       await signInWithGoogle();
+      
+      // Note: For Google sign-in, we can't subscribe to newsletter here
+      // because we don't have access to the user's email until after sign-in
+      // The user can subscribe later from their dashboard
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to sign in with Google');
     } finally {
@@ -230,6 +256,26 @@ export function SignUpForm() {
               }
               required
             />
+          </div>
+        </div>
+
+        <div className="flex items-start space-x-3 rounded-lg border border-border bg-muted/30 p-4">
+          <Checkbox
+            id="newsletter-signup"
+            checked={subscribeToNewsletter}
+            onCheckedChange={(checked) => setSubscribeToNewsletter(checked === true)}
+            className="mt-0.5"
+          />
+          <div className="flex-1 space-y-1">
+            <Label
+              htmlFor="newsletter-signup"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            >
+              Subscribe to our newsletter
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Get updates about coding challenges, events, and club news delivered to your inbox
+            </p>
           </div>
         </div>
 
