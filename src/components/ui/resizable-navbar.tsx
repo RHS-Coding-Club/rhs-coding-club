@@ -115,7 +115,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       }}
       className={cn(
         "relative z-[60] mx-auto hidden w-full max-w-7xl items-center justify-between self-start bg-transparent px-4 py-3 xl:px-6 lg:flex",
-        visible && "bg-background/50 border border-border/30 backdrop-blur-xl",
+        visible && "bg-background/80 border-2 border-border/60 backdrop-blur-xl shadow-lg",
         visible ? "rounded-[calc(var(--radius)+0.5rem)]" : "rounded-none",
         className,
       )}
@@ -183,7 +183,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-3 lg:hidden",
-        visible && "bg-background/50 border border-border/30 backdrop-blur-xl",
+        visible && "bg-background/80 border-2 border-border/60 backdrop-blur-xl shadow-lg",
         visible ? "rounded-[var(--radius)]" : "rounded-none",
         className,
       )}
@@ -224,8 +224,8 @@ export const MobileNavMenu = ({
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
           className={cn(
-            "absolute inset-x-0 top-[4.5rem] z-50 flex w-full flex-col items-start justify-start gap-3 px-6 py-6 border",
-            "bg-background/60 backdrop-blur-xl border-border/30",
+            "absolute inset-x-0 top-[4.5rem] z-50 flex w-full flex-col items-start justify-start gap-3 px-6 py-6 border-2",
+            "bg-background/85 backdrop-blur-xl border-border/60 shadow-lg",
             "rounded-[var(--radius)]",
             className,
           )}

@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/contexts/auth-context';
 import { ClubSettingsProvider } from '@/contexts/club-settings-context';
 import { SocialMediaProvider } from '@/contexts/social-media-context';
+import { GitHubOrgSettingsProvider } from '@/contexts/github-org-settings-context';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Toaster } from 'sonner';
@@ -68,13 +69,15 @@ export default function RootLayout({
           <AuthProvider>
             <ClubSettingsProvider>
               <SocialMediaProvider>
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-                <Toaster position="bottom-right" />
-                {/* Vercel Speed Insights */}
-                <SpeedInsights />
-                <Analytics />
+                <GitHubOrgSettingsProvider>
+                  <Header />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                  <Toaster position="bottom-right" />
+                  {/* Vercel Speed Insights */}
+                  <SpeedInsights />
+                  <Analytics />
+                </GitHubOrgSettingsProvider>
               </SocialMediaProvider>
             </ClubSettingsProvider>
           </AuthProvider>

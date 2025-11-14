@@ -403,6 +403,145 @@ export async function getPointsForDifficulty(difficulty: 'easy' | 'medium' | 'ha
   }
 }
 
+// ==================== GITHUB ORGANIZATION SETTINGS ====================
+
+export interface TeamAssignmentRule {
+  teamSlug: string;
+  teamName: string;
+  condition: string;
+  priority: number;
+}
+
+export interface GitHubOrgSettings {
+  id: string;
+  organizationName: string;
+  autoInvite: boolean;
+  defaultTeam?: string;
+  defaultTeamName?: string;
+  inviteExpiryDays: number;
+  welcomeMessage: string;
+  requirements: {
+    requireVerifiedEmail: boolean;
+    minimumPoints?: number;
+    requireEventAttendance?: boolean;
+  };
+  teamAssignmentRules: TeamAssignmentRule[];
+  updatedAt: Timestamp;
+  updatedBy: string; // Admin user ID
+}
+
+// Default GitHub organization settings
+const DEFAULT_GITHUB_ORG_SETTINGS: Omit<GitHubOrgSettings, 'id' | 'updatedAt' | 'updatedBy'> = {
+  organizationName: process.env.NEXT_PUBLIC_GITHUB_ORG || 'RHS-Coding-Club',
+  autoInvite: false,
+  defaultTeam: '',
+  defaultTeamName: '',
+  inviteExpiryDays: 7,
+  welcomeMessage: 'Welcome to our GitHub organization! We\'re excited to have you collaborate with us on exciting projects.',
+  requirements: {
+    requireVerifiedEmail: true,
+    minimumPoints: 0,
+    requireEventAttendance: false,
+  },
+  teamAssignmentRules: [],
+};
+
+/**
+ * Get GitHub organization settings from Firestore
+ */
+export async function getGitHubOrgSettings(): Promise<GitHubOrgSettings | null> {
+  try {
+    const settingsRef = doc(db, 'settings', 'github-org');
+    const settingsDoc = await getDoc(settingsRef);
+
+    if (settingsDoc.exists()) {
+      return {
+        id: settingsDoc.id,
+        ...settingsDoc.data(),
+      } as GitHubOrgSettings;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching GitHub org settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update or create GitHub organization settings
+ */
+export async function updateGitHubOrgSettings(
+  settings: Partial<Omit<GitHubOrgSettings, 'id' | 'updatedAt' | 'updatedBy'>>,
+  userId: string
+): Promise<void> {
+  try {
+    const settingsRef = doc(db, 'settings', 'github-org');
+    
+    const updatedSettings = {
+      ...settings,
+      updatedAt: Timestamp.now(),
+      updatedBy: userId,
+    };
+
+    await setDoc(settingsRef, updatedSettings, { merge: true });
+  } catch (error) {
+    console.error('Error updating GitHub org settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Initialize GitHub organization settings with default values
+ */
+export async function initializeGitHubOrgSettings(userId: string): Promise<void> {
+  try {
+    const settingsRef = doc(db, 'settings', 'github-org');
+    const settingsDoc = await getDoc(settingsRef);
+
+    if (!settingsDoc.exists()) {
+      await setDoc(settingsRef, {
+        ...DEFAULT_GITHUB_ORG_SETTINGS,
+        updatedAt: Timestamp.now(),
+        updatedBy: userId,
+      });
+    }
+  } catch (error) {
+    console.error('Error initializing GitHub org settings:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get GitHub organization settings or return defaults if not found
+ */
+export async function getGitHubOrgSettingsWithDefaults(): Promise<GitHubOrgSettings> {
+  try {
+    const settings = await getGitHubOrgSettings();
+    
+    if (settings) {
+      return settings;
+    }
+
+    // Return defaults if no settings exist
+    return {
+      id: 'github-org',
+      ...DEFAULT_GITHUB_ORG_SETTINGS,
+      updatedAt: Timestamp.now(),
+      updatedBy: 'system',
+    };
+  } catch (error) {
+    console.error('Error fetching GitHub org settings with defaults:', error);
+    // Return defaults on error
+    return {
+      id: 'github-org',
+      ...DEFAULT_GITHUB_ORG_SETTINGS,
+      updatedAt: Timestamp.now(),
+      updatedBy: 'system',
+    };
+  }
+}
+
 // ==================== BADGE SYSTEM ====================
 
 export interface Badge {

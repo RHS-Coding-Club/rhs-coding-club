@@ -34,6 +34,7 @@ import {
 import { db } from '@/lib/firebase';
 import { GitHubMembershipRequest } from '@/lib/firebase-collections';
 import { toast } from 'sonner';
+import { useGitHubOrgSettings } from '@/contexts/github-org-settings-context';
 
 type RequestStatus = 'pending' | 'approved' | 'denied' | 'invite-sent' | 'already-member' | 'already-invited' | 'joined';
 
@@ -99,6 +100,7 @@ const STATUS_INFO: Record<RequestStatus, StatusInfo> = {
 
 export default function GitHubMembershipPage() {
   const { user, userProfile } = useAuth();
+  const { settings: githubOrgSettings } = useGitHubOrgSettings();
   const [githubUsername, setGithubUsername] = useState('');
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -265,11 +267,47 @@ export default function GitHubMembershipPage() {
               <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mx-auto">
                 <Github className="h-8 w-8 text-gray-700 dark:text-gray-300" />
               </div>
-              <h1 className="text-3xl font-bold">Join Our GitHub Organization</h1>
+              <h1 className="text-3xl font-bold">
+                Join {githubOrgSettings?.organizationName || 'Our GitHub Organization'}
+              </h1>
               <p className="text-lg text-muted-foreground">
-                Request membership to collaborate on our projects and access exclusive repositories.
+                {githubOrgSettings?.welcomeMessage || 'Request membership to collaborate on our projects and access exclusive repositories.'}
               </p>
             </div>
+
+            {/* Requirements Card - Show if configured */}
+            {githubOrgSettings && ((githubOrgSettings.requirements.minimumPoints ?? 0) > 0 || githubOrgSettings.requirements.requireEventAttendance || githubOrgSettings.requirements.requireVerifiedEmail) && (
+              <Card className="border-blue-500/50 bg-blue-50 dark:bg-blue-950/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-200">
+                    <Shield className="h-5 w-5" />
+                    Membership Requirements
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm">
+                    {githubOrgSettings.requirements.requireVerifiedEmail && (
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <span>Verified email address</span>
+                      </li>
+                    )}
+                    {(githubOrgSettings.requirements.minimumPoints ?? 0) > 0 && (
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <span>Minimum {githubOrgSettings.requirements.minimumPoints} points</span>
+                      </li>
+                    )}
+                    {githubOrgSettings.requirements.requireEventAttendance && (
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <span>Attendance at least one club event</span>
+                      </li>
+                    )}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Current Request Status */}
             {currentRequest && (
