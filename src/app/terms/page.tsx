@@ -110,10 +110,10 @@ export default function TermsPage() {
           <p className="text-responsive-base leading-relaxed">
             For questions about these Terms of Service, please contact us at{' '}
             <a 
-              href="mailto:contact@rhscodingclub.com" 
+              href="mailto:contact@rhscoding.club" 
               className="text-primary hover:underline"
             >
-              contact@rhscodingclub.com
+              contact@rhscoding.club
             </a>.
           </p>
         </section>

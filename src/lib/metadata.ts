@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
-const baseUrl = 'https://rhscodingclub.com';
+const baseUrl = 'https://rhscoding.club';
 const defaultImage = `${baseUrl}/opengraph-image.png`;
 
 export const defaultMetadata: Metadata = {

@@ -94,10 +94,10 @@ export default function PrivacyPage() {
             If you have questions about this Privacy Policy or want to exercise your rights, 
             please contact us at{' '}
             <a 
-              href="mailto:privacy@rhscodingclub.com" 
+              href="mailto:privacy@rhscoding.club" 
               className="text-primary hover:underline"
             >
-              privacy@rhscodingclub.com
+              privacy@rhscoding.club
             </a>.
           </p>
         </section>

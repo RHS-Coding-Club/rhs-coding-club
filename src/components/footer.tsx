@@ -73,7 +73,7 @@ export function Footer() {
               
               {/* Email button (always show) */}
               <Button variant="ghost" size="icon" asChild>
-                <Link href={`mailto:${clubSettings?.contactEmail || 'contact@rhscodingclub.com'}`}>
+                <Link href={`mailto:${clubSettings?.contactEmail || 'contact@rhscoding.club'}`}>
                   <Mail className="h-4 w-4" />
                   <span className="sr-only">Email</span>
                 </Link>

@@ -5,12 +5,12 @@ export function StructuredData() {
   const organizationData = generateStructuredData('Organization', {
     name: 'RHS Coding Club',
     alternateName: ['RHS Programming Club', 'Richmond High School Coding Club'],
-    url: 'https://rhscodingclub.com',
-    logo: 'https://rhscodingclub.com/logo.svg',
-    image: 'https://rhscodingclub.com/opengraph-image.png',
+    url: 'https://rhscoding.club',
+    logo: 'https://rhscoding.club/logo.svg',
+    image: 'https://rhscoding.club/opengraph-image.png',
     description: 'Student-led coding club at Richmond High School focused on programming education, project development, and technology innovation.',
     foundingDate: '2020',
-    email: 'contact@rhscodingclub.com',
+    email: 'contact@rhscoding.club',
     memberOf: {
       '@type': 'EducationalOrganization',
       name: 'Richmond High School',
@@ -72,7 +72,7 @@ export function StructuredData() {
 
   const websiteData = generateStructuredData('WebSite', {
     name: 'RHS Coding Club',
-    url: 'https://rhscodingclub.com',
+    url: 'https://rhscoding.club',
     description: 'Official website of the RHS Coding Club - Learn programming, participate in challenges, build projects, and connect with fellow developers.',
     inLanguage: 'en-US',
     author: {
@@ -82,17 +82,17 @@ export function StructuredData() {
     publisher: {
       '@type': 'Organization',
       name: 'RHS Coding Club',
-      logo: 'https://rhscodingclub.com/logo.svg',
+      logo: 'https://rhscoding.club/logo.svg',
     },
     potentialAction: [
       {
         '@type': 'SearchAction',
-        target: 'https://rhscodingclub.com/search?q={search_term_string}',
+        target: 'https://rhscoding.club/search?q={search_term_string}',
         'query-input': 'required name=search_term_string',
       },
       {
         '@type': 'JoinAction',
-        target: 'https://rhscodingclub.com/join',
+        target: 'https://rhscoding.club/join',
         object: {
           '@type': 'Organization',
           name: 'RHS Coding Club',
@@ -109,37 +109,37 @@ export function StructuredData() {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://rhscodingclub.com',
+        item: 'https://rhscoding.club',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'About',
-        item: 'https://rhscodingclub.com/about',
+        item: 'https://rhscoding.club/about',
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Events',
-        item: 'https://rhscodingclub.com/events',
+        item: 'https://rhscoding.club/events',
       },
       {
         '@type': 'ListItem',
         position: 4,
         name: 'Projects',
-        item: 'https://rhscodingclub.com/projects',
+        item: 'https://rhscoding.club/projects',
       },
       {
         '@type': 'ListItem',
         position: 5,
         name: 'Challenges',
-        item: 'https://rhscodingclub.com/challenges',
+        item: 'https://rhscoding.club/challenges',
       },
       {
         '@type': 'ListItem',
         position: 6,
         name: 'Blog',
-        item: 'https://rhscodingclub.com/blog',
+        item: 'https://rhscoding.club/blog',
       },
     ],
   };

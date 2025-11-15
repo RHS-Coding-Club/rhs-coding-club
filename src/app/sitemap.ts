@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://rhscodingclub.com';
+  const baseUrl = 'https://rhscoding.club';
   
   // Static routes with their priority and change frequency
   const staticRoutes: MetadataRoute.Sitemap = [

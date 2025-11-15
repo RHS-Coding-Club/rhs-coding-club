@@ -257,7 +257,7 @@ export function EmailSettingsComponent() {
                   type="email"
                   value={formData.senderEmail}
                   onChange={(e) => handleChange('senderEmail', e.target.value)}
-                  placeholder="noreply@rhscodingclub.com"
+                  placeholder="noreply@rhscoding.club"
                   required
                 />
                 <p className="text-xs text-muted-foreground">
