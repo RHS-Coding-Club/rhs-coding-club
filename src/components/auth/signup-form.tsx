@@ -11,11 +11,13 @@ import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff, Mail, Lock, User, CheckCircle2 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
+import { FaGithub } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { getFirebaseAuthErrorMessage } from '@/lib/utils';
 
 export function SignUpForm() {
-  const { user, signUpWithEmail, signInWithGoogle } = useAuth();
+  const { user, signUpWithEmail, signInWithGoogle, signInWithGitHub } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -69,7 +71,7 @@ export function SignUpForm() {
         }
       }
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to create account');
+      setError(getFirebaseAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -86,7 +88,24 @@ export function SignUpForm() {
       // because we don't have access to the user's email until after sign-in
       // The user can subscribe later from their dashboard
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to sign in with Google');
+      setError(getFirebaseAuthErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      await signInWithGitHub();
+      
+      // Note: For GitHub sign-in, we can't subscribe to newsletter here
+      // because we don't have access to the user's email until after sign-in
+      // The user can subscribe later from their dashboard
+    } catch (error: unknown) {
+      setError(getFirebaseAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -283,7 +302,7 @@ export function SignUpForm() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 rounded-lg"
+            className="text-sm text-destructive bg-destructive/10 border border-destructive/20 p-3 rounded-lg"
           >
             {error}
           </motion.div>
@@ -327,6 +346,17 @@ export function SignUpForm() {
         >
           <FcGoogle className="mr-3 h-5 w-5" />
           Continue with Google
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full mt-4 h-12 rounded-xl border-2 border-border bg-background text-foreground hover:bg-muted/50 transition-all duration-200 font-medium"
+          onClick={handleGitHubSignIn}
+          disabled={loading}
+        >
+          <FaGithub className="mr-3 h-5 w-5" />
+          Continue with GitHub
         </Button>
       </div>
 

@@ -13,14 +13,16 @@ import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
+import { FaGithub } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getFirebaseAuthErrorMessage } from '@/lib/utils';
 
 interface AuthFormProps {
   onClose?: () => void;
 }
 
 export function AuthForm({ onClose }: AuthFormProps) {
-  const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
+  const { signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithGitHub } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -50,7 +52,7 @@ export function AuthForm({ onClose }: AuthFormProps) {
       await signInWithEmail(signInData.email, signInData.password);
       onClose?.();
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to sign in');
+      setError(getFirebaseAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -98,7 +100,7 @@ export function AuthForm({ onClose }: AuthFormProps) {
       
       onClose?.();
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to create account');
+      setError(getFirebaseAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -112,7 +114,21 @@ export function AuthForm({ onClose }: AuthFormProps) {
       await signInWithGoogle();
       onClose?.();
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to sign in with Google');
+      setError(getFirebaseAuthErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      await signInWithGitHub();
+      onClose?.();
+    } catch (error: unknown) {
+      setError(getFirebaseAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -223,7 +239,7 @@ export function AuthForm({ onClose }: AuthFormProps) {
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded-lg"
+                          className="text-sm text-destructive bg-destructive/10 border border-destructive/20 p-3 rounded-lg"
                         >
                           {error}
                         </motion.div>
@@ -374,7 +390,7 @@ export function AuthForm({ onClose }: AuthFormProps) {
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded-lg"
+                          className="text-sm text-destructive bg-destructive/10 border border-destructive/20 p-3 rounded-lg"
                         >
                           {error}
                         </motion.div>
@@ -423,6 +439,17 @@ export function AuthForm({ onClose }: AuthFormProps) {
             >
               <FcGoogle className="mr-3 h-5 w-5" />
               Continue with Google
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full mt-4 h-12 rounded-xl border-2 border-border bg-background text-foreground hover:bg-muted/50 transition-all duration-200 font-medium"
+              onClick={handleGitHubSignIn}
+              disabled={loading}
+            >
+              <FaGithub className="mr-3 h-5 w-5" />
+              Continue with GitHub
             </Button>
           </div>
         </CardContent>
