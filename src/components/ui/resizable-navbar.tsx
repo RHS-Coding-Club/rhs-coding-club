@@ -123,7 +123,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       <div className="flex items-center flex-shrink-0 relative z-30 min-w-0">
         {childrenArray[0]}
       </div>
-      <div className="flex-1 flex items-center justify-center min-w-0 overflow-x-auto">
+      <div className="flex-1 flex items-center justify-center min-w-0 overflow-x-hidden">
         {childrenArray[1]}
       </div>
       <div className="flex items-center gap-1.5 xl:gap-2 flex-shrink-0 relative z-30 min-w-0">
