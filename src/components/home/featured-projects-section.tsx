@@ -76,7 +76,11 @@ export function FeaturedProjectsSection() {
                     <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                       <Card className="h-full">
                         <CardHeader>
-                          <CardTitle className="text-xl">{project.title}</CardTitle>
+                          <CardTitle className="text-xl">
+                            <Link href={`/projects/${project.id}`} className="hover:text-primary transition-colors hover:underline">
+                              {project.title}
+                            </Link>
+                          </CardTitle>
                           <p className="text-muted-foreground line-clamp-3">{project.description}</p>
                         </CardHeader>
                         <CardContent className="space-y-4">
