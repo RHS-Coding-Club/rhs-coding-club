@@ -61,7 +61,7 @@ export function Header() {
         <NavBody>
           <NavbarLogo />
           <NavItems items={navigation} />
-          <div className="flex items-center gap-1.5 xl:gap-2">
+          <div className="flex items-center gap-2 xl:gap-3">
             <ThemeToggle />
             <AuthButton />
             {showJoinCta && (

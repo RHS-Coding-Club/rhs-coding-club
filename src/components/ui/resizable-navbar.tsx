@@ -126,7 +126,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       <div className="flex-1 flex items-center justify-center min-w-0 overflow-x-hidden px-2 xl:px-4">
         {childrenArray[1]}
       </div>
-      <div className="flex items-center gap-1.5 xl:gap-2 flex-shrink-0 relative z-30 min-w-0 ml-2 xl:ml-4">
+      <div className="flex items-center gap-2 xl:gap-3 flex-shrink-0 relative z-30 min-w-0 ml-2 xl:ml-4">
         {childrenArray[2]}
       </div>
     </motion.div>
@@ -140,7 +140,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "flex flex-row items-center justify-center space-x-0.5 xl:space-x-1 text-sm font-medium",
+        "flex flex-row items-center justify-center space-x-0 xl:space-x-0.5 text-sm font-medium",
         className,
       )}
     >
@@ -148,7 +148,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
         <a
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
-          className="relative px-2 xl:px-3 py-2 text-foreground/80 hover:text-foreground transition-colors duration-200 whitespace-nowrap"
+          className="relative px-1.5 xl:px-2.5 py-2 text-foreground/80 hover:text-foreground transition-colors duration-200 whitespace-nowrap"
           key={`link-${idx}`}
           href={item.link}
         >
