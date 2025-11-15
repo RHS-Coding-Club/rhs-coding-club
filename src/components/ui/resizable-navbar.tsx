@@ -120,13 +120,13 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         className,
       )}
     >
-      <div className="flex items-center flex-shrink-0 relative z-30 min-w-0">
+      <div className="flex items-center flex-shrink-0 relative z-30 min-w-0 mr-2 xl:mr-4">
         {childrenArray[0]}
       </div>
-      <div className="flex-1 flex items-center justify-center min-w-0 overflow-x-hidden">
+      <div className="flex-1 flex items-center justify-center min-w-0 overflow-x-hidden px-2 xl:px-4">
         {childrenArray[1]}
       </div>
-      <div className="flex items-center gap-1.5 xl:gap-2 flex-shrink-0 relative z-30 min-w-0">
+      <div className="flex items-center gap-1.5 xl:gap-2 flex-shrink-0 relative z-30 min-w-0 ml-2 xl:ml-4">
         {childrenArray[2]}
       </div>
     </motion.div>
