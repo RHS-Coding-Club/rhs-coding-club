@@ -168,7 +168,7 @@ float Bayer2(vec2 a) {
 #define Bayer4(a) (Bayer2(.5*(a))*0.25 + Bayer2(a))
 #define Bayer8(a) (Bayer4(.5*(a))*0.25 + Bayer2(a))
 
-#define FBM_OCTAVES     5
+#define FBM_OCTAVES     3
 #define FBM_LACUNARITY  1.25
 #define FBM_GAIN        1.0
 
@@ -323,6 +323,22 @@ const PixelBlast = ({
 
   const threeRef = useRef(null);
   const prevConfigRef = useRef(null);
+  
+  // Add Intersection Observer for visibility detection
+  useEffect(() => {
+    if (!autoPauseOffscreen || !containerRef.current) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        visibilityRef.current.visible = entries[0].isIntersecting;
+      },
+      { threshold: 0.1 }
+    );
+    
+    observer.observe(containerRef.current);
+    
+    return () => observer.disconnect();
+  }, [autoPauseOffscreen]);
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -355,11 +371,14 @@ const PixelBlast = ({
         canvas,
         antialias,
         alpha: true,
-        powerPreference: 'high-performance'
+        powerPreference: 'high-performance',
+        stencil: false,
+        depth: false
       });
       renderer.domElement.style.width = '100%';
       renderer.domElement.style.height = '100%';
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      // Limit pixel ratio to reduce GPU load
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       container.appendChild(renderer.domElement);
       if (transparent) renderer.setClearAlpha(0);
       else renderer.setClearColor(0x000000, 1);
@@ -488,11 +507,24 @@ const PixelBlast = ({
         passive: true
       });
       let raf = 0;
-      const animate = () => {
+      let lastFrameTime = 0;
+      const targetFPS = 60;
+      const frameInterval = 1000 / targetFPS;
+      
+      const animate = (currentTime) => {
         if (autoPauseOffscreen && !visibilityRef.current.visible) {
           raf = requestAnimationFrame(animate);
           return;
         }
+        
+        // Throttle to target FPS
+        const deltaTime = currentTime - lastFrameTime;
+        if (deltaTime < frameInterval) {
+          raf = requestAnimationFrame(animate);
+          return;
+        }
+        lastFrameTime = currentTime - (deltaTime % frameInterval);
+        
         uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
         if (liquidEffect) liquidEffect.uniforms.get('uTime').value = uniforms.uTime.value;
         if (composer) {

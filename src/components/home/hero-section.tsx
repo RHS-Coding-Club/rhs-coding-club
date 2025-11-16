@@ -2,20 +2,24 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/container';
 import { NextEventBanner } from '@/components/next-event-banner';
 import { useAuth } from '@/components/auth';
 import { useClubSettings } from '@/contexts/club-settings-context';
-import PixelBlast from '@/components/PixelBlast';
+import { isCapableDevice, requestIdleCallback } from '@/lib/performance';
+
+// Lazy load PixelBlast to avoid blocking initial render
+const PixelBlast = lazy(() => import('@/components/PixelBlast'));
 
 export function HeroSection() {
   const { userProfile, loading: authLoading } = useAuth();
   const { settings: clubSettings } = useClubSettings();
   const showJoinCta = !authLoading && (!userProfile || userProfile.role === 'guest');
   const [pixelColor, setPixelColor] = useState('#111827');
+  const [shouldRenderPixelBlast, setShouldRenderPixelBlast] = useState(false);
 
   useEffect(() => {
     // Get the accent-foreground color from CSS variables
@@ -38,41 +42,63 @@ export function HeroSection() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    // Only load PixelBlast on capable devices to avoid performance issues
+    // Use requestIdleCallback to defer loading until browser is idle
+    const idleCallback = requestIdleCallback(() => {
+      setShouldRenderPixelBlast(isCapableDevice());
+    }, { timeout: 200 });
+
+    return () => {
+      if (typeof idleCallback === 'number') {
+        if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+          window.cancelIdleCallback(idleCallback);
+        } else {
+          clearTimeout(idleCallback);
+        }
+      }
+    };
+  }, []);
+
   return (
     <section className="h-screen flex items-center justify-center relative overflow-hidden">
       {/* PixelBlast Background Effect */}
       <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}>
-        <PixelBlast
-          variant="circle"
-          pixelSize={6}
-          color={pixelColor}
-          patternScale={3}
-          patternDensity={1.2}
-          pixelSizeJitter={0.5}
-          enableRipples
-          rippleSpeed={0.4}
-          rippleThickness={0.12}
-          rippleIntensityScale={1.5}
-          liquid={false}
-          liquidStrength={0.12}
-          liquidRadius={1.2}
-          liquidWobbleSpeed={5}
-          speed={0.5}
-          edgeFade={0.25}
-          transparent
-          className="w-full h-full"
-          style={{ width: '100%', height: '100%' }}
-        />
+        {shouldRenderPixelBlast && (
+          <Suspense fallback={null}>
+            <PixelBlast
+              variant="circle"
+              pixelSize={8}
+              color={pixelColor}
+              patternScale={2.5}
+              patternDensity={1.0}
+              pixelSizeJitter={0.3}
+              enableRipples
+              rippleSpeed={0.3}
+              rippleThickness={0.15}
+              rippleIntensityScale={1.2}
+              liquid={false}
+              speed={0.3}
+              edgeFade={0.25}
+              transparent
+              antialias={false}
+              className="w-full h-full"
+              style={{ width: '100%', height: '100%' }}
+            />
+          </Suspense>
+        )}
       </div>
 
       <Container className="relative z-10">
         <div className="text-center space-y-8 max-w-4xl mx-auto px-4">
           <div className="animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-primary">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-primary [text-shadow:0_0_12px_var(--tw-shadow-color)] shadow-primary/10">
               {clubSettings?.clubName || 'RHS Coding Club'}
             </h1>
             <p className="mt-6 md:mt-8 text-lg md:text-xl lg:text-2xl text-foreground max-w-3xl mx-auto leading-relaxed">
-              {clubSettings?.description || 'Empowering student developers through collaboration, innovation, and hands-on learning. Join our community and take your coding skills to the next level.'}
+              <span className="bg-background box-decoration-clone px-5">
+                {clubSettings?.description || 'Empowering student developers through collaboration, innovation, and hands-on learning. Join our community and take your coding skills to the next level.'}
+              </span>
             </p>
           </div>
 
@@ -90,7 +116,7 @@ export function HeroSection() {
                 </Link>
               </Button>
             )}
-            <Button size="lg" variant="outline" className="px-8 sm:px-10 w-full sm:w-auto min-h-[48px] text-lg backdrop-blur-md bg-background/30 border-border/50 hover:bg-background/50" asChild>
+            <Button size="lg" variant="glass" className="px-8 sm:px-10 w-full sm:w-auto min-h-[48px] text-lg" asChild>
               <Link href="/about">
                 Learn More
                 <ArrowRight className="ml-2 h-5 w-5" />

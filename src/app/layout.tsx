@@ -36,6 +36,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Performance optimization hints */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" type="image/svg+xml" href="/logo.svg" />
         <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" />

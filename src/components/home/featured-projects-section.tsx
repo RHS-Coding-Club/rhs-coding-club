@@ -68,6 +68,8 @@ export function FeaturedProjectsSection() {
                 opts={{
                   align: 'start',
                   loop: true,
+                  skipSnaps: false,
+                  dragFree: false,
                 }}
                 className="w-full max-w-6xl mx-auto"
               >
