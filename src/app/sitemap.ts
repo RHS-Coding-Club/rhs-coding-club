@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import type { DocumentData, QueryDocumentSnapshot } from 'firebase-admin/firestore';
+
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -89,47 +89,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Fetch dynamic routes
+  // Fetch dynamic routes using Admin SDK
   let dynamicRoutes: MetadataRoute.Sitemap = [];
 
   try {
-    // Fetch blog posts
-    const blogSnapshot = await getDocs(collection(db, 'posts'));
-    const blogRoutes: MetadataRoute.Sitemap = blogSnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        url: `${baseUrl}/blog/${doc.id}`,
-        lastModified: data.createdAt?.toDate() || new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-      };
-    });
+    // Only fetch on server-side during build
+    if (typeof window === 'undefined') {
+      const { adminDb } = await import('@/lib/firebase-admin');
 
-    // Fetch challenges
-    const challengesSnapshot = await getDocs(collection(db, 'challenges'));
-    const challengeRoutes: MetadataRoute.Sitemap = challengesSnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        url: `${baseUrl}/challenges/${doc.id}`,
-        lastModified: data.createdAt?.toDate() || new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.8,
-      };
-    });
+      // Fetch blog posts
+      const blogSnapshot = await adminDb.collection('posts').get();
+      const blogRoutes: MetadataRoute.Sitemap = blogSnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const data = doc.data();
+        return {
+          url: `${baseUrl}/blog/${doc.id}`,
+          lastModified: data.createdAt?.toDate() || new Date(),
+          changeFrequency: 'monthly' as const,
+          priority: 0.7,
+        };
+      });
 
-    // Fetch events
-    const eventsSnapshot = await getDocs(collection(db, 'events'));
-    const eventRoutes: MetadataRoute.Sitemap = eventsSnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        url: `${baseUrl}/events/${doc.id}`,
-        lastModified: data.createdAt?.toDate() || new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-      };
-    });
+      // Fetch challenges
+      const challengesSnapshot = await adminDb.collection('challenges').get();
+      const challengeRoutes: MetadataRoute.Sitemap = challengesSnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const data = doc.data();
+        return {
+          url: `${baseUrl}/challenges/${doc.id}`,
+          lastModified: data.createdAt?.toDate() || new Date(),
+          changeFrequency: 'weekly' as const,
+          priority: 0.8,
+        };
+      });
 
-    dynamicRoutes = [...blogRoutes, ...challengeRoutes, ...eventRoutes];
+      // Fetch events
+      const eventsSnapshot = await adminDb.collection('events').get();
+      const eventRoutes: MetadataRoute.Sitemap = eventsSnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const data = doc.data();
+        return {
+          url: `${baseUrl}/events/${doc.id}`,
+          lastModified: data.createdAt?.toDate() || new Date(),
+          changeFrequency: 'monthly' as const,
+          priority: 0.7,
+        };
+      });
+
+      dynamicRoutes = [...blogRoutes, ...challengeRoutes, ...eventRoutes];
+    }
   } catch (error) {
     console.error('Error fetching dynamic routes for sitemap:', error);
     // Continue with static routes only if dynamic fetch fails
