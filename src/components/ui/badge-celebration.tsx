@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Confetti from 'react-confetti';
-import { Award, Crown, Sparkles, Gem, Star, X } from 'lucide-react';
+import { Crown, Sparkles, Gem, Star, X } from 'lucide-react';
 import Image from 'next/image';
 import { Badge as BadgeType } from '@/lib/services/badges';
 import { Card, CardContent } from '@/components/ui/card';

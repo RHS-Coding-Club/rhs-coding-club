@@ -6,14 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -36,7 +28,6 @@ import {
   Loader2,
   Search,
   X,
-  Check,
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -82,7 +73,6 @@ export function ManualBadgeAward() {
   const [awarding, setAwarding] = useState(false);
   const [revoking, setRevoking] = useState<string | null>(null);
   const [userSearch, setUserSearch] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     loadData();

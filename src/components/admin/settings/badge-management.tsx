@@ -39,16 +39,13 @@ import {
   Trash2,
   Save,
   X,
-  Upload,
   Loader2,
-  GripVertical,
   Sparkles,
   Star,
   Crown,
   Gem,
   ChevronUp,
   ChevronDown,
-  Eye,
   EyeOff,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -386,10 +383,6 @@ export function BadgeManagement() {
     }
   };
 
-  const RarityIcon = ({ rarity }: { rarity: Badge['rarity'] }) => {
-    const Icon = RARITY_CONFIG[rarity].icon;
-    return <Icon className="h-4 w-4" />;
-  };
 
   return (
     <Card>

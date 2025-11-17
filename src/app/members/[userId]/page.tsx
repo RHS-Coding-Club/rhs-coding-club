@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Container } from '@/components/container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +23,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { doc, getDoc, collection, query, where, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { getUserBadges, Badge as BadgeType } from '@/lib/services/badges';
+import { Badge as BadgeType } from '@/lib/services/badges';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 
@@ -111,13 +111,7 @@ export default function MemberProfilePage() {
     challengesCompleted: 0,
   });
 
-  useEffect(() => {
-    if (userId) {
-      loadMemberData();
-    }
-  }, [userId]);
-
-  const loadMemberData = async () => {
+  const loadMemberData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -215,7 +209,13 @@ export default function MemberProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      loadMemberData();
+    }
+  }, [userId, loadMemberData]);
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -312,7 +312,6 @@ export default function MemberProfilePage() {
                       <span className="text-sm text-muted-foreground">Top Badges:</span>
                       <div className="flex gap-2">
                         {badges.slice(0, 3).map((badge) => {
-                          const RarityIcon = RARITY_CONFIG[badge.rarity].icon;
                           return (
                             <div
                               key={badge.id}

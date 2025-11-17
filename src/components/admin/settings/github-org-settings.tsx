@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,11 +64,7 @@ export function GitHubOrgSettings() {
     priority: 1,
   });
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -101,7 +97,11 @@ export function GitHubOrgSettings() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userProfile]);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
 
   const handleChange = (field: string, value: string | boolean | number) => {
     setFormData(prev => ({

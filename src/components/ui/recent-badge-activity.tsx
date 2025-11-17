@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -61,11 +61,7 @@ export function RecentBadgeActivity({ maxItems = 10 }: RecentBadgeActivityProps)
   const [awards, setAwards] = useState<BadgeAward[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadRecentAwards();
-  }, [maxItems]);
-
-  const loadRecentAwards = async () => {
+  const loadRecentAwards = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -109,7 +105,11 @@ export function RecentBadgeActivity({ maxItems = 10 }: RecentBadgeActivityProps)
     } finally {
       setLoading(false);
     }
-  };
+  }, [maxItems]);
+
+  useEffect(() => {
+    loadRecentAwards();
+  }, [maxItems, loadRecentAwards]);
 
   if (loading) {
     return (

@@ -87,7 +87,6 @@ export function Header() {
 
           <MobileNavMenu
             isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
           >
             {navigation.map((item, idx) => (
               <Link

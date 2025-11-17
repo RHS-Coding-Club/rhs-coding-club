@@ -59,7 +59,7 @@ export function usePosts(includeUnpublished: boolean = false) {
 
   useEffect(() => {
     fetchPosts(true);
-  }, [includeUnpublished]);
+  }, [includeUnpublished, fetchPosts]);
 
   return {
     posts,

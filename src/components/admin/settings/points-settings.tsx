@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,7 @@ import {
   initializePointsSettings,
   PointsSettings 
 } from '@/lib/services/settings';
-import { Trophy, Award, Target, Calendar, Loader2, Save } from 'lucide-react';
+import { Trophy, Target, Calendar, Loader2, Save } from 'lucide-react';
 
 export function PointsSettingsComponent() {
   const { userProfile } = useAuth();
@@ -40,11 +40,7 @@ export function PointsSettingsComponent() {
   });
   const [hasChanges, setHasChanges] = useState(false);
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -63,7 +59,11 @@ export function PointsSettingsComponent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userProfile]);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
 
   const handleSave = async () => {
     if (!userProfile?.uid) {

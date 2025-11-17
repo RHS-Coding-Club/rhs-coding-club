@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,16 +34,7 @@ export function SocialMediaSettings() {
 
   const [initialData, setInitialData] = useState(formData);
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  useEffect(() => {
-    const changed = JSON.stringify(formData) !== JSON.stringify(initialData);
-    setHasChanges(changed);
-  }, [formData, initialData]);
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -73,7 +64,16 @@ export function SocialMediaSettings() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userProfile]);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
+
+  useEffect(() => {
+    const changed = JSON.stringify(formData) !== JSON.stringify(initialData);
+    setHasChanges(changed);
+  }, [formData, initialData]);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({

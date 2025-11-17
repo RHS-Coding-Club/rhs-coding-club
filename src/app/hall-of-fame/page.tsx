@@ -9,16 +9,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Crown, 
   Sparkles, 
-  Trophy,
-  Award,
   Gem,
   Star,
-  Medal,
   Loader2,
   TrendingUp
 } from 'lucide-react';
 import Link from 'next/link';
-import { collection, getDocs, query, orderBy, limit, where, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, limit, where, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';

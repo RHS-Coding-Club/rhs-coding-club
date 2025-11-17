@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,8 +11,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { 
   getEmailSettings, 
   updateEmailSettings, 
-  initializeEmailSettings,
-  EmailSettings 
+  initializeEmailSettings
 } from '@/lib/services/settings';
 import { Save, Loader2, Mail, Bell, Clock, FileText, Send, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -49,16 +48,7 @@ export function EmailSettingsComponent() {
 
   const [initialData, setInitialData] = useState(formData);
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  useEffect(() => {
-    const changed = JSON.stringify(formData) !== JSON.stringify(initialData);
-    setHasChanges(changed);
-  }, [formData, initialData]);
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -100,7 +90,16 @@ export function EmailSettingsComponent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userProfile]);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
+
+  useEffect(() => {
+    const changed = JSON.stringify(formData) !== JSON.stringify(initialData);
+    setHasChanges(changed);
+  }, [formData, initialData]);
 
   const handleChange = (field: string, value: string | number | boolean) => {
     setFormData(prev => ({

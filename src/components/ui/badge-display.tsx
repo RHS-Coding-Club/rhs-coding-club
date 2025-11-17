@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getUserBadges, Badge } from '@/lib/services/badges';
 import { Award, Sparkles, Star, Crown, Gem, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -78,11 +77,7 @@ export function BadgeDisplay({
   const [loading, setLoading] = useState(true);
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 
-  useEffect(() => {
-    loadUserBadges();
-  }, [userId]);
-
-  const loadUserBadges = async () => {
+  const loadUserBadges = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getUserBadges(userId);
@@ -92,7 +87,11 @@ export function BadgeDisplay({
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    loadUserBadges();
+  }, [userId, loadUserBadges]);
 
   if (loading) {
     return (
@@ -214,11 +213,7 @@ export function BadgeGrid({ userId, columns = 4 }: BadgeGridProps) {
   const [loading, setLoading] = useState(true);
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 
-  useEffect(() => {
-    loadUserBadges();
-  }, [userId]);
-
-  const loadUserBadges = async () => {
+  const loadUserBadges = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getUserBadges(userId);
@@ -228,7 +223,11 @@ export function BadgeGrid({ userId, columns = 4 }: BadgeGridProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    loadUserBadges();
+  }, [userId, loadUserBadges]);
 
   if (loading) {
     return (

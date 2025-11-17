@@ -22,7 +22,6 @@ import { getPointsSettingsWithDefaults } from '@/lib/services/settings';
 export default function LeaderboardPage() {
   const { userProfile } = useAuth();
   const [topLimit, setTopLimit] = useState(10);
-  const [displayType, setDisplayType] = useState<'weekly' | 'monthly' | 'all-time' | 'all'>('all');
   const { leaderboard: topUsers, loading: topLoading } = useLeaderboard(topLimit);
   const { leaderboard: allUsers } = useLeaderboard(0);
   const [activeSection, setActiveSection] = useState<string>('top10');
@@ -37,7 +36,6 @@ export default function LeaderboardPage() {
       const settings = await getPointsSettingsWithDefaults();
       const limit = settings.leaderboardOptions.showTop || 10;
       setTopLimit(limit);
-      setDisplayType(settings.leaderboardOptions.displayType || 'all');
     } catch (error) {
       console.error('Error loading leaderboard settings:', error);
     }
