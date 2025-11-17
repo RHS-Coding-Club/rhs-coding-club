@@ -7,6 +7,7 @@ import {
   useScroll,
   useMotionValueEvent,
 } from "framer-motion";
+import Link from "next/link";
 
 import React, { useRef, useState } from "react";
 
@@ -145,12 +146,12 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
       )}
     >
       {items.map((item, idx) => (
-        <a
+        <Link
+          key={`link-${idx}`}
+          href={item.link}
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
           className="relative px-1.5 xl:px-2.5 py-2 text-foreground/80 hover:text-foreground transition-colors duration-200 whitespace-nowrap"
-          key={`link-${idx}`}
-          href={item.link}
         >
           {hovered === idx && (
             <motion.div
@@ -160,7 +161,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
             />
           )}
           <span className="relative z-20">{item.name}</span>
-        </a>
+        </Link>
       ))}
     </motion.div>
   );
