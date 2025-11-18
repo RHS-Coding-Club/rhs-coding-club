@@ -24,8 +24,14 @@ interface PerformanceWithMemory extends Performance {
 
 /**
  * Check if device is capable of handling heavy graphics
+ * TEMPORARILY DISABLED - All devices will show effects
+ * Uncomment the checks below to re-enable device filtering
  */
 export function isCapableDevice(): boolean {
+  // Temporarily return true for all devices to test pixel blast
+  return true;
+
+  /* COMMENTED OUT - Uncomment to re-enable device capability checks
   if (typeof window === 'undefined') return false;
 
   // Check for mobile devices
@@ -61,6 +67,7 @@ export function isCapableDevice(): boolean {
   }
 
   return true;
+  */
 }
 
 /**
