@@ -10,6 +10,7 @@ import { useAuth } from '@/components/auth';
 import { Logo } from '@/components/logo';
 import { useClubSettings } from '@/contexts/club-settings-context';
 import { useSocialMedia } from '@/contexts/social-media-context';
+import { TextHoverEffect } from '@/components/ui/text-hover-effect';
 
 export function Footer() {
   const { userProfile, loading } = useAuth();
@@ -29,6 +30,8 @@ export function Footer() {
 
   return (
     <footer className="border-t bg-muted/50">
+      
+      
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}
@@ -224,7 +227,13 @@ export function Footer() {
             </Link>
           </div>
         </div>
+        
+        {/* Text Hover Effect Banner */}
+        <div className="flex items-center justify-center h-32 mt-8">
+          <TextHoverEffect text="RHS CODING CLUB" />
+        </div>
       </div>
+      
     </footer>
   );
 }
