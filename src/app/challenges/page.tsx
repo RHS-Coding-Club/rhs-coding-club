@@ -286,7 +286,7 @@ export default function ChallengesPage() {
                     />
                     
                     {(userProfile?.role === 'admin' || userProfile?.role === 'officer') && (
-                      <Link href="/admin/challenges">
+                      <Link href="/admin#challenges">
                         <Button>Manage Challenges</Button>
                       </Link>
                     )}
