@@ -469,7 +469,7 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <ProtectedRoute requiredRoles={['admin']}>
+    <ProtectedRoute requiredRoles={['admin', 'officer']}>
       <div className="fixed top-16 left-0 right-0 bottom-0 flex w-full bg-muted overflow-hidden">
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="justify-between gap-10">
