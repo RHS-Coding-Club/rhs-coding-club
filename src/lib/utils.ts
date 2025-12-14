@@ -5,6 +5,32 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function isProbablyValidEmail(email: unknown): email is string {
+  if (typeof email !== 'string') return false;
+  if (email.length === 0) return false;
+
+  // Basic DoS guard for untrusted input; typical emails are far smaller.
+  if (email.length > 1024) return false;
+
+  // Disallow ASCII whitespace/control characters (keeps behavior close to /\s/ checks).
+  for (let i = 0; i < email.length; i++) {
+    if (email.charCodeAt(i) <= 32) return false;
+  }
+
+  const atIndex = email.indexOf('@');
+  if (atIndex <= 0) return false;
+  if (email.indexOf('@', atIndex + 1) !== -1) return false;
+
+  const domain = email.slice(atIndex + 1);
+  if (domain.length === 0) return false;
+
+  const dotIndex = domain.lastIndexOf('.');
+  if (dotIndex <= 0) return false;
+  if (dotIndex >= domain.length - 1) return false;
+
+  return true;
+}
+
 /**
  * Converts Firebase authentication error codes to user-friendly messages
  */

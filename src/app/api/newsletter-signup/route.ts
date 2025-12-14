@@ -2,6 +2,7 @@ import { brevoService } from '@/lib/brevo';
 import { NextRequest, NextResponse } from 'next/server';
 import { addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { newsletterSubscribersCollection } from '@/lib/firebase-collections';
+import { isProbablyValidEmail } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,8 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!isProbablyValidEmail(email)) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
