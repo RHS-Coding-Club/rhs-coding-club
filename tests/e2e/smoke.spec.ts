@@ -59,6 +59,8 @@ test('home shows the next event and stats', async ({ page }) => {
 test('theme toggle persists across reloads', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('html')).toHaveClass(/dark/)
+  // The hero shader only mounts on the client, so its canvas proves hydration finished.
+  await page.locator('canvas').first().waitFor({ timeout: 15_000 })
   await page.getByRole('button', { name: 'Switch to light theme' }).click()
   await expect(page.locator('html')).toHaveClass(/light/)
   await page.reload()
