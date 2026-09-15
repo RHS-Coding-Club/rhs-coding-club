@@ -1,0 +1,184 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  RHS Coding Club identity: sky blue on deep navy, near-black ground with a
+  blue bias, frosted off-white for the logo disc. Dark is the default theme
+  (the <html> element carries class "dark" unless the visitor picks light).
+  Semantic tokens below follow the Shadcn contract so ui/ components work
+  unchanged; brand tokens sit alongside for the few places that need them.
+*/
+
+:root {
+  /* brand */
+  --brand-sky: #5fb2ee;
+  --brand-navy: #1f4f8a;
+  --brand-frost: #e6edf5;
+  --brand-gradient: linear-gradient(160deg, #1f4f8a 0%, #5fb2ee 100%);
+
+  /* light theme (alternate) */
+  --background: #f4f7fb;
+  --foreground: #101826;
+  --card: #ffffff;
+  --card-foreground: #101826;
+  --popover: #ffffff;
+  --popover-foreground: #101826;
+  --primary: #2a7fc4;
+  --primary-foreground: #ffffff;
+  --secondary: #e3ecf7;
+  --secondary-foreground: #1f4f8a;
+  --muted: #e9eff6;
+  --muted-foreground: #5f6d80;
+  --accent: #dcecfa;
+  --accent-foreground: #1f4f8a;
+  --destructive: #b83c3c;
+  --destructive-foreground: #ffffff;
+  --success: #2f7a4a;
+  --warning: #9a6a12;
+  --border: #d9e2ec;
+  --input: #d9e2ec;
+  --ring: #2a7fc4;
+  --chart-1: #2a7fc4;
+  --chart-2: #1f4f8a;
+  --chart-3: #5fb2ee;
+  --chart-4: #9ccbf2;
+  --chart-5: #6f7d8f;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #101826;
+  --sidebar-primary: #2a7fc4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e9eff6;
+  --sidebar-accent-foreground: #101826;
+  --sidebar-border: #d9e2ec;
+  --sidebar-ring: #2a7fc4;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #0b0f15;
+  --foreground: #e8eef6;
+  --card: #121924;
+  --card-foreground: #e8eef6;
+  --popover: #121924;
+  --popover-foreground: #e8eef6;
+  --primary: #5fb2ee;
+  --primary-foreground: #0b0f15;
+  --secondary: #172a3d;
+  --secondary-foreground: #9ccbf2;
+  --muted: #161e2a;
+  --muted-foreground: #8b98a8;
+  --accent: #14304a;
+  --accent-foreground: #9ccbf2;
+  --destructive: #ef8a8a;
+  --destructive-foreground: #0b0f15;
+  --success: #7fcf9a;
+  --warning: #e2b664;
+  --border: #1f2937;
+  --input: #2c3949;
+  --ring: #5fb2ee;
+  --chart-1: #5fb2ee;
+  --chart-2: #9ccbf2;
+  --chart-3: #1f4f8a;
+  --chart-4: #e6edf5;
+  --chart-5: #7d8b9c;
+  --sidebar: #0e131b;
+  --sidebar-foreground: #e8eef6;
+  --sidebar-primary: #5fb2ee;
+  --sidebar-primary-foreground: #0b0f15;
+  --sidebar-accent: #161e2a;
+  --sidebar-accent-foreground: #e8eef6;
+  --sidebar-border: #1f2937;
+  --sidebar-ring: #5fb2ee;
+}
+
+@theme inline {
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --color-brand-sky: var(--brand-sky);
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-frost: var(--brand-frost);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    min-height: 100dvh;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--brand-sky) 35%, transparent);
+  }
+}
+
+@utility eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+@utility brand-gradient {
+  background-image: var(--brand-gradient);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}

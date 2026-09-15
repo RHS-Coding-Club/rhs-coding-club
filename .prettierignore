@@ -1,14 +1,12 @@
 node_modules
-.next
 dist
-build
-.env.local
-.env
-*.log
-.DS_Store
-coverage
-.nyc_output
-
-# Next.js rewrites tsconfig.json on every build (it enforces "jsx": "react-jsx"
-# and its own array formatting). Leaving it to Prettier causes format/build churn.
-tsconfig.json
+.output
+.tanstack
+.wrangler
+bun.lock
+src/routeTree.gen.ts
+src/db/migrations
+worker-configuration.d.ts
+playwright-report
+test-results
+public

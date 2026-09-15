@@ -1,0 +1,23 @@
+# Copy to .dev.vars for local development. Wrangler and the Vite dev server
+# load this file; it is gitignored. Production values are set with
+# `wrangler secret put NAME`.
+
+# Better Auth. Generate with: openssl rand -base64 32
+BETTER_AUTH_SECRET=
+
+# Comma-separated emails that become admin the first time they sign in.
+BOOTSTRAP_ADMIN_EMAILS=
+
+# OAuth apps created for this site (not the old Firebase ones).
+# Callback URLs: {APP_URL}/api/auth/callback/google and /api/auth/callback/github
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+# Resend
+RESEND_API_KEY=
+EMAIL_FROM="RHS Coding Club <hello@example.com>"
+
+# GitHub organization management (token needs admin:org and read:user)
+GITHUB_TOKEN=
