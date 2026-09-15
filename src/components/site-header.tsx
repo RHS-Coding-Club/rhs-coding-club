@@ -42,22 +42,24 @@ export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: T
 
   return (
     <header className="border-border/60 bg-background/85 sticky top-0 z-40 border-b backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-(--gutter)">
         <Link
           to="/"
           className="flex items-center gap-2.5"
           aria-label="RHS Coding Club home"
         >
-          <Logo className="size-7" />
-          <span className="font-display text-xl leading-none">RHS Coding Club</span>
+          <Logo className="size-8" />
+          <span className="font-display text-xl leading-none font-semibold tracking-tight">
+            RHS Coding Club
+          </span>
         </Link>
 
-        <nav className="ml-4 hidden items-center gap-0.5 lg:flex" aria-label="Primary">
+        <nav className="ml-6 hidden items-center gap-0.5 lg:flex" aria-label="Primary">
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="text-muted-foreground hover:text-foreground rounded-md px-2.5 py-1.5 text-sm transition-colors"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-full px-3 py-1.5 text-sm transition-colors"
               activeProps={{ className: 'text-foreground' }}
             >
               {item.label}
@@ -115,10 +117,15 @@ export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: T
             </DropdownMenu>
           ) : (
             <>
-              <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="hidden rounded-full sm:inline-flex"
+              >
                 <Link to="/login">Log in</Link>
               </Button>
-              <Button asChild size="sm">
+              <Button asChild size="sm" className="rounded-full px-4">
                 <Link to="/signup">Join</Link>
               </Button>
             </>
@@ -129,7 +136,7 @@ export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: T
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="rounded-full lg:hidden"
                 aria-label="Open menu"
               >
                 <Menu className="size-5" />

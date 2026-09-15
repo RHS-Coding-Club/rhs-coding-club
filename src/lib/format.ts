@@ -37,6 +37,8 @@ const DATE_STYLES = {
   },
   /** 12:30 PM */
   time: { hour: 'numeric', minute: '2-digit' },
+  /** Tuesday */
+  weekday: { weekday: 'long' },
 } satisfies Record<string, Intl.DateTimeFormatOptions>
 
 export type DateStyle = keyof typeof DATE_STYLES
