@@ -95,9 +95,9 @@
 }
 
 @theme inline {
-  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --color-brand-sky: var(--brand-sky);
   --color-brand-navy: var(--brand-navy);
@@ -181,4 +181,20 @@
 
 @utility tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* Server-rendered / reduced-motion fallbacks for the home hero shaders. */
+@utility hero-fallback-water {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 70% 60%, rgba(95, 178, 238, 0.55), transparent 70%),
+    radial-gradient(50% 40% at 25% 30%, rgba(31, 79, 138, 0.8), transparent 70%), #0b0f15;
+}
+@utility hero-fallback-signal {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(45% 70% at 50% -10%, rgba(95, 178, 238, 0.35), transparent 70%),
+    #0b0f15;
 }

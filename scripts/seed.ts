@@ -131,6 +131,12 @@ async function buildSql(): Promise<string> {
     `INSERT INTO project (id, title, description, tech, repo_url, demo_url, image_keys, author_id, status, rejection_reason, featured, year, reviewed_by, reviewed_at, created_at, updated_at) VALUES ('pr_seed_2', 'Lunch line estimator', 'Predicts how long the cafeteria line is from a photo.', '["Python","OpenCV"]', NULL, NULL, '[]', 'u_member', 'pending', NULL, 0, 2026, NULL, NULL, ${now - 1 * day}, ${now - 1 * day});`,
   )
 
+  lines.push(
+    `INSERT INTO project (id, title, description, tech, repo_url, demo_url, image_keys, author_id, status, rejection_reason, featured, year, reviewed_by, reviewed_at, created_at, updated_at) VALUES ('pr_seed_3', 'Bell schedule widget', 'A tiny PWA that shows the current period and minutes left, with the rally-day schedule built in.', '["JavaScript","PWA"]', 'https://github.com/RHS-Coding-Club', NULL, '[]', 'u_officer', 'approved', NULL, 0, 2026, 'u_admin', ${now - 8 * day}, ${now - 12 * day}, ${now - 8 * day});`,
+  )
+  lines.push(
+    `INSERT INTO project (id, title, description, tech, repo_url, demo_url, image_keys, author_id, status, rejection_reason, featured, year, reviewed_by, reviewed_at, created_at, updated_at) VALUES ('pr_seed_4', 'RAP lesson planner', 'Drag-and-drop planner the volunteers use to build 40-minute STEM lessons for Ripon Elementary.', '["TypeScript","React"]', NULL, 'https://example.com', '[]', 'u_member', 'approved', NULL, 0, 2026, 'u_officer', ${now - 20 * day}, ${now - 25 * day}, ${now - 20 * day});`,
+  )
   lines.push(`DELETE FROM user_badge WHERE id LIKE 'ub_seed_%';`)
   lines.push(
     `INSERT INTO user_badge (id, user_id, badge_id, awarded_by, awarded_at) VALUES ('ub_seed_1', 'u_member', 'b_seed_1', NULL, ${now - 4 * day});`,

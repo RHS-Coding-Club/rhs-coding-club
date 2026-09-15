@@ -19,7 +19,7 @@ export interface RouterContext {
 }
 
 const FONTS =
-  'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap'
+  'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async () => {

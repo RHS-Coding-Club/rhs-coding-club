@@ -51,9 +51,9 @@ test('about page lists officers from the database', async ({ page }) => {
 
 test('home shows the next event and stats', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByText('Next up')).toBeVisible()
+  await expect(page.getByText('Next', { exact: true })).toBeVisible()
   await expect(page.getByText('First Meeting')).toBeVisible()
-  await expect(page.getByText('shipped projects')).toBeVisible()
+  await expect(page.getByText('projects shipped')).toBeVisible()
 })
 
 test('theme toggle persists across reloads', async ({ page }) => {
