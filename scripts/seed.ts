@@ -82,6 +82,60 @@ async function buildSql(): Promise<string> {
     `INSERT INTO badge (id, name, description, image_key, rarity, criteria_type, threshold, auto_award, sort_order, is_active, created_at, updated_at) VALUES ('b_seed_2', 'Centurion', 'Earned 100 points.', NULL, 'rare', 'points', 100, 1, 2, 1, ${now}, ${now});`,
   )
 
+  lines.push(`DELETE FROM officer WHERE id LIKE 'o_seed_%';`)
+  const officers = [
+    [
+      'o_seed_1',
+      'Jashan Maan',
+      'President',
+      'Runs the club, ships the website, and teaches at RAP.',
+      'https://github.com/JashanMaan28',
+      1,
+    ],
+    [
+      'o_seed_2',
+      'Sahib S.',
+      'Vice President',
+      'Plans hackathons and keeps the Discord alive.',
+      null,
+      2,
+    ],
+    [
+      'o_seed_3',
+      'Miguel A.',
+      'Outreach',
+      'Coordinates the Ripon Afterschool Program volunteers.',
+      null,
+      3,
+    ],
+  ] as const
+  for (const [id, name, title, bio, gh, order] of officers) {
+    lines.push(
+      `INSERT INTO officer (id, name, title, bio, email, github_url, image_key, sort_order, is_active, created_at, updated_at) VALUES (${q(id)}, ${q(name)}, ${q(title)}, ${q(bio)}, NULL, ${q(gh)}, NULL, ${order}, 1, ${now}, ${now});`,
+    )
+  }
+
+  lines.push(`DELETE FROM post WHERE id LIKE 'p_seed_%';`)
+  lines.push(
+    `INSERT INTO post (id, title, slug, summary, content, tags, author_id, legacy_author_email, published_at, created_at, updated_at) VALUES ('p_seed_1', 'Welcome to the new site', 'welcome-to-the-new-site', 'We rebuilt the club website from scratch. Here is what changed and why.', ${q('# Welcome\n\nThe club site now runs on **TanStack Start** and Cloudflare. Points are a ledger, badges award themselves, and the leaderboard finally has a weekly view.\n\n```ts\nconst hello = "world"\n```')}, '["announcement"]', 'u_officer', NULL, ${now - 2 * day}, ${now - 2 * day}, ${now - 2 * day});`,
+  )
+  lines.push(
+    `INSERT INTO post (id, title, slug, summary, content, tags, author_id, legacy_author_email, published_at, created_at, updated_at) VALUES ('p_seed_2', 'How the STEM teaching program works', 'how-the-stem-teaching-program-works', 'What to expect on your first Tuesday at Ripon Elementary.', ${q('Show up at 2:45, grab a lanyard, and find your group. Lessons are 40 minutes.')}, '["rap","volunteering"]', 'u_officer', NULL, ${now - 9 * day}, ${now - 9 * day}, ${now - 9 * day});`,
+  )
+
+  lines.push(`DELETE FROM project WHERE id LIKE 'pr_seed_%';`)
+  lines.push(
+    `INSERT INTO project (id, title, description, tech, repo_url, demo_url, image_keys, author_id, status, rejection_reason, featured, year, reviewed_by, reviewed_at, created_at, updated_at) VALUES ('pr_seed_1', 'H2O usage tracker', 'A dashboard that shows how much water the school uses per week, built for the H2O hackathon.', '["TypeScript","React","D1"]', 'https://github.com/RHS-Coding-Club', NULL, '[]', 'u_member', 'approved', NULL, 1, 2026, 'u_officer', ${now - 3 * day}, ${now - 5 * day}, ${now - 3 * day});`,
+  )
+  lines.push(
+    `INSERT INTO project (id, title, description, tech, repo_url, demo_url, image_keys, author_id, status, rejection_reason, featured, year, reviewed_by, reviewed_at, created_at, updated_at) VALUES ('pr_seed_2', 'Lunch line estimator', 'Predicts how long the cafeteria line is from a photo.', '["Python","OpenCV"]', NULL, NULL, '[]', 'u_member', 'pending', NULL, 0, 2026, NULL, NULL, ${now - 1 * day}, ${now - 1 * day});`,
+  )
+
+  lines.push(`DELETE FROM user_badge WHERE id LIKE 'ub_seed_%';`)
+  lines.push(
+    `INSERT INTO user_badge (id, user_id, badge_id, awarded_by, awarded_at) VALUES ('ub_seed_1', 'u_member', 'b_seed_1', NULL, ${now - 4 * day});`,
+  )
+
   lines.push(
     `INSERT INTO setting (key, value, updated_by, updated_at) VALUES ('club-info', ${q(
       JSON.stringify({

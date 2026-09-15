@@ -19,7 +19,9 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
-      - run: bun run wrangler types
+      - run: bun run cf:types
+      # The build generates src/routeTree.gen.ts, which type-check needs.
+      - run: bun run build
       - run: bun run type-check
       - run: bun run lint
       - run: bun run format:check

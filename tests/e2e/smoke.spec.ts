@@ -38,5 +38,40 @@ test('officer reaches admin', async ({ page }) => {
   await page.getByLabel('Password').fill(PASSWORD)
   await page.getByRole('button', { name: 'Log in' }).click()
   await page.goto('/admin')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Overview')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/waiting|caught up/)
+})
+
+test('about page lists officers from the database', async ({ page }) => {
+  await page.goto('/about')
+  await expect(
+    page.getByRole('heading', { level: 2, name: 'The people running it' }),
+  ).toBeVisible()
+  await expect(page.getByRole('heading', { level: 3, name: 'Jashan Maan' })).toBeVisible()
+})
+
+test('home shows the next event and stats', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByText('Next up')).toBeVisible()
+  await expect(page.getByText('First Meeting')).toBeVisible()
+  await expect(page.getByText('shipped projects')).toBeVisible()
+})
+
+test('theme toggle persists across reloads', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await page.getByRole('button', { name: 'Switch to light theme' }).click()
+  await expect(page.locator('html')).toHaveClass(/light/)
+  await page.reload()
+  await expect(page.locator('html')).toHaveClass(/light/)
+  await page.getByRole('button', { name: 'Switch to dark theme' }).click()
+  await expect(page.locator('html')).toHaveClass(/dark/)
+})
+
+test('admin overview shows pending queues', async ({ page }) => {
+  await page.goto('/login')
+  await page.getByLabel('Email').fill('admin@test.local')
+  await page.getByLabel('Password').fill(PASSWORD)
+  await page.getByRole('button', { name: 'Log in' }).click()
+  await page.goto('/admin')
+  await expect(page.getByRole('link', { name: /Projects to approve/ })).toBeVisible()
 })

@@ -7,8 +7,10 @@ import {
 import type { QueryClient } from '@tanstack/react-query'
 import { getSessionUser } from '#/server/auth'
 import type { SessionUser } from '#/server/auth'
+import { getTheme } from '#/server/theme'
 import { SiteHeader } from '#/components/site-header'
 import { SiteFooter } from '#/components/site-footer'
+import { Toaster } from '#/components/ui/sonner'
 import appCss from '#/styles.css?url'
 
 export interface RouterContext {
@@ -20,7 +22,10 @@ const FONTS =
   'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  beforeLoad: async () => ({ user: await getSessionUser() }),
+  beforeLoad: async () => {
+    const [user, theme] = await Promise.all([getSessionUser(), getTheme()])
+    return { user, theme }
+  },
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -47,13 +52,15 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { theme } = Route.useRouteContext()
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={theme}>
       <head>
         <HeadContent />
       </head>
       <body>
         {children}
+        <Toaster position="bottom-right" />
         <Scripts />
       </body>
     </html>
@@ -61,10 +68,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 }
 
 function RootLayout() {
-  const { user } = Route.useRouteContext()
+  const { user, theme } = Route.useRouteContext()
   return (
     <div className="flex min-h-dvh flex-col">
-      <SiteHeader user={user} />
+      <SiteHeader user={user} theme={theme} />
       <main className="flex-1">
         <Outlet />
       </main>
