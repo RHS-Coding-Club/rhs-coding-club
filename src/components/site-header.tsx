@@ -246,10 +246,10 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
 }
 
 /**
- * The notch. One solid shape in the page ground color that starts at the
- * very top edge of the viewport (the 10px above the bar is padding inside
- * the header, not a gap) and hangs into the hero card. Nothing can ever show
- * between it and the edge, at any scroll position. Slides in on first paint.
+ * The notch. A 10px ground-colored strip runs edge to edge across the very
+ * top of the viewport and the bar hangs from its middle, all one shape, so
+ * nothing ever shows above the bar at any scroll position. Slides in on
+ * first paint.
  */
 function FloatingBar({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion()
@@ -261,9 +261,13 @@ function FloatingBar({ children }: { children: React.ReactNode }) {
         y: { duration: 0.8, ease: EASE, delay: 0.1 },
         opacity: { duration: 0.6, delay: 0.1 },
       }}
-      className="bg-background text-foreground fixed top-0 left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 rounded-b-4xl shadow-2xl shadow-black/30 min-[850px]:pt-2.5"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50"
     >
-      {children}
+      {/* Edge-to-edge strip in the ground color; the bar hangs from its middle. */}
+      <div aria-hidden="true" className="bg-background hidden h-2.5 min-[850px]:block" />
+      <div className="bg-background text-foreground pointer-events-auto mx-auto w-full max-w-5xl rounded-b-4xl shadow-2xl shadow-black/30">
+        {children}
+      </div>
     </motion.header>
   )
 }
