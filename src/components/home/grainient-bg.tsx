@@ -27,9 +27,9 @@ function Live({ initialTheme }: { initialTheme: Theme }) {
     <Suspense fallback={<Fallback />}>
       <div aria-hidden="true" className="absolute inset-0">
         <Grainient
-          color1={dark ? '#1f4f8a' : '#5fb2ee'}
+          color1="#1f4f8a"
           color2="#5fb2ee"
-          color3={dark ? '#0b0f15' : '#e6edf5'}
+          color3={dark ? '#a9d4f5' : '#e6edf5'}
           lightMode={!dark}
           timeSpeed={0.18}
           warpStrength={1}
@@ -40,7 +40,7 @@ function Live({ initialTheme }: { initialTheme: Theme }) {
           noiseScale={1.6}
           grainAmount={0.12}
           grainScale={2}
-          contrast={dark ? 1.35 : 1.15}
+          contrast={dark ? 1.2 : 1.15}
           saturation={1.05}
           zoom={0.9}
         />
@@ -54,7 +54,7 @@ function Fallback({ className }: { className?: string }) {
     <div
       aria-hidden="true"
       className={cn(
-        'absolute inset-0 bg-[radial-gradient(70%_60%_at_20%_20%,#1f4f8a_0%,transparent_60%),radial-gradient(60%_70%_at_85%_30%,#5fb2ee_0%,transparent_60%),radial-gradient(70%_60%_at_50%_100%,#1f4f8a_0%,transparent_65%)] bg-[#0b0f15] dark:bg-[#0b0f15] [html:not(.dark)_&]:bg-[#e6edf5]',
+        'absolute inset-0 bg-[radial-gradient(70%_60%_at_20%_20%,#1f4f8a_0%,transparent_60%),radial-gradient(60%_70%_at_85%_30%,#a9d4f5_0%,transparent_60%),radial-gradient(70%_60%_at_50%_100%,#1f4f8a_0%,transparent_65%)] bg-[#5fb2ee]',
         className,
       )}
     />

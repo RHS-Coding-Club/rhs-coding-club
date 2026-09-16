@@ -16,10 +16,10 @@ export function Hero({ theme }: { theme: Theme }) {
   return (
     <section className="relative mx-2.5 min-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-4xl min-[850px]:mt-2.5">
       <GrainientBackground initialTheme={theme} />
-      {/* Scrim: keeps the headline legible over the busy gradient in both themes. */}
+      {/* Light navy scrim: just enough for the headline to sit on the gradient. */}
       <div
         aria-hidden="true"
-        className="from-background/70 via-background/20 to-background/60 pointer-events-none absolute inset-0 bg-gradient-to-b"
+        className="from-brand-navy/40 via-brand-navy/15 to-brand-navy/30 pointer-events-none absolute inset-0 bg-gradient-to-b"
       />
       {/* Thin guide lines framing the content column, borrowed from the finance template. */}
       <div
@@ -42,13 +42,13 @@ export function Hero({ theme }: { theme: Theme }) {
           </span>
         </motion.p>
 
-        <h1 className="font-display mt-7 text-[clamp(2.75rem,7.2vw,6.25rem)] leading-[1.02] font-semibold tracking-[-0.045em]">
+        <h1 className="font-display mt-7 text-[clamp(2.75rem,7.2vw,6.25rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-white">
           <motion.span {...item} className="block">
             {HERO_LINE_1}
           </motion.span>
           <motion.span {...item} className="block">
             Ship with{' '}
-            <em className="text-brand-sky font-serif font-normal tracking-normal">
+            <em className="font-serif font-normal tracking-normal text-[#0f2f57] [html:not(.dark)_&]:text-[#0f2f57]">
               friends
             </em>
             .
@@ -57,7 +57,7 @@ export function Hero({ theme }: { theme: Theme }) {
 
         <motion.p
           {...item}
-          className="text-foreground/75 mx-auto mt-6 max-w-2xl text-lg text-balance sm:text-xl"
+          className="mx-auto mt-6 max-w-2xl text-lg text-balance text-white/85 sm:text-xl"
         >
           Weekly challenges, a points leaderboard, hackathons, and afternoons teaching
           kids to code. Open to every RHS student, no experience needed.
