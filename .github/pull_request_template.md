@@ -12,22 +12,22 @@ What does it change or add?
 
 Check all that apply:
 
-- [ ]  Feature
-- [ ]  Bug fix
-- [ ]  Documentation update
-- [ ]  Refactor / code cleanup
-- [ ]  UI/UX update
-- [ ]  Security-related change
+- [ ] Feature
+- [ ] Bug fix
+- [ ] Documentation update
+- [ ] Refactor / code cleanup
+- [ ] UI/UX update
+- [ ] Security-related change
 - [ ] Other (describe below)
 
-##  Screenshots / GIFs (if UI changes)
+## Screenshots / GIFs (if UI changes)
 
 If your changes affect the UI, add before/after screenshots or GIFs.
 
 - Before:
 - After:
 
-##  How to Test
+## How to Test
 
 Steps for a reviewer to test this PR locally:
 
@@ -37,12 +37,12 @@ Steps for a reviewer to test this PR locally:
 4. Visit: `http://localhost:3000/...`
 5. Verify that...
 
-##  Environment / Config Changes
+## Environment / Config Changes
 
 Does this PR require new environment variables, Firebase rules, or config changes?
 
-- [ ] Yes  
-- [ ] No  
+- [ ] Yes
+- [ ] No
 
 If **yes**, list them here:
 
@@ -50,3 +50,4 @@ If **yes**, list them here:
 # Example
 NEXT_PUBLIC_SOMETHING=
 FIREBASE_SOMETHING=
+```

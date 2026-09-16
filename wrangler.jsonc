@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rhs-coding-club",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "observability": { "enabled": true },
+
+  // Public, non-secret configuration for the deployed Worker. Secrets go in
+  // .dev.vars locally and `wrangler secret put` in production. Local dev
+  // overrides APP_URL from .dev.vars.
+  "vars": {
+    "APP_URL": "https://rhs-coding-club.jmaan1337.workers.dev",
+    "GITHUB_ORG": "RHS-Coding-Club",
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rhs-coding-club",
+      "database_id": "260ab3fb-b486-40d2-8581-1f3d202a38a2",
+      "migrations_dir": "src/db/migrations",
+    },
+  ],
+
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "rhs-coding-club-files" }],
+}
