@@ -28,6 +28,14 @@ export const SEED_USERS = [
   { id: 'u_guest', name: 'Gus Guest', email: 'guest@test.local', role: 'guest' },
 ] as const
 
+/** Extra members so the leaderboard and badge shelf have something to show. */
+const SEED_MEMBERS = [
+  { id: 'u_seed_m1', name: 'Priya Natarajan', email: 'priya@test.local' },
+  { id: 'u_seed_m2', name: 'Diego Ramirez', email: 'diego@test.local' },
+  { id: 'u_seed_m3', name: 'Lena Kowalski', email: 'lena@test.local' },
+  { id: 'u_seed_m4', name: 'Theo Bassett', email: 'theo@test.local' },
+] as const
+
 function q(value: string | number | null | boolean): string {
   if (value === null) return 'NULL'
   if (typeof value === 'number') return String(value)
@@ -46,10 +54,21 @@ async function buildSql(): Promise<string> {
   lines.push(`DELETE FROM event WHERE id LIKE 'e_seed_%';`)
   lines.push(`DELETE FROM badge WHERE id LIKE 'b_seed_%';`)
   lines.push(`DELETE FROM setting WHERE key IN ('club-info','points');`)
+  lines.push(`DELETE FROM point_entry WHERE id LIKE 'pe_seed_%';`)
+  lines.push(`DELETE FROM rsvp WHERE id LIKE 'r_seed_%';`)
 
   for (const u of SEED_USERS) {
     lines.push(
       `INSERT INTO user (id, name, email, email_verified, image, created_at, updated_at, role, bio, grad_year, skills) VALUES (${q(u.id)}, ${q(u.name)}, ${q(u.email)}, 1, NULL, ${now}, ${now}, ${q(u.role)}, NULL, NULL, '[]');`,
+    )
+    lines.push(
+      `INSERT INTO account (id, account_id, provider_id, user_id, password, created_at, updated_at) VALUES (${q(`acc_${u.id}`)}, ${q(u.id)}, 'credential', ${q(u.id)}, ${q(hash)}, ${now}, ${now});`,
+    )
+  }
+
+  for (const u of SEED_MEMBERS) {
+    lines.push(
+      `INSERT INTO user (id, name, email, email_verified, image, created_at, updated_at, role, bio, grad_year, skills) VALUES (${q(u.id)}, ${q(u.name)}, ${q(u.email)}, 1, NULL, ${now}, ${now}, 'member', NULL, NULL, '[]');`,
     )
     lines.push(
       `INSERT INTO account (id, account_id, provider_id, user_id, password, created_at, updated_at) VALUES (${q(`acc_${u.id}`)}, ${q(u.id)}, 'credential', ${q(u.id)}, ${q(hash)}, ${now}, ${now});`,
@@ -138,9 +157,43 @@ async function buildSql(): Promise<string> {
     `INSERT INTO project (id, title, description, tech, repo_url, demo_url, image_keys, author_id, status, rejection_reason, featured, year, reviewed_by, reviewed_at, created_at, updated_at) VALUES ('pr_seed_4', 'RAP lesson planner', 'Drag-and-drop planner the volunteers use to build 40-minute STEM lessons for Ripon Elementary.', '["TypeScript","React"]', NULL, 'https://example.com', '[]', 'u_member', 'approved', NULL, 0, 2026, 'u_officer', ${now - 20 * day}, ${now - 25 * day}, ${now - 20 * day});`,
   )
   lines.push(`DELETE FROM user_badge WHERE id LIKE 'ub_seed_%';`)
-  lines.push(
-    `INSERT INTO user_badge (id, user_id, badge_id, awarded_by, awarded_at) VALUES ('ub_seed_1', 'u_member', 'b_seed_1', NULL, ${now - 4 * day});`,
-  )
+  const awards = [
+    ['ub_seed_1', 'u_member', 'b_seed_1', 4],
+    ['ub_seed_2', 'u_seed_m1', 'b_seed_1', 6],
+    ['ub_seed_3', 'u_seed_m1', 'b_seed_2', 2],
+    ['ub_seed_4', 'u_seed_m2', 'b_seed_1', 5],
+  ] as const
+  for (const [id, userId, badgeId, daysAgo] of awards) {
+    lines.push(
+      `INSERT INTO user_badge (id, user_id, badge_id, awarded_by, awarded_at) VALUES (${q(id)}, ${q(userId)}, ${q(badgeId)}, NULL, ${now - daysAgo * day});`,
+    )
+  }
+
+  // Points ledger: one row per award, never a stored total.
+  const entries = [
+    ['pe_seed_1', 'u_seed_m1', 50, 'submission', 'c_seed_1', 6],
+    ['pe_seed_2', 'u_seed_m1', 100, 'submission', 'c_seed_2', 3],
+    ['pe_seed_3', 'u_seed_m1', 25, 'attendance', 'e_seed_2', 14],
+    ['pe_seed_4', 'u_seed_m2', 50, 'submission', 'c_seed_1', 5],
+    ['pe_seed_5', 'u_seed_m2', 25, 'attendance', 'e_seed_2', 14],
+    ['pe_seed_6', 'u_member', 50, 'submission', 'c_seed_1', 4],
+    ['pe_seed_7', 'u_member', 150, 'project', 'pr_seed_1', 3],
+    ['pe_seed_8', 'u_seed_m3', 25, 'attendance', 'e_seed_2', 14],
+    ['pe_seed_9', 'u_seed_m3', 100, 'submission', 'c_seed_2', 1],
+    ['pe_seed_10', 'u_seed_m4', 25, 'attendance', 'e_seed_2', 14],
+  ] as const
+  for (const [id, userId, delta, source, sourceId, daysAgo] of entries) {
+    lines.push(
+      `INSERT INTO point_entry (id, user_id, delta, source, source_id, note, created_by, created_at) VALUES (${q(id)}, ${q(userId)}, ${delta}, ${q(source)}, ${q(sourceId)}, NULL, 'u_officer', ${now - daysAgo * day});`,
+    )
+  }
+
+  const rsvps = ['u_member', 'u_seed_m1', 'u_seed_m2', 'u_seed_m3', 'u_officer'] as const
+  rsvps.forEach((userId, i) => {
+    lines.push(
+      `INSERT INTO rsvp (id, event_id, user_id, status, created_at, updated_at) VALUES (${q(`r_seed_${i + 1}`)}, 'e_seed_1', ${q(userId)}, 'yes', ${now}, ${now});`,
+    )
+  })
 
   lines.push(
     `INSERT INTO setting (key, value, updated_by, updated_at) VALUES ('club-info', ${q(
@@ -184,7 +237,7 @@ async function main() {
     process.exit(result.status ?? 1)
   }
   console.log(
-    `Seeded ${SEED_USERS.length} users (password: ${SEED_PASSWORD}) and sample content.`,
+    `Seeded ${SEED_USERS.length + SEED_MEMBERS.length} users (password: ${SEED_PASSWORD}) and sample content.`,
   )
 }
 

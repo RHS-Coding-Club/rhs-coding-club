@@ -1,37 +1,58 @@
-import { and, count, desc, eq, gte, inArray, isNotNull, lt, sql } from 'drizzle-orm'
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  lt,
+  lte,
+  sql,
+  sum,
+} from 'drizzle-orm'
 import type { Db } from '#/db'
 import { schema } from '#/db'
 import { semesterStart } from '#/lib/dates'
 import { getSetting } from './settings'
 
-export async function getHomeData(db: Db, now = new Date()) {
-  const [club, nextEvent, memberCount, eventCount, projectCount] = await Promise.all([
-    getSetting(db, 'club-info'),
-    db.query.event.findFirst({
-      where: gte(schema.event.startsAt, now),
-      orderBy: schema.event.startsAt,
-      columns: { id: true, title: true, startsAt: true, endsAt: true, location: true },
-    }),
-    db
-      .select({ n: count() })
-      .from(schema.user)
-      .where(inArray(schema.user.role, ['member', 'officer', 'admin'])),
-    db
-      .select({ n: count() })
-      .from(schema.event)
-      .where(
-        and(
-          gte(schema.event.startsAt, semesterStart(now)),
-          lt(schema.event.startsAt, now),
-        ),
-      ),
-    db
-      .select({ n: count() })
-      .from(schema.project)
-      .where(eq(schema.project.status, 'approved')),
-  ])
+const MEMBER_ROLES = ['member', 'officer', 'admin'] as const
 
-  const [featuredProjects, latestPosts, recentAwards] = await Promise.all([
+export async function getHomeData(db: Db, now = new Date()) {
+  const since = semesterStart(now)
+  const [club, points, social, nextEvent, memberCount, eventCount, projectCount] =
+    await Promise.all([
+      getSetting(db, 'club-info'),
+      getSetting(db, 'points'),
+      getSetting(db, 'social'),
+      db.query.event.findFirst({
+        where: gte(schema.event.startsAt, now),
+        orderBy: schema.event.startsAt,
+        columns: { id: true, title: true, startsAt: true, endsAt: true, location: true },
+      }),
+      db
+        .select({ n: count() })
+        .from(schema.user)
+        .where(inArray(schema.user.role, MEMBER_ROLES)),
+      db
+        .select({ n: count() })
+        .from(schema.event)
+        .where(and(gte(schema.event.startsAt, since), lt(schema.event.startsAt, now))),
+      db
+        .select({ n: count() })
+        .from(schema.project)
+        .where(eq(schema.project.status, 'approved')),
+    ])
+
+  const [
+    featuredProjects,
+    latestPosts,
+    recentAwards,
+    activeChallenge,
+    leaderboard,
+    badges,
+    rsvpCount,
+  ] = await Promise.all([
     db
       .select({
         id: schema.project.id,
@@ -74,11 +95,66 @@ export async function getHomeData(db: Db, now = new Date()) {
       .where(eq(schema.badge.isActive, true))
       .orderBy(desc(schema.userBadge.awardedAt))
       .limit(6),
+    // The newest published challenge is "this week's".
+    db.query.challenge.findFirst({
+      where: and(
+        isNotNull(schema.challenge.publishedAt),
+        lte(schema.challenge.publishedAt, now),
+      ),
+      orderBy: [desc(schema.challenge.weekNo), desc(schema.challenge.publishedAt)],
+      columns: {
+        id: true,
+        title: true,
+        description: true,
+        prompt: true,
+        difficulty: true,
+        points: true,
+        weekNo: true,
+      },
+    }),
+    // Points are a ledger: the semester leaderboard sums deltas since term start.
+    db
+      .select({
+        userId: schema.user.id,
+        name: schema.user.name,
+        image: schema.user.image,
+        points: sql<number>`coalesce(${sum(schema.pointEntry.delta)}, 0)`.mapWith(Number),
+      })
+      .from(schema.pointEntry)
+      .innerJoin(schema.user, eq(schema.user.id, schema.pointEntry.userId))
+      .where(
+        and(
+          gte(schema.pointEntry.createdAt, since),
+          inArray(schema.user.role, MEMBER_ROLES),
+        ),
+      )
+      .groupBy(schema.user.id, schema.user.name, schema.user.image)
+      .orderBy(desc(sql`coalesce(${sum(schema.pointEntry.delta)}, 0)`), schema.user.name)
+      .limit(5),
+    db.query.badge.findMany({
+      where: eq(schema.badge.isActive, true),
+      orderBy: [schema.badge.sortOrder, schema.badge.name],
+      columns: { id: true, name: true, description: true, rarity: true },
+      limit: 6,
+    }),
+    nextEvent
+      ? db
+          .select({ n: count() })
+          .from(schema.rsvp)
+          .where(
+            and(eq(schema.rsvp.eventId, nextEvent.id), eq(schema.rsvp.status, 'yes')),
+          )
+      : Promise.resolve([{ n: 0 }]),
   ])
 
   return {
     club,
-    nextEvent: nextEvent ?? null,
+    points,
+    social,
+    nextEvent: nextEvent ? { ...nextEvent, going: rsvpCount[0]?.n ?? 0 } : null,
+    activeChallenge: activeChallenge ?? null,
+    leaderboard,
+    badges,
     stats: {
       members: memberCount[0]?.n ?? 0,
       eventsThisSemester: eventCount[0]?.n ?? 0,

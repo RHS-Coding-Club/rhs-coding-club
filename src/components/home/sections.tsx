@@ -1,295 +1,419 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowUpRight } from 'lucide-react'
+import { Check } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { HomeData } from '#/services/home'
-import { fmtDate, initials } from '#/lib/format'
+import { cn } from '#/lib/utils'
 import { Button } from '#/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '#/components/ui/accordion'
 import CountUp from '#/components/bits/CountUp'
+import { BorderBeam } from '#/components/bits/BorderBeam'
+import { GrainientBackdrop } from './grainient-backdrop'
 import { Reveal } from './motion'
+import {
+  BadgeShelf,
+  ChallengeCard,
+  EventRsvpRow,
+  GithubOrgRow,
+  LeaderboardList,
+  ProjectTiles,
+} from './vignettes'
 
-type SectionLink = '/projects' | '/blog' | '/events' | '/hall-of-fame'
+function Container({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={cn('mx-auto max-w-7xl px-(--gutter)', className)}>{children}</div>
+  )
+}
 
-function SectionHeading({
+function Heading({
   title,
-  to,
-  cta,
+  body,
+  center = false,
 }: {
   title: string
-  to?: SectionLink
-  cta?: string
+  body?: string
+  center?: boolean
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
-      <h2 className="font-display max-w-2xl text-4xl leading-[0.98] font-bold tracking-[-0.03em] lg:text-5xl">
+    <div className={cn('max-w-2xl', center && 'mx-auto text-center')}>
+      <h2 className="font-display text-4xl leading-[1] font-bold tracking-[-0.03em] lg:text-5xl">
         {title}
       </h2>
-      {to && cta && (
-        <Link
-          to={to}
-          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 pb-1 text-sm font-medium transition-colors"
-        >
-          {cta}
-          <ArrowUpRight className="size-4" />
-        </Link>
+      {body && (
+        <p className="text-muted-foreground mt-4 text-lg leading-relaxed text-pretty">
+          {body}
+        </p>
       )}
     </div>
   )
 }
 
-/**
- * Placeholder photography until the club uploads its own. Grayscale plus a
- * luminosity blend over navy turns any photo into a brand duotone.
- * TODO: replace with real club photos (classroom, RAP lessons, hackathon).
- */
-function Duotone({
-  seed,
-  alt = '',
-  className,
-}: {
-  seed: string
-  alt?: string
-  className?: string
-}) {
+/* ---------- 1. Logo cloud of the tools members learn ---------- */
+
+const STACK = ['Python', 'JavaScript', 'TypeScript', 'React', 'Git', 'GitHub', 'HTML/CSS']
+
+export function StackStrip() {
   return (
-    <div className={`bg-brand-navy relative overflow-hidden ${className ?? ''}`}>
-      <img
-        src={`https://picsum.photos/seed/${seed}/1200/1200?grayscale`}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-        className="absolute inset-0 h-full w-full object-cover opacity-90 mix-blend-luminosity"
-      />
-    </div>
+    <section className="border-border border-y">
+      <Container className="py-10">
+        <Reveal>
+          <p className="text-muted-foreground text-center text-sm">
+            The tools you'll learn
+          </p>
+          <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 lg:justify-between">
+            {STACK.map((name) => (
+              <li
+                key={name}
+                className="font-display text-foreground/50 text-2xl font-semibold tracking-tight select-none"
+              >
+                {name}
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+      </Container>
+    </section>
   )
 }
 
-/*
-  Learn, Teach, Ship: the three things the club does every semester, told as a
-  sticky stack. On large screens each panel pins under the header while the
-  next one slides over it, so the story reads in order; below lg they simply
-  stack. Pure CSS, so it costs nothing and needs no reduced-motion branch.
-*/
-export function Pillars({
-  stats,
-  awards,
-}: {
-  stats: HomeData['stats']
-  awards: HomeData['recentAwards']
-}) {
-  const latest = awards.at(0)
-  const panels: Array<{
-    word: string
+/* ---------- 2. Feature bento with live vignettes ---------- */
+
+export function FeatureBento({ data }: { data: HomeData }) {
+  const cells: Array<{
+    title: string
     body: string
-    seed: string
-    data: ReactNode
+    span: string
+    tint?: string
+    ui: ReactNode
   }> = [
     {
-      word: 'Learn',
-      body: 'A new coding challenge every week. Solve it, earn points, collect badges, and climb the leaderboard.',
-      seed: 'rhs-classroom-laptops',
-      data: (
-        <>
-          <Stat n={stats.members} label="members" />
-          {latest && (
-            <div className="flex items-center gap-3">
-              <Avatar className="size-9">
-                <AvatarImage src={latest.userImage ?? undefined} alt="" />
-                <AvatarFallback className="text-xs">
-                  {initials(latest.userName)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-sm leading-tight">
-                <p className="font-medium">
-                  {latest.userName} earned {latest.badgeName}
-                </p>
-                <p className="text-muted-foreground mt-0.5">
-                  {fmtDate(latest.awardedAt, 'short')}
-                </p>
-              </div>
-            </div>
-          )}
-        </>
-      ),
+      title: 'Weekly challenges',
+      body: 'A new problem every week, three difficulties, any language. Submit a link, an officer reviews it.',
+      span: 'md:col-span-4',
+      tint: 'bg-[radial-gradient(60%_60%_at_100%_0%,color-mix(in_oklab,var(--brand-sky)_14%,transparent),transparent)]',
+      ui: <ChallengeCard challenge={data.activeChallenge} detailed className="h-full" />,
     },
     {
-      word: 'Teach',
-      body: 'Members run STEM lessons for kids at the Ripon Afterschool Program at Ripon Elementary. Volunteer hours included.',
-      seed: 'rhs-elementary-lesson',
-      data: <Stat n={stats.eventsThisSemester} label="events this semester" />,
+      title: 'Points and leaderboard',
+      body: 'Every point is a ledger entry. The board sums them per semester.',
+      span: 'md:col-span-2',
+      ui: <LeaderboardList rows={data.leaderboard} />,
     },
     {
-      word: 'Ship',
-      body: 'Build for the H2O hackathon or ship your own project. Members get a GitHub org and a place to show it off.',
-      seed: 'rhs-hackathon-table',
-      data: <Stat n={stats.projects} label="projects shipped" />,
+      title: 'Badges',
+      body: 'Awarded automatically the moment you hit a threshold. No asking.',
+      span: 'md:col-span-2',
+      tint: 'bg-[linear-gradient(160deg,color-mix(in_oklab,var(--brand-navy)_30%,var(--card)),var(--card)_70%)]',
+      ui: <BadgeShelf badges={data.badges} />,
+    },
+    {
+      title: 'Events and RSVP',
+      body: 'Meetings, the hackathon, and teaching days at the afterschool program. One tap to RSVP; attendance earns points.',
+      span: 'md:col-span-4',
+      ui: <EventRsvpRow event={data.nextEvent} />,
+    },
+    {
+      title: 'Project showcase',
+      body: 'Ship something, submit it, get it approved. It goes on the public wall with your name on it.',
+      span: 'md:col-span-4',
+      ui: <ProjectTiles projects={data.featuredProjects} />,
+    },
+    {
+      title: 'GitHub org',
+      body: 'Members get a seat in the club org: shared repos, reviews, and a real commit history.',
+      span: 'md:col-span-2',
+      tint: 'bg-muted/50',
+      ui: <GithubOrgRow social={data.social} />,
     },
   ]
 
   return (
-    <section className="mx-auto max-w-7xl px-(--gutter) py-20 lg:py-28">
-      <Reveal>
-        <SectionHeading title="What a semester looks like" />
-      </Reveal>
-      <div className="mt-10 grid gap-5 lg:mt-14">
-        {panels.map((p, i) => (
-          <article
-            key={p.word}
-            style={{ top: `calc(5rem + ${i}rem)` }}
-            className="border-border bg-card grid overflow-hidden rounded-2xl border lg:sticky lg:h-[min(34rem,calc(100dvh-6rem))] lg:grid-cols-2"
-          >
-            <div className="flex flex-col justify-between gap-10 p-7 sm:p-9 lg:p-12">
-              <Reveal>
-                <p className="font-display text-6xl leading-none font-bold tracking-[-0.04em] lg:text-8xl">
-                  {p.word}
-                </p>
-                <p className="text-muted-foreground mt-6 max-w-md text-lg leading-relaxed">
-                  {p.body}
-                </p>
-              </Reveal>
-              <Reveal delay={0.1} className="flex flex-wrap items-end gap-x-10 gap-y-6">
-                {p.data}
-              </Reveal>
-            </div>
-            <Duotone seed={p.seed} className="aspect-[4/3] lg:aspect-auto lg:h-full" />
-          </article>
-        ))}
-      </div>
+    <section className="py-20 lg:py-28">
+      <Container>
+        <Reveal>
+          <Heading
+            title="Everything a member gets."
+            body="One account. Challenges, points, badges, events, projects, and the org, all in one place."
+          />
+        </Reveal>
+        <div className="mt-12 grid gap-4 md:grid-cols-6 lg:mt-16">
+          {cells.map((cell, i) => (
+            <Reveal key={cell.title} delay={(i % 3) * 0.06} className={cell.span}>
+              <article
+                className={cn(
+                  'border-border bg-card flex h-full flex-col gap-6 rounded-2xl border p-6',
+                  cell.tint,
+                )}
+              >
+                <div>
+                  <h3 className="font-display text-xl font-semibold tracking-tight">
+                    {cell.title}
+                  </h3>
+                  <p className="text-muted-foreground mt-2 text-sm leading-relaxed text-pretty">
+                    {cell.body}
+                  </p>
+                </div>
+                <div className="mt-auto flex flex-1 flex-col justify-end">{cell.ui}</div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </Container>
     </section>
   )
 }
 
-function Stat({ n, label }: { n: number; label: string }) {
-  return (
-    <div>
-      <p className="font-display tabular text-5xl leading-none font-bold tracking-tight">
-        <CountUp to={n} duration={1.2} />
-      </p>
-      <p className="text-muted-foreground mt-2 text-sm">{label}</p>
-    </div>
-  )
-}
+/* ---------- 3. How it works ---------- */
 
-/** Approved member projects as a horizontal rail of square tiles, sized so the rail visibly runs past the viewport edge. */
-export function Projects({ projects }: { projects: HomeData['featuredProjects'] }) {
+const STEPS = [
+  {
+    verb: 'Join',
+    body: 'Sign up with your school email and answer a short application. An officer approves you before the next meeting.',
+  },
+  {
+    verb: 'Solve',
+    body: 'A challenge drops every week. Submit a link to your solution in any language, get it reviewed, and watch the points land.',
+  },
+  {
+    verb: 'Ship',
+    body: 'Show up to events, build for the hackathon, and publish a project to the showcase. Badges award themselves along the way.',
+  },
+]
+
+export function HowItWorks() {
   return (
     <section className="border-border border-t py-20 lg:py-28">
-      <div className="mx-auto max-w-7xl px-(--gutter)">
+      <Container className="grid gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-20">
         <Reveal>
-          <SectionHeading title="Built by members" to="/projects" cta="All projects" />
-        </Reveal>
-      </div>
-      {projects.length === 0 ? (
-        <div className="mx-auto max-w-7xl px-(--gutter)">
-          <Empty>
-            No approved projects yet. Members submit theirs from the dashboard.
-          </Empty>
-        </div>
-      ) : (
-        <Reveal>
-          <ul className="rail-pad no-scrollbar mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 lg:mt-14">
-            {projects.map((p) => (
-              <li
-                key={p.id}
-                className="w-[78vw] max-w-[30rem] shrink-0 snap-start sm:w-[24rem] lg:w-[30rem]"
-              >
-                <Link to="/projects" className="group block">
-                  <Duotone
-                    seed={`rhs-project-${p.id}`}
-                    className="aspect-square rounded-2xl transition-transform duration-500 ease-out group-hover:-translate-y-1"
-                  />
-                  <h3 className="font-display mt-5 text-2xl font-semibold tracking-tight group-hover:underline group-hover:underline-offset-4">
-                    {p.title}
-                  </h3>
-                  <p className="text-muted-foreground mt-2 line-clamp-2 text-sm leading-relaxed">
-                    {p.description}
-                  </p>
-                  <p className="text-muted-foreground mt-3 text-sm">
-                    <span className="text-foreground font-medium">{p.authorName}</span>
-                    {p.tech.length > 0 && (
-                      <span> in {p.tech.slice(0, 3).join(', ')}</span>
-                    )}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-      )}
-    </section>
-  )
-}
-
-export function Writing({ posts }: { posts: HomeData['latestPosts'] }) {
-  return (
-    <section className="border-border border-t">
-      <div className="mx-auto max-w-7xl px-(--gutter) py-20 lg:py-28">
-        <Reveal>
-          <SectionHeading title="From the blog" to="/blog" cta="All posts" />
-        </Reveal>
-        {posts.length === 0 ? (
-          <Empty>No posts yet.</Empty>
-        ) : (
-          <ul className="divide-border mt-8 divide-y lg:mt-10">
-            {posts.map((p, i) => (
-              <li key={p.id}>
-                <Reveal delay={i * 0.06}>
-                  <Link
-                    to="/blog"
-                    className="group grid gap-2 py-7 lg:grid-cols-[9rem_minmax(0,1fr)_auto] lg:items-baseline lg:gap-8"
-                  >
-                    <p className="text-muted-foreground font-mono text-xs">
-                      {p.publishedAt ? fmtDate(p.publishedAt) : 'Draft'}
-                    </p>
-                    <div>
-                      <h3 className="font-display text-2xl font-semibold tracking-tight group-hover:underline group-hover:underline-offset-4 lg:text-3xl">
-                        {p.title}
-                      </h3>
-                      <p className="text-muted-foreground mt-2 max-w-2xl">{p.summary}</p>
-                    </div>
-                    <ArrowUpRight className="text-muted-foreground group-hover:text-foreground hidden size-5 transition-colors lg:block" />
-                  </Link>
-                </Reveal>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </section>
-  )
-}
-
-export function JoinBand({ club }: { club: HomeData['club'] }) {
-  return (
-    <section className="border-border border-t">
-      <div className="mx-auto grid max-w-7xl gap-10 px-(--gutter) py-24 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:py-32">
-        <Reveal>
-          <h2 className="font-display max-w-3xl text-5xl leading-[0.94] font-bold tracking-[-0.04em] lg:text-7xl">
-            No experience needed.
-          </h2>
-          <p className="text-muted-foreground mt-6 max-w-xl text-lg leading-relaxed">
-            Every RHS student is welcome. Find us at {club.meetingSchedule.toLowerCase()}{' '}
-            in {club.meetingLocation}.
-          </p>
-        </Reveal>
-        <Reveal delay={0.1}>
+          <Heading
+            title="Join. Solve. Ship."
+            body="Three steps from signup to your first approved project. The first one takes a couple of minutes."
+          />
           <Button
             asChild
             size="lg"
-            className="h-12 rounded-full px-6 text-base transition-transform active:scale-[0.98]"
+            className="mt-8 h-12 rounded-full px-6 text-base transition-transform active:scale-[0.98]"
           >
             <Link to="/signup">Join the club</Link>
           </Button>
         </Reveal>
-      </div>
+        <ol>
+          {STEPS.map((step, i) => (
+            <li key={step.verb} className="border-border border-t">
+              <Reveal
+                delay={i * 0.08}
+                className="grid gap-3 py-8 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-8"
+              >
+                <h3 className="font-display text-3xl font-bold tracking-tight">
+                  {step.verb}
+                </h3>
+                <p className="text-muted-foreground max-w-prose text-base leading-relaxed">
+                  {step.body}
+                </p>
+              </Reveal>
+            </li>
+          ))}
+        </ol>
+      </Container>
     </section>
   )
 }
 
-function Empty({ children }: { children: ReactNode }) {
+/* ---------- 4. Stats band ---------- */
+
+export function StatsBand({ stats }: { stats: HomeData['stats'] }) {
+  const items = [
+    { n: stats.members, label: 'members' },
+    { n: stats.eventsThisSemester, label: 'events this semester' },
+    { n: stats.projects, label: 'projects shipped' },
+  ]
   return (
-    <p className="text-muted-foreground border-border mt-10 rounded-2xl border border-dashed px-6 py-12 text-center text-sm">
-      {children}
-    </p>
+    <section className="border-border border-t">
+      <Container>
+        <dl className="divide-border grid divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          {items.map((item) => (
+            <Reveal
+              key={item.label}
+              className="py-10 sm:px-8 sm:first:pl-0 sm:last:pr-0 lg:py-14"
+            >
+              <dd className="font-display tabular text-6xl leading-none font-bold tracking-tight lg:text-7xl">
+                <CountUp to={item.n} duration={1.2} />
+              </dd>
+              <dt className="text-muted-foreground mt-3 text-base">{item.label}</dt>
+            </Reveal>
+          ))}
+        </dl>
+      </Container>
+    </section>
+  )
+}
+
+/* ---------- 5. Pricing ---------- */
+
+const PLAN_FEATURES = [
+  'Weekly challenges, reviewed by officers',
+  'Points ledger and semester leaderboard',
+  'Badges, awarded automatically',
+  'Events with one-tap RSVP',
+  'Project showcase with your name on it',
+  'A seat in the club GitHub org',
+  'Volunteer hours for teaching days',
+]
+
+export function Pricing() {
+  return (
+    <section className="border-border border-t py-20 lg:py-28">
+      <Container>
+        <Reveal>
+          <Heading
+            center
+            title="Simple pricing."
+            body="One plan. It costs exactly nothing, and it always will."
+          />
+        </Reveal>
+        <Reveal delay={0.1} className="mx-auto mt-12 max-w-md lg:mt-16">
+          <div className="border-border bg-card relative overflow-hidden rounded-2xl border p-8">
+            <BorderBeam size={120} duration={9} colorFrom="#5fb2ee" colorTo="#1f4f8a" />
+            <BorderBeam
+              size={120}
+              duration={9}
+              delay={4.5}
+              colorFrom="#5fb2ee"
+              colorTo="#1f4f8a"
+            />
+            <p className="font-display text-2xl font-semibold tracking-tight">Free</p>
+            <p className="mt-4 flex items-baseline gap-2">
+              <span className="font-display tabular text-6xl leading-none font-bold tracking-tight">
+                $0
+              </span>
+              <span className="text-muted-foreground text-base">/ forever</span>
+            </p>
+            <ul className="mt-8 flex flex-col gap-3">
+              {PLAN_FEATURES.map((feature) => (
+                <li key={feature} className="flex items-start gap-3 text-sm">
+                  <span className="bg-primary/10 text-primary mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full">
+                    <Check className="size-3" strokeWidth={3} />
+                  </span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <Button
+              asChild
+              size="lg"
+              className="mt-8 h-12 w-full rounded-full text-base transition-transform active:scale-[0.98]"
+            >
+              <Link to="/signup">Join the club</Link>
+            </Button>
+            <p className="text-muted-foreground mt-4 text-center text-xs">
+              Must be an RHS student.
+            </p>
+          </div>
+        </Reveal>
+      </Container>
+    </section>
+  )
+}
+
+/* ---------- 6. FAQ ---------- */
+
+export function Faq({
+  club,
+  points,
+}: {
+  club: HomeData['club']
+  points: HomeData['points']
+}) {
+  const items = [
+    {
+      q: 'Do I need experience?',
+      a: 'No. Challenges come in three difficulties and the easy ones are written for first-timers. Officers review every submission with feedback, so you learn from the first one.',
+    },
+    {
+      q: 'When and where do you meet?',
+      a: `${club.meetingSchedule}, in ${club.meetingLocation}. Everything else, like hackathon days and teaching sessions, is posted on the events page with an RSVP.`,
+    },
+    {
+      q: 'What do I need to bring?',
+      a: 'A laptop if you have one, or a Chromebook. Everything we use runs in the browser or on free tools, and the resources page has setup guides.',
+    },
+    {
+      q: 'Do I get volunteer hours?',
+      a: 'Yes. Members run STEM lessons for kids at the Ripon Afterschool Program, and every teaching session counts toward your hours. Attendance is marked by an officer on the day.',
+    },
+    {
+      q: 'How do points work?',
+      a: `Every action is an entry in a ledger: ${points.easy} for an easy challenge, ${points.medium} for medium, ${points.hard} for hard, ${points.project} for an approved project, and ${points.attendance} for showing up to an event. The leaderboard sums your entries for the semester, and badges unlock at set totals.`,
+    },
+  ]
+
+  return (
+    <section className="border-border border-t py-20 lg:py-28">
+      <Container className="max-w-3xl">
+        <Reveal>
+          <Heading center title="Questions, answered." />
+        </Reveal>
+        <Reveal delay={0.1}>
+          <Accordion type="single" collapsible className="mt-10 lg:mt-14">
+            {items.map((item, i) => (
+              <AccordionItem key={item.q} value={`item-${i}`}>
+                <AccordionTrigger className="py-5 text-base font-medium hover:no-underline">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground max-w-prose pb-6 text-base leading-relaxed">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Reveal>
+      </Container>
+    </section>
+  )
+}
+
+/* ---------- 7. Final CTA on the brand gradient ---------- */
+
+export function FinalCta() {
+  return (
+    <section className="pb-20 lg:pb-28">
+      <Container>
+        <Reveal>
+          <div className="relative isolate overflow-hidden rounded-2xl px-6 py-20 text-center text-white lg:py-28">
+            <GrainientBackdrop />
+            <div aria-hidden="true" className="absolute inset-0 bg-[#0b0f15]/25" />
+            <div className="relative mx-auto max-w-2xl">
+              <h2 className="font-display text-4xl leading-[0.98] font-bold tracking-[-0.03em] lg:text-6xl">
+                Your first challenge is waiting.
+              </h2>
+              <p className="mx-auto mt-5 max-w-md text-lg text-white/80">
+                Sign up today. Your first points are one solved challenge away.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 rounded-full bg-white px-6 text-base text-[#0b0f15] transition-transform hover:bg-white/90 active:scale-[0.98] focus-visible:ring-white/60"
+                >
+                  <Link to="/signup">Join the club</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="ghost"
+                  className="h-12 rounded-full border border-white/25 bg-white/10 px-6 text-base text-white backdrop-blur transition-transform hover:bg-white/15 hover:text-white active:scale-[0.98] focus-visible:ring-white/60"
+                >
+                  <Link to="/contact">Talk to an officer</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </Container>
+    </section>
   )
 }

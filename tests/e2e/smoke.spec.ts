@@ -4,8 +4,8 @@ const PASSWORD = 'password123'
 
 test('home page renders the hero', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Learn to code')
-  // Hero CTA (the closing band repeats the same link further down).
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Keep score')
+  // Hero CTA (pricing and the closing band repeat the same link further down).
   await expect(page.getByRole('link', { name: 'Join the club' }).first()).toBeVisible()
 })
 
@@ -50,13 +50,19 @@ test('about page lists officers from the database', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 3, name: 'Jashan Maan' })).toBeVisible()
 })
 
-test('home shows the next event and stats', async ({ page }) => {
+test('home renders live product UI from the database', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByText('Next up', { exact: true })).toBeVisible()
+  // The hero app frame shows the next event and this week's challenge.
   await expect(
-    page.getByRole('heading', { level: 2, name: 'First Meeting' }),
+    page.getByRole('heading', { level: 3, name: 'First Meeting' }).first(),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('heading', { level: 3, name: 'Build a tiny URL shortener' }).first(),
   ).toBeVisible()
   await expect(page.getByText('projects shipped')).toBeVisible()
+  await expect(
+    page.getByRole('heading', { level: 2, name: 'Simple pricing.' }),
+  ).toBeVisible()
 })
 
 test('theme toggle persists across reloads', async ({ page }) => {

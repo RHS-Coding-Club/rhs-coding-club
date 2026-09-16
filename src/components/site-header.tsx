@@ -42,10 +42,10 @@ export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: T
 
   return (
     <header className="border-border/60 bg-background/85 sticky top-0 z-40 border-b backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-(--gutter)">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-(--gutter) lg:grid lg:grid-cols-[1fr_auto_1fr]">
         <Link
           to="/"
-          className="flex items-center gap-2.5"
+          className="flex items-center gap-2.5 justify-self-start"
           aria-label="RHS Coding Club home"
         >
           <Logo className="size-8" />
@@ -54,12 +54,12 @@ export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: T
           </span>
         </Link>
 
-        <nav className="ml-6 hidden items-center gap-0.5 lg:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Primary">
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-full px-3 py-1.5 text-sm transition-colors"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-full px-2.5 py-1.5 text-[13px] font-medium transition-colors xl:px-3 xl:text-sm"
               activeProps={{ className: 'text-foreground' }}
             >
               {item.label}
@@ -67,7 +67,7 @@ export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: T
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="ml-auto flex items-center gap-1.5 lg:justify-self-end">
           <ThemeToggle initial={theme} />
 
           {user ? (
@@ -123,9 +123,13 @@ export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: T
                 size="sm"
                 className="hidden rounded-full sm:inline-flex"
               >
-                <Link to="/login">Log in</Link>
+                <Link to="/login">Sign in</Link>
               </Button>
-              <Button asChild size="sm" className="rounded-full px-4">
+              <Button
+                asChild
+                size="sm"
+                className="rounded-full px-4 transition-transform active:scale-[0.98]"
+              >
                 <Link to="/signup">Join</Link>
               </Button>
             </>
@@ -162,7 +166,7 @@ export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: T
                     onClick={() => setOpen(false)}
                     className="text-muted-foreground hover:text-foreground rounded-md px-2 py-2.5 text-base"
                   >
-                    Log in
+                    Sign in
                   </Link>
                 )}
               </nav>
