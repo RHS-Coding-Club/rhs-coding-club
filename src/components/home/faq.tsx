@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { FadeUp } from '#/components/motion'
 import type { HomeData } from '#/services/home'
 import {
   Accordion,
@@ -43,7 +44,7 @@ export function Faq({
       className="mx-auto max-w-3xl px-(--gutter) py-24 sm:py-28"
       aria-labelledby="faq-heading"
     >
-      <div className="text-center">
+      <FadeUp className="text-center">
         <p className="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">
           Frequently asked questions
         </p>
@@ -70,22 +71,23 @@ export function Faq({
             Contact us
           </Link>
         </div>
-      </div>
+      </FadeUp>
 
       <Accordion type="single" collapsible className="mt-12 space-y-3">
-        {items.map((item) => (
-          <AccordionItem
-            key={item.q}
-            value={item.q}
-            className="bg-card ring-border/60 rounded-2xl border-b-0 px-5 ring-1"
-          >
-            <AccordionTrigger className="py-4 text-base font-medium hover:no-underline">
-              {item.q}
-            </AccordionTrigger>
-            <AccordionContent className="text-muted-foreground pb-5 text-sm leading-relaxed">
-              {item.a}
-            </AccordionContent>
-          </AccordionItem>
+        {items.map((item, i) => (
+          <FadeUp key={item.q} delay={i * 0.05} distance={20}>
+            <AccordionItem
+              value={item.q}
+              className="bg-card ring-border/60 rounded-2xl border-b-0 px-5 ring-1"
+            >
+              <AccordionTrigger className="py-4 text-base font-medium hover:no-underline">
+                {item.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-5 text-sm leading-relaxed">
+                {item.a}
+              </AccordionContent>
+            </AccordionItem>
+          </FadeUp>
         ))}
       </Accordion>
     </section>

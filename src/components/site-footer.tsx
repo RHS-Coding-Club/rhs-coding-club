@@ -4,7 +4,10 @@ import type { LinkProps } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { ArrowRight, Mail } from 'lucide-react'
 import { subscribeNewsletter, newsletterSchema } from '#/server/newsletter'
+import type { Theme } from '#/server/theme'
 import { Logo } from '#/components/logo'
+import { FadeUp } from '#/components/motion'
+import { GrainientBackground } from '#/components/home/grainient-bg'
 
 const COLUMNS: {
   title: string
@@ -48,13 +51,13 @@ const COLUMNS: {
  * Template footer: a navy rounded block with a floating surface card that
  * overlaps its top edge (newsletter signup), then logo + link columns.
  */
-export function SiteFooter() {
+export function SiteFooter({ theme }: { theme: Theme }) {
   return (
     <footer className="mx-2.5 mt-32 pb-2.5">
       {/* Floating signup card. The negative bottom margin pulls the navy block up underneath it. */}
-      <div className="relative z-10 mx-auto -mb-64 max-w-5xl">
-        <NewsletterCard />
-      </div>
+      <FadeUp className="relative z-10 mx-auto -mb-64 max-w-5xl">
+        <NewsletterCard theme={theme} />
+      </FadeUp>
 
       <div className="bg-brand-navy rounded-3xl px-6 pt-[22rem] pb-10 text-[#e6edf5] sm:px-10 lg:px-16">
         <div className="mx-auto flex max-w-6xl flex-col gap-12 md:flex-row md:justify-between">
@@ -118,7 +121,7 @@ type Status =
   | { kind: 'ok' }
   | { kind: 'error'; message: string }
 
-function NewsletterCard() {
+function NewsletterCard({ theme }: { theme: Theme }) {
   const subscribe = useServerFn(subscribeNewsletter)
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
 
@@ -150,10 +153,10 @@ function NewsletterCard() {
       aria-labelledby="newsletter-heading"
       className="bg-card text-card-foreground relative overflow-hidden rounded-3xl px-6 pt-16 pb-16 text-center shadow-2xl shadow-black/25 sm:px-12"
     >
-      {/* Soft blurred gradient, the template's blurred landscape in club colors. */}
+      {/* The hero's Grainient again, fading up into the card so the copy stays readable. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute -bottom-20 left-1/2 h-[26rem] w-[140%] -translate-x-1/2 bg-[radial-gradient(55%_80%_at_18%_100%,#5fb2ee_0%,transparent_62%),radial-gradient(50%_70%_at_78%_95%,#1f4f8a_0%,transparent_62%),radial-gradient(45%_55%_at_50%_100%,#9ccbf2_0%,transparent_60%)] blur-2xl dark:opacity-75" />
-        <div className="from-card via-card/80 absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b to-transparent" />
+        <GrainientBackground initialTheme={theme} />
+        <div className="from-card via-card/85 absolute inset-0 bg-gradient-to-b to-transparent" />
       </div>
 
       <div className="relative">

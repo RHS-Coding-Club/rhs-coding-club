@@ -204,17 +204,22 @@
   --header-offset: 5.5rem;
 }
 
-/* Infinite wordmark marquee (hero). Two copies of the track scroll by half. */
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
+/* Lenis smooth scroll (see src/components/smooth-scroll.tsx). */
+html.lenis,
+html.lenis body {
+  height: auto;
 }
-@utility animate-marquee {
-  animation: marquee 38s linear infinite;
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
 }
-@media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
-    animation: none;
-  }
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+.lenis.lenis-autoToggle {
+  transition-property: overflow;
+  transition-duration: 1ms;
+  transition-behavior: allow-discrete;
 }

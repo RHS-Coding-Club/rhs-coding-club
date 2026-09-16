@@ -12,6 +12,7 @@ import { getTheme } from '#/server/theme'
 import { SiteHeader } from '#/components/site-header'
 import { SiteFooter } from '#/components/site-footer'
 import { ThemeToggle } from '#/components/theme-toggle'
+import { SmoothScroll } from '#/components/smooth-scroll'
 import { Toaster } from '#/components/ui/sonner'
 import appCss from '#/styles.css?url'
 
@@ -75,13 +76,15 @@ function RootLayout() {
   // the template); every other page pads for it.
   const isHome = useRouterState({ select: (s) => s.location.pathname === '/' })
   return (
-    <div className="flex min-h-dvh flex-col">
-      <SiteHeader user={user} />
-      <main className={isHome ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
-        <Outlet />
-      </main>
-      <SiteFooter />
-      <ThemeToggle initial={theme} />
-    </div>
+    <SmoothScroll>
+      <div className="flex min-h-dvh flex-col">
+        <SiteHeader user={user} />
+        <main className={isHome ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
+          <Outlet />
+        </main>
+        <SiteFooter theme={theme} />
+        <ThemeToggle initial={theme} />
+      </div>
+    </SmoothScroll>
   )
 }

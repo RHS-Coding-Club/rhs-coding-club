@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { motion, useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react'
+import { EASE } from '#/components/motion'
 import { Link, useRouter } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import { ChevronDown, LayoutDashboard, LogOut, Menu, ShieldCheck } from 'lucide-react'
@@ -66,7 +68,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
   }
 
   return (
-    <header className="bg-card text-card-foreground fixed top-2.5 left-1/2 z-50 w-[calc(100%-1.25rem)] max-w-5xl -translate-x-1/2 rounded-b-4xl shadow-2xl shadow-black/20 min-[850px]:w-full">
+    <FloatingBar>
       <div className="flex h-16 items-center gap-3 pr-3 pl-5 min-[850px]:grid min-[850px]:grid-cols-[1fr_auto_1fr] min-[850px]:pr-4 min-[850px]:pl-6">
         <Link
           to="/"
@@ -239,7 +241,45 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
           </Sheet>
         </div>
       </div>
-    </header>
+    </FloatingBar>
+  )
+}
+
+/**
+ * The notch. At the top of the page it sits 10px down, flush with the hero
+ * card's top edge; as soon as the page scrolls it slides up and sticks to
+ * the viewport edge. Slides in from above on first paint.
+ */
+function FloatingBar({ children }: { children: React.ReactNode }) {
+  const reduced = useReducedMotion()
+  const { scrollY } = useScroll()
+  const [stuck, setStuck] = useState(false)
+  const [narrow, setNarrow] = useState(false)
+
+  useMotionValueEvent(scrollY, 'change', (y) => setStuck(y > 8))
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 849px)')
+    const read = () => setNarrow(mq.matches)
+    read()
+    mq.addEventListener('change', read)
+    return () => mq.removeEventListener('change', read)
+  }, [])
+
+  const top = stuck || narrow ? 0 : 10
+  return (
+    <motion.header
+      initial={reduced ? false : { y: -96, opacity: 0 }}
+      animate={{ y: 0, opacity: 1, top }}
+      transition={{
+        y: { duration: 0.8, ease: EASE, delay: 0.1 },
+        opacity: { duration: 0.6, delay: 0.1 },
+        top: { duration: 0.35, ease: EASE },
+      }}
+      style={{ top }}
+      className="bg-card text-card-foreground fixed left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 rounded-b-4xl shadow-2xl shadow-black/20"
+    >
+      {children}
+    </motion.header>
   )
 }
 

@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { EASE, FadeUp } from '#/components/motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { initials } from '#/lib/format'
 import { cn } from '#/lib/utils'
@@ -35,14 +37,19 @@ export function Testimonials() {
       aria-labelledby="testimonials-heading"
     >
       <div className="mx-auto max-w-6xl px-(--gutter) py-24 sm:py-28">
-        <h2
-          id="testimonials-heading"
-          className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl"
-        >
-          What members say
-        </h2>
+        <FadeUp>
+          <h2
+            id="testimonials-heading"
+            className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl"
+          >
+            What members say
+          </h2>
+        </FadeUp>
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+        <FadeUp
+          delay={0.1}
+          className="mt-14 grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16"
+        >
           <div className="flex items-center gap-3">
             {TESTIMONIALS.map((t, i) => (
               <button
@@ -72,9 +79,18 @@ export function Testimonials() {
           </div>
 
           <figure className="max-w-xl">
-            <blockquote className="text-lg leading-relaxed sm:text-xl">
-              <p>“{current.quote}”</p>
-            </blockquote>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.blockquote
+                key={active}
+                initial={{ opacity: 0, y: 10, filter: 'blur(6px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -10, filter: 'blur(6px)' }}
+                transition={{ duration: 0.35, ease: EASE }}
+                className="text-lg leading-relaxed sm:text-xl"
+              >
+                <p>“{current.quote}”</p>
+              </motion.blockquote>
+            </AnimatePresence>
             <figcaption className="mt-5 flex items-center justify-between gap-4 text-sm">
               <span>
                 <span className="font-medium">{current.name}</span>
@@ -90,7 +106,7 @@ export function Testimonials() {
               </span>
             </figcaption>
           </figure>
-        </div>
+        </FadeUp>
       </div>
     </section>
   )
