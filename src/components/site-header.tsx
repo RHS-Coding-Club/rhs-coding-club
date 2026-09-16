@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { motion, useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react'
+import { useState } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
 import { EASE } from '#/components/motion'
 import { Link, useRouter } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
@@ -246,37 +246,21 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
 }
 
 /**
- * The notch. At the top of the page it sits 10px down, flush with the hero
- * card's top edge; as soon as the page scrolls it slides up and sticks to
- * the viewport edge. Slides in from above on first paint.
+ * The notch: pinned to the very top edge of the viewport and hanging down
+ * into the hero card, on every page and at every scroll position. Slides in
+ * from above on first paint.
  */
 function FloatingBar({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion()
-  const { scrollY } = useScroll()
-  const [stuck, setStuck] = useState(false)
-  const [narrow, setNarrow] = useState(false)
-
-  useMotionValueEvent(scrollY, 'change', (y) => setStuck(y > 8))
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 849px)')
-    const read = () => setNarrow(mq.matches)
-    read()
-    mq.addEventListener('change', read)
-    return () => mq.removeEventListener('change', read)
-  }, [])
-
-  const top = stuck || narrow ? 0 : 10
   return (
     <motion.header
       initial={reduced ? false : { y: -96, opacity: 0 }}
-      animate={{ y: 0, opacity: 1, top }}
+      animate={{ y: 0, opacity: 1 }}
       transition={{
         y: { duration: 0.8, ease: EASE, delay: 0.1 },
         opacity: { duration: 0.6, delay: 0.1 },
-        top: { duration: 0.35, ease: EASE },
       }}
-      style={{ top }}
-      className="bg-card text-card-foreground fixed left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 rounded-b-4xl shadow-2xl shadow-black/20"
+      className="bg-card text-card-foreground fixed top-0 left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 rounded-b-4xl shadow-2xl shadow-black/20"
     >
       {children}
     </motion.header>

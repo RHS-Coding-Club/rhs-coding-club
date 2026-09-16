@@ -7,13 +7,13 @@ import { GrainientBackground } from './grainient-bg'
 export const HERO_LINE_1 = 'Learn to code.'
 
 /**
- * Full-bleed hero card that floats on the ground (inset 10px, rounded-3xl)
- * with the navbar sitting flush in its top edge. Every line rises, sharpens,
+ * Full-bleed hero card hanging from the top edge of the viewport (inset 10px
+ * on the sides, rounded bottom corners) with the navbar pinned into its top. Every line rises, sharpens,
  * and fades in on load, in the template's order: badge, headline, copy, CTA.
  */
 export function Hero({ theme }: { theme: Theme }) {
   return (
-    <section className="relative mx-2.5 mt-2.5 min-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-3xl">
+    <section className="relative mx-2.5 min-h-[calc(100dvh-0.625rem)] overflow-hidden rounded-b-3xl">
       <GrainientBackground initialTheme={theme} />
       {/* Scrim: keeps the headline legible over the busy gradient in both themes. */}
       <div
@@ -29,7 +29,7 @@ export function Hero({ theme }: { theme: Theme }) {
       <Stagger
         stagger={0.12}
         delay={0.25}
-        className="relative flex min-h-[calc(100dvh-1.25rem)] flex-col items-center justify-center px-6 pt-28 pb-24 text-center"
+        className="relative flex min-h-[calc(100dvh-0.625rem)] flex-col items-center justify-center px-6 pt-28 pb-24 text-center"
       >
         <motion.p
           {...item}
