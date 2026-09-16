@@ -151,22 +151,22 @@ function NewsletterCard({ theme }: { theme: Theme }) {
   return (
     <section
       aria-labelledby="newsletter-heading"
-      className="bg-card text-card-foreground relative overflow-hidden rounded-3xl px-6 pt-16 pb-16 text-center shadow-2xl shadow-black/25 sm:px-12"
+      className="relative overflow-hidden rounded-3xl px-6 pt-16 pb-16 text-center shadow-2xl shadow-black/25 sm:px-12"
     >
-      {/* The hero's Grainient again, fading up into the card so the copy stays readable. */}
+      {/* The hero's Grainient again, full strength, with the same light navy tint. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <GrainientBackground initialTheme={theme} />
-        <div className="from-card via-card/85 absolute inset-0 bg-gradient-to-b to-transparent" />
+        <div className="from-brand-navy/35 via-brand-navy/15 to-brand-navy/25 absolute inset-0 bg-gradient-to-b" />
       </div>
 
       <div className="relative">
         <h2
           id="newsletter-heading"
-          className="mx-auto max-w-2xl text-4xl font-semibold tracking-[-0.03em] sm:text-5xl"
+          className="mx-auto max-w-2xl text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl"
         >
           Stay in the loop with the club
         </h2>
-        <p className="text-muted-foreground mx-auto mt-4 max-w-md text-base">
+        <p className="mx-auto mt-4 max-w-md text-base text-white/85">
           New challenges, event reminders, and hackathon dates. No spam, unsubscribe any
           time.
         </p>
@@ -197,12 +197,12 @@ function NewsletterCard({ theme }: { theme: Theme }) {
           </div>
           <p className="mt-3 min-h-5 text-sm" role="status" aria-live="polite">
             {status.kind === 'ok' && (
-              <span className="text-success">
+              <span className="text-white">
                 You are on the list. See you in the next update.
               </span>
             )}
             {status.kind === 'error' && (
-              <span className="text-destructive">{status.message}</span>
+              <span className="text-white">{status.message}</span>
             )}
           </p>
         </form>
