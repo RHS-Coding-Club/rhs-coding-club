@@ -1,3 +1,6 @@
+# Local dev overrides the deployed APP_URL from wrangler.jsonc.
+APP_URL=http://localhost:3000
+
 # Copy to .dev.vars for local development. Wrangler and the Vite dev server
 # load this file; it is gitignored. Production values are set with
 # `wrangler secret put NAME`.

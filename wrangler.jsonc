@@ -6,10 +6,11 @@
   "main": "@tanstack/react-start/server-entry",
   "observability": { "enabled": true },
 
-  // Public, non-secret configuration. Secrets go in .dev.vars locally and
-  // `wrangler secret put` in production. See .env.example for the full list.
+  // Public, non-secret configuration for the deployed Worker. Secrets go in
+  // .dev.vars locally and `wrangler secret put` in production. Local dev
+  // overrides APP_URL from .dev.vars.
   "vars": {
-    "APP_URL": "http://localhost:3000",
+    "APP_URL": "https://rhs-coding-club.jmaan1337.workers.dev",
     "GITHUB_ORG": "RHS-Coding-Club",
   },
 
@@ -17,8 +18,7 @@
     {
       "binding": "DB",
       "database_name": "rhs-coding-club",
-      // database_id is filled in after `wrangler d1 create rhs-coding-club`.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "260ab3fb-b486-40d2-8581-1f3d202a38a2",
       "migrations_dir": "src/db/migrations",
     },
   ],
