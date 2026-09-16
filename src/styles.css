@@ -223,3 +223,17 @@ html.lenis body {
   transition-duration: 1ms;
   transition-behavior: allow-discrete;
 }
+
+/*
+  Ground-colored square hanging below the header strip, masked to a concave
+  quarter circle so it reads as the hero card's rounded top corner (2rem,
+  matching rounded-4xl) even once the card has scrolled underneath.
+*/
+@utility notch-corner {
+  position: absolute;
+  top: 100%;
+  width: 2rem;
+  height: 2rem;
+  background: var(--background);
+  mask: radial-gradient(circle at 100% 100%, transparent calc(2rem - 0.5px), #000 2rem);
+}

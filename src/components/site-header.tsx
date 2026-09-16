@@ -264,7 +264,14 @@ function FloatingBar({ children }: { children: React.ReactNode }) {
       className="pointer-events-none fixed inset-x-0 top-0 z-50"
     >
       {/* Edge-to-edge strip in the ground color; the bar hangs from its middle. */}
-      <div aria-hidden="true" className="bg-background hidden h-2.5 min-[850px]:block" />
+      <div
+        aria-hidden="true"
+        className="bg-background relative hidden h-2.5 min-[850px]:block"
+      >
+        {/* Inverted corners: the strip carries the hero card's rounded top corners with it. */}
+        <div className="notch-corner left-2.5" />
+        <div className="notch-corner right-2.5 -scale-x-100" />
+      </div>
       <div className="bg-background text-foreground pointer-events-auto mx-auto w-full max-w-5xl rounded-b-4xl shadow-2xl shadow-black/30">
         {children}
       </div>
