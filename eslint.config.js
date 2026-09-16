@@ -20,7 +20,6 @@ export default [
       'prettier.config.js',
       'src/routeTree.gen.ts',
       // Vendored React Bits components (installed via the shadcn registry).
-      'src/components/bits/**',
       'src/db/migrations/**',
       'worker-configuration.d.ts',
       'dist/**',

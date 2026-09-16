@@ -2,11 +2,9 @@ import { expect, test } from '@playwright/test'
 
 const PASSWORD = 'password123'
 
-test('home page renders the hero', async ({ page }) => {
+test('home page renders', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Keep score')
-  // Hero CTA (pricing and the closing band repeat the same link further down).
-  await expect(page.getByRole('link', { name: 'Join the club' }).first()).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('RHS Coding Club')
 })
 
 test('unauthenticated dashboard redirects to login', async ({ page }) => {
@@ -50,33 +48,19 @@ test('about page lists officers from the database', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 3, name: 'Jashan Maan' })).toBeVisible()
 })
 
-test('home renders live product UI from the database', async ({ page }) => {
-  await page.goto('/')
-  // The hero app frame shows the next event and this week's challenge.
-  await expect(
-    page.getByRole('heading', { level: 3, name: 'First Meeting' }).first(),
-  ).toBeVisible()
-  await expect(
-    page.getByRole('heading', { level: 3, name: 'Build a tiny URL shortener' }).first(),
-  ).toBeVisible()
-  await expect(page.getByText('projects shipped')).toBeVisible()
-  await expect(
-    page.getByRole('heading', { level: 2, name: 'Simple pricing.' }),
-  ).toBeVisible()
-})
-
 test('theme toggle persists across reloads', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('html')).toHaveClass(/dark/)
-  // The poster gradient (WebGL) only mounts on the client, so its canvas proves hydration finished.
-  await page.locator('canvas').first().waitFor({ timeout: 15_000 })
   // The toggle flips the class immediately and persists the cookie in the
   // background; wait for that request so the reload does not cancel it.
   const persisted = page.waitForResponse(
     (res) => res.request().method() === 'POST' && res.ok(),
   )
-  await page.getByRole('button', { name: 'Switch to light theme' }).click()
-  await expect(page.locator('html')).toHaveClass(/light/)
+  // Clicks before hydration do nothing, so retry until the class flips.
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Switch to light theme' }).click()
+    await expect(page.locator('html')).toHaveClass(/light/, { timeout: 500 })
+  }).toPass({ timeout: 15_000 })
   await persisted
   await page.reload()
   await expect(page.locator('html')).toHaveClass(/light/)

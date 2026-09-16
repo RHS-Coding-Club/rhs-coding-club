@@ -1,34 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getHome } from '#/server/public'
-import { Hero } from '#/components/home/hero'
-import {
-  Faq,
-  FeatureBento,
-  FinalCta,
-  HowItWorks,
-  Pricing,
-  StackStrip,
-  StatsBand,
-} from '#/components/home/sections'
 
 export const Route = createFileRoute('/')({
   loader: () => getHome(),
   component: Home,
 })
 
+/** Blank slate. The home page is being rebuilt one component at a time. */
 function Home() {
-  const data = Route.useLoaderData()
-
   return (
-    <>
-      <Hero data={data} />
-      <StackStrip />
-      <FeatureBento data={data} />
-      <HowItWorks />
-      <StatsBand stats={data.stats} />
-      <Pricing />
-      <Faq club={data.club} points={data.points} />
-      <FinalCta />
-    </>
+    <main className="mx-auto max-w-7xl px-(--gutter) py-16">
+      <h1 className="font-display text-4xl font-semibold tracking-tight">
+        RHS Coding Club
+      </h1>
+    </main>
   )
 }

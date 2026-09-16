@@ -197,29 +197,3 @@
     --gutter: 2.5rem;
   }
 }
-
-/* Server-rendered / reduced-motion fallback behind the Grainient poster. */
-@utility poster-fallback {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(70% 55% at 85% 15%, rgba(95, 178, 238, 0.95), transparent 70%),
-    radial-gradient(60% 60% at 15% 85%, rgba(31, 79, 138, 0.9), transparent 70%),
-    linear-gradient(160deg, #1f4f8a 0%, #0b0f15 100%);
-}
-
-/*
-  Horizontal rail whose first item lines up with the page container while the
-  track itself runs to the viewport edge.
-*/
-@utility rail-pad {
-  padding-inline: max(var(--gutter), calc((100vw - 80rem) / 2 + var(--gutter)));
-  scroll-padding-inline: max(var(--gutter), calc((100vw - 80rem) / 2 + var(--gutter)));
-}
-
-@utility no-scrollbar {
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
