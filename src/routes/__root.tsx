@@ -3,6 +3,7 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useRouterState,
 } from '@tanstack/react-router'
 import type { QueryClient } from '@tanstack/react-query'
 import { getSessionUser } from '#/server/auth'
@@ -10,6 +11,7 @@ import type { SessionUser } from '#/server/auth'
 import { getTheme } from '#/server/theme'
 import { SiteHeader } from '#/components/site-header'
 import { SiteFooter } from '#/components/site-footer'
+import { ThemeToggle } from '#/components/theme-toggle'
 import { Toaster } from '#/components/ui/sonner'
 import appCss from '#/styles.css?url'
 
@@ -19,7 +21,7 @@ export interface RouterContext {
 }
 
 const FONTS =
-  'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap'
+  'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async () => {
@@ -69,13 +71,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
 function RootLayout() {
   const { user, theme } = Route.useRouteContext()
+  // The header floats over the page. The home hero runs underneath it (like
+  // the template); every other page pads for it.
+  const isHome = useRouterState({ select: (s) => s.location.pathname === '/' })
   return (
     <div className="flex min-h-dvh flex-col">
-      <SiteHeader user={user} theme={theme} />
-      <main className="flex-1">
+      <SiteHeader user={user} />
+      <main className={isHome ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
         <Outlet />
       </main>
       <SiteFooter />
+      <ThemeToggle initial={theme} />
     </div>
   )
 }

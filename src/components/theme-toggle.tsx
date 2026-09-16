@@ -3,8 +3,11 @@ import { useServerFn } from '@tanstack/react-start'
 import { Moon, Sun } from 'lucide-react'
 import { setTheme } from '#/server/theme'
 import type { Theme } from '#/server/theme'
-import { Button } from '#/components/ui/button'
 
+/**
+ * Floating theme switch, bottom-right on every page. Flips the <html> class
+ * immediately and persists the choice in a cookie via a server function.
+ */
 export function ThemeToggle({ initial }: { initial: Theme }) {
   const [theme, setLocal] = useState<Theme>(initial)
   const persist = useServerFn(setTheme)
@@ -20,15 +23,14 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
 
   const label = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="rounded-full"
+    <button
+      type="button"
       onClick={toggle}
       aria-label={label}
       title={label}
+      className="bg-card text-foreground border-border/60 shadow-black/20 hover:bg-muted focus-visible:ring-ring fixed right-5 bottom-5 z-50 inline-flex size-11 items-center justify-center rounded-full border shadow-lg transition-[background-color,transform] outline-none focus-visible:ring-2 active:scale-[0.96]"
     >
       {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
-    </Button>
+    </button>
   )
 }

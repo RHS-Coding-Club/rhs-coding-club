@@ -96,7 +96,8 @@
 
 @theme inline {
   --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Bricolage Grotesque', 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: ui-serif, Georgia, 'Times New Roman', serif;
   --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --color-brand-sky: var(--brand-sky);
@@ -195,5 +196,25 @@
 @media (min-width: 1024px) {
   :root {
     --gutter: 2.5rem;
+  }
+}
+
+/* Fixed floating navbar: pages that do not start with a full-bleed hero pad for it. */
+:root {
+  --header-offset: 5.5rem;
+}
+
+/* Infinite wordmark marquee (hero). Two copies of the track scroll by half. */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@utility animate-marquee {
+  animation: marquee 38s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
   }
 }

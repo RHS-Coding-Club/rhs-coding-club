@@ -4,7 +4,21 @@ const PASSWORD = 'password123'
 
 test('home page renders', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('RHS Coding Club')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Learn to code.')
+  await expect(page.getByRole('link', { name: 'Join the club' }).first()).toBeVisible()
+})
+
+test('footer newsletter form subscribes an email', async ({ page }) => {
+  await page.goto('/')
+  const email = `e2e-${Date.now()}-${Math.floor(Math.random() * 1e6)}@test.local`
+  const input = page.getByLabel('Newsletter signup')
+  await input.scrollIntoViewIfNeeded()
+  // Submits before hydration do nothing, so retry until the success text lands.
+  await expect(async () => {
+    await input.fill(email)
+    await page.getByRole('button', { name: 'Subscribe' }).click()
+    await expect(page.getByText('You are on the list')).toBeVisible({ timeout: 2000 })
+  }).toPass({ timeout: 15_000 })
 })
 
 test('unauthenticated dashboard redirects to login', async ({ page }) => {
