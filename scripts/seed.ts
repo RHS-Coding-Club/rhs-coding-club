@@ -6,7 +6,11 @@
  *
  * Passwords are hashed with Better Auth's own scrypt implementation so the
  * accounts work with normal email/password login. All seeded users share the
- * password below. Never run this against production.
+ * password below.
+ *
+ * `bun run db:seed:prod` (this script with --remote) seeds the DEPLOYED
+ * database with the same sample content for demos, but writes NO login
+ * accounts, so nobody can sign in as a seeded user on the public site.
  */
 import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -43,9 +47,13 @@ function q(value: string | number | null | boolean): string {
   return `'${value.replace(/'/g, "''")}'`
 }
 
-async function buildSql(): Promise<string> {
+async function buildSql(withLogins: boolean): Promise<string> {
   const now = Date.now()
   const hash = await hashPassword(SEED_PASSWORD)
+  const account = (id: string) =>
+    withLogins
+      ? `INSERT INTO account (id, account_id, provider_id, user_id, password, created_at, updated_at) VALUES (${q(`acc_${id}`)}, ${q(id)}, 'credential', ${q(id)}, ${q(hash)}, ${now}, ${now});`
+      : null
   const lines: string[] = ['PRAGMA foreign_keys = ON;']
 
   // Idempotent: wipe seeded rows first.
@@ -61,18 +69,16 @@ async function buildSql(): Promise<string> {
     lines.push(
       `INSERT INTO user (id, name, email, email_verified, image, created_at, updated_at, role, bio, grad_year, skills) VALUES (${q(u.id)}, ${q(u.name)}, ${q(u.email)}, 1, NULL, ${now}, ${now}, ${q(u.role)}, NULL, NULL, '[]');`,
     )
-    lines.push(
-      `INSERT INTO account (id, account_id, provider_id, user_id, password, created_at, updated_at) VALUES (${q(`acc_${u.id}`)}, ${q(u.id)}, 'credential', ${q(u.id)}, ${q(hash)}, ${now}, ${now});`,
-    )
+    const acc = account(u.id)
+    if (acc) lines.push(acc)
   }
 
   for (const u of SEED_MEMBERS) {
     lines.push(
       `INSERT INTO user (id, name, email, email_verified, image, created_at, updated_at, role, bio, grad_year, skills) VALUES (${q(u.id)}, ${q(u.name)}, ${q(u.email)}, 1, NULL, ${now}, ${now}, 'member', NULL, NULL, '[]');`,
     )
-    lines.push(
-      `INSERT INTO account (id, account_id, provider_id, user_id, password, created_at, updated_at) VALUES (${q(`acc_${u.id}`)}, ${q(u.id)}, 'credential', ${q(u.id)}, ${q(hash)}, ${now}, ${now});`,
-    )
+    const acc = account(u.id)
+    if (acc) lines.push(acc)
   }
 
   const challenges = [
@@ -222,22 +228,34 @@ async function buildSql(): Promise<string> {
 }
 
 async function main() {
-  const sql = await buildSql()
+  const remote = process.argv.includes('--remote')
+  const sql = await buildSql(!remote)
   const dir = mkdtempSync(join(tmpdir(), 'rhs-seed-'))
   const file = join(dir, 'seed.sql')
   writeFileSync(file, sql)
 
   const result = spawnSync(
     'bunx',
-    ['wrangler', 'd1', 'execute', 'rhs-coding-club', '--local', '--file', file],
+    [
+      'wrangler',
+      'd1',
+      'execute',
+      'rhs-coding-club',
+      remote ? '--remote' : '--local',
+      '--file',
+      file,
+    ],
     { stdio: 'inherit' },
   )
   if (result.status !== 0) {
     console.error('Seed failed.')
     process.exit(result.status ?? 1)
   }
+  const users = SEED_USERS.length + SEED_MEMBERS.length
   console.log(
-    `Seeded ${SEED_USERS.length + SEED_MEMBERS.length} users (password: ${SEED_PASSWORD}) and sample content.`,
+    remote
+      ? `Seeded ${users} users (no login accounts) and sample content into the deployed database.`
+      : `Seeded ${users} users (password: ${SEED_PASSWORD}) and sample content.`,
   )
 }
 

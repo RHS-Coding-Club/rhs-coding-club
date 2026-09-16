@@ -20,6 +20,7 @@
     "db:migrate": "wrangler d1 migrations apply rhs-coding-club --local",
     "db:migrate:prod": "wrangler d1 migrations apply rhs-coding-club --remote",
     "db:seed": "bun scripts/seed.ts",
+    "db:seed:prod": "bun scripts/seed.ts --remote",
     "db:studio": "drizzle-kit studio",
     "auth:schema": "better-auth generate --config src/lib/auth.ts --output src/db/schema/auth.generated.ts",
     "test": "bun run test:unit && bun run test:integration",
