@@ -69,7 +69,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
 
   return (
     <FloatingBar>
-      <div className="flex h-16 items-center gap-3 pr-3 pl-5 min-[850px]:grid min-[850px]:grid-cols-[1fr_auto_1fr] min-[850px]:pr-4 min-[850px]:pl-6">
+      <div className="flex h-[4.5rem] items-center gap-3 pr-3 pl-5 min-[850px]:grid min-[850px]:grid-cols-[1fr_auto_1fr] min-[850px]:pr-4 min-[850px]:pl-6">
         <Link
           to="/"
           className="focus-visible:ring-ring flex items-center gap-2.5 justify-self-start rounded-full outline-none focus-visible:ring-2"
@@ -246,9 +246,10 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
 }
 
 /**
- * The notch: pinned to the very top edge of the viewport and hanging down
- * into the hero card, on every page and at every scroll position. Slides in
- * from above on first paint.
+ * The notch. The bar is painted in the page ground color and sits 10px down,
+ * exactly where the hero card's top gap is, so the strip above it and the
+ * bar read as one shape hanging from the top edge into the card. That holds
+ * at every scroll position. Slides in from above on first paint.
  */
 function FloatingBar({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion()
@@ -260,7 +261,7 @@ function FloatingBar({ children }: { children: React.ReactNode }) {
         y: { duration: 0.8, ease: EASE, delay: 0.1 },
         opacity: { duration: 0.6, delay: 0.1 },
       }}
-      className="bg-card text-card-foreground fixed top-0 left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 rounded-b-4xl shadow-2xl shadow-black/20"
+      className="bg-background text-foreground fixed top-0 left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 rounded-b-4xl shadow-2xl shadow-black/30 min-[850px]:top-2.5"
     >
       {children}
     </motion.header>

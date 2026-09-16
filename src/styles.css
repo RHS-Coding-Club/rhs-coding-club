@@ -201,7 +201,7 @@
 
 /* Fixed floating navbar: pages that do not start with a full-bleed hero pad for it. */
 :root {
-  --header-offset: 5.5rem;
+  --header-offset: 6.5rem;
 }
 
 /* Lenis smooth scroll (see src/components/smooth-scroll.tsx). */
