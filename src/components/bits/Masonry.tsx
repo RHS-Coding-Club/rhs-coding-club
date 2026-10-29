@@ -983,14 +983,12 @@ const Masonry = ({
       easing: 'ease',
       fill: 'forwards',
     })
-    box
-      ?.querySelectorAll('[data-box-fade]')
-      .forEach((node) =>
-        node.animate([{ opacity: 1 }, { opacity: 0 }], {
-          duration: 160,
-          fill: 'forwards',
-        }),
-      )
+    box?.querySelectorAll('[data-box-fade]').forEach((node) =>
+      node.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 160,
+        fill: 'forwards',
+      }),
+    )
     animation.finished
       .then(() => {
         if (token !== tokenRef.current) return
