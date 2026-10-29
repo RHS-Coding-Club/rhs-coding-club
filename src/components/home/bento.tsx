@@ -1,118 +1,144 @@
-import { lazy, Suspense } from 'react'
-import { ClientOnly } from '@tanstack/react-router'
-import type { HomeData } from '#/services/home'
-import { FadeUp } from '#/components/motion'
-import type { MagicBentoCard } from '#/components/bits/MagicBento'
+import type { CSSProperties } from 'react'
+import { useRouter } from '@tanstack/react-router'
+import type { LinkProps } from '@tanstack/react-router'
+import { HugeiconsIcon } from '@hugeicons/react'
+import type { IconSvgElement } from '@hugeicons/react'
 import {
-  BadgeShelf,
-  ChallengeVignette,
-  EventVignette,
-  LeaderboardVignette,
-  OrgVignette,
-  ProjectsVignette,
-} from './vignettes'
+  Calendar03Icon,
+  ChartLineData02Icon,
+  CheckmarkCircle02Icon,
+  GithubIcon,
+  UserGroupIcon,
+  ZapIcon,
+} from '@hugeicons/core-free-icons'
+import MagicBento from '#/components/bits/MagicBento'
+import type { MagicBentoItem } from '#/components/bits/MagicBento'
+import { FadeUp } from '#/components/motion'
+import { useIsDark } from '#/hooks/use-is-dark'
+import type { Theme } from '#/server/theme'
 
-// gsap only loads in the browser.
-const MagicBento = lazy(() => import('#/components/bits/MagicBento'))
+type Cell = MagicBentoItem & { to: LinkProps['to'] }
+
+const icon = (svg: IconSvgElement) => (
+  <HugeiconsIcon icon={svg} size={14} strokeWidth={1.9} />
+)
+
+const CELLS: Cell[] = [
+  {
+    label: 'Leaderboard',
+    icon: icon(ChartLineData02Icon),
+    title: 'Points that add up',
+    description: 'Every solve, project, and meeting goes on the ledger.',
+    visual: 'analytics',
+    to: '/leaderboard',
+  },
+  {
+    label: 'Challenges',
+    icon: icon(ZapIcon),
+    title: 'A problem every week',
+    description: 'Easy to hard, in any language you like.',
+    visual: 'dashboard',
+    to: '/challenges',
+  },
+  {
+    label: 'Projects',
+    icon: icon(UserGroupIcon),
+    title: 'Build with a team',
+    description:
+      'Pair up for the hackathon or a semester project. Approved work goes to the public showcase with your name on it.',
+    visual: 'collaboration',
+    colSpan: 2,
+    rowSpan: 2,
+    to: '/projects',
+  },
+  {
+    label: 'Reviews',
+    icon: icon(CheckmarkCircle02Icon),
+    title: 'Submit, get reviewed, earn',
+    description:
+      'Drop a link to your solution. An officer reviews it, points land on the board, and badges unlock on their own.',
+    visual: 'automation',
+    colSpan: 2,
+    rowSpan: 2,
+    to: '/challenges',
+  },
+  {
+    label: 'GitHub',
+    icon: icon(GithubIcon),
+    title: 'A seat in the org',
+    description: 'Shared repos, code review, real history.',
+    visual: 'integration',
+    to: '/about',
+  },
+  {
+    label: 'Events',
+    icon: icon(Calendar03Icon),
+    title: 'RSVP in one tap',
+    description: 'Meetings, service days, the hackathon.',
+    visual: 'security',
+    to: '/events',
+  },
+]
+
+/** Magic Bento's surfaces mapped onto the site tokens. */
+const BENTO_VARS = {
+  '--mb-surface': 'var(--bits-surface)',
+  '--mb-edge': 'var(--bits-edge)',
+  '--mb-highlight': 'var(--bits-highlight)',
+  '--mb-tile': 'var(--bits-tile)',
+} as CSSProperties
 
 /**
- * React Bits "Magic Bento" (spotlight + border glow + magnetism, no stars, no
- * click ripple) filled with the six things a member gets. The two large
- * cells carry live UI from the loader; the small ones a one-line vignette.
+ * React Bits Magic Bento: six things a member gets, each with live artwork
+ * (points chart, weekly solves, a shared doc, the review pipeline, the tool
+ * hub, event toggles). Edge light follows the cursor; a click sends a wave
+ * across the grid and opens the page behind the card.
  */
-export function FeatureBento({ data }: { data: HomeData }) {
-  const cards: MagicBentoCard[] = [
-    {
-      label: 'Badges',
-      title: 'Earn badges',
-      description: 'Awarded automatically the moment you hit a milestone.',
-      content: <BadgeShelf badges={data.badges} awards={data.recentAwards} />,
-    },
-    {
-      label: 'Events',
-      title: 'RSVP in one tap',
-      description: 'Meetings, service afternoons, and the hackathon.',
-      content: <EventVignette event={data.nextEvent} />,
-    },
-    {
-      label: 'Challenges',
-      title: 'A challenge every week',
-      description:
-        'Easy to hard, in any language. Submit a link, an officer reviews it, you earn points.',
-      content: <ChallengeVignette challenge={data.activeChallenge} />,
-    },
-    {
-      label: 'Leaderboard',
-      title: 'Points that add up',
-      description:
-        'Every solve, project, and meeting goes on the ledger. The board resets each semester.',
-      content: <LeaderboardVignette rows={data.leaderboard} />,
-    },
-    {
-      label: 'Projects',
-      title: 'Ship to the showcase',
-      description: 'Approved projects go public with your name on them.',
-      content: <ProjectsVignette count={data.stats.projects} />,
-    },
-    {
-      label: 'GitHub',
-      title: 'A seat in the org',
-      description: 'Shared repos, reviews, and a real commit history.',
-      content: <OrgVignette />,
-    },
-  ]
+export function FeatureBento({ theme }: { theme: Theme }) {
+  const router = useRouter()
+  const dark = useIsDark(theme === 'dark')
 
   return (
     <section
-      className="mx-auto max-w-6xl px-(--gutter) pb-28"
+      className="mx-auto max-w-6xl px-(--gutter) py-16 sm:py-24"
       aria-labelledby="features-heading"
     >
       <FadeUp className="mx-auto mb-12 max-w-2xl text-center">
         <h2
           id="features-heading"
-          className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl"
+          className="text-4xl font-semibold tracking-[-0.035em] sm:text-5xl"
         >
           Everything a member gets
         </h2>
-        <p className="text-muted-foreground mt-3 text-base">
-          One account. Challenges, points, badges, events, projects, and the org, all in
-          one place.
+        <p className="text-muted-foreground mt-4 text-lg">
+          One account for challenges, points, badges, events, projects, and the org.
         </p>
       </FadeUp>
-      <FadeUp delay={0.1}>
-        <ClientOnly fallback={<StaticGrid cards={cards} />}>
-          <Suspense fallback={<StaticGrid cards={cards} />}>
-            <MagicBento cards={cards} />
-          </Suspense>
-        </ClientOnly>
-      </FadeUp>
+      <MagicBento
+        items={CELLS}
+        columns={4}
+        rowHeight={200}
+        gap={12}
+        radius={20}
+        theme={dark ? 'dark' : 'light'}
+        glowColor="#5fb2ee"
+        spotlightRadius={300}
+        enableSpotlight
+        enableBorderGlow
+        enableStars={false}
+        particleCount={24}
+        enableTilt={false}
+        enableMagnetism={false}
+        clickEffect
+        textAutoHide
+        intro
+        onItemClick={(item) => {
+          const to = (item as Cell).to
+          // Let the click wave start before the route changes.
+          window.setTimeout(() => void router.navigate({ to }), 260)
+        }}
+        style={BENTO_VARS}
+      />
     </section>
-  )
-}
-
-/** Same layout without the effects: server render, loading, and no-JS. */
-function StaticGrid({ cards }: { cards: MagicBentoCard[] }) {
-  return (
-    <div className="bento-section">
-      <div className="card-responsive grid gap-3">
-        {cards.map((card) => (
-          <div
-            key={card.title}
-            className="card bg-card text-card-foreground border-border relative flex flex-col justify-between overflow-hidden rounded-[20px] border p-5"
-          >
-            <span className="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">
-              {card.label}
-            </span>
-            {card.content && <div className="my-4 min-h-0 flex-1">{card.content}</div>}
-            <div>
-              <h3 className="mb-1 text-lg font-semibold tracking-tight">{card.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {card.description}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
   )
 }

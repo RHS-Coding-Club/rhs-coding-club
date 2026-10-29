@@ -1,9 +1,15 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { CalendarDays, Github, Instagram, MapPin } from 'lucide-react'
+import BlurText from '#/components/bits/BlurText'
+import SpotlightCard from '#/components/bits/SpotlightCard'
+import Magnet from '#/components/bits/Magnet'
 import { getAbout } from '#/server/public'
 import { initials } from '#/lib/format'
-import { Button } from '#/components/ui/button'
+import { FadeUp } from '#/components/motion'
+import { RaisedButton } from '#/components/raised-button'
+import { SplitButton } from '#/components/split-button'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
+import { useIsDark } from '#/hooks/use-is-dark'
 
 export const Route = createFileRoute('/about')({
   loader: () => getAbout(),
@@ -13,123 +19,174 @@ export const Route = createFileRoute('/about')({
 
 function AboutPage() {
   const { club, social, officers } = Route.useLoaderData()
+  const { theme } = Route.useRouteContext()
+  const dark = useIsDark(theme === 'dark')
 
   return (
     <>
-      <section className="mx-auto max-w-6xl px-4 pt-16 pb-12 sm:px-6 sm:pt-24">
-        <p className="eyebrow">Who we are</p>
-        <h1 className="font-display mt-3 max-w-3xl text-6xl leading-[0.95] sm:text-7xl">
-          {club.tagline}
+      <section className="mx-auto max-w-6xl px-(--gutter) pt-16 pb-16 sm:pt-24">
+        <h1 className="max-w-4xl text-[clamp(2.75rem,6.5vw,5.5rem)] leading-[1.02] font-semibold tracking-[-0.045em]">
+          <BlurText text={club.tagline} trigger="load" delay={70} stepDuration={0.4} />
         </h1>
-        <p className="text-muted-foreground mt-6 max-w-2xl text-lg">{club.description}</p>
-
-        <dl className="mt-10 grid gap-6 sm:grid-cols-2 lg:max-w-3xl">
-          <div className="flex gap-3">
-            <CalendarDays className="text-primary mt-1 size-5 shrink-0" />
-            <div>
-              <dt className="eyebrow">When we meet</dt>
-              <dd className="mt-1">{club.meetingSchedule}</dd>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <MapPin className="text-primary mt-1 size-5 shrink-0" />
-            <div>
-              <dt className="eyebrow">Where</dt>
-              <dd className="mt-1">{club.meetingLocation}</dd>
-            </div>
-          </div>
-        </dl>
+        <FadeUp delay={0.3}>
+          <p className="text-muted-foreground mt-7 max-w-2xl text-xl leading-relaxed">
+            {club.description}
+          </p>
+          <dl className="mt-12 flex flex-wrap gap-x-14 gap-y-6">
+            <Fact icon={CalendarDays} term="When we meet" value={club.meetingSchedule} />
+            <Fact icon={MapPin} term="Where" value={club.meetingLocation} />
+          </dl>
+        </FadeUp>
       </section>
 
-      <section className="border-border border-y">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-          <p className="eyebrow">Mission</p>
-          <p className="font-display text-3xl leading-snug sm:text-4xl">
-            {club.missionStatement}
-          </p>
+      <section className="mx-2.5">
+        <div className="bg-brand-navy rounded-4xl px-(--gutter) py-20 text-[#e6edf5] sm:py-28">
+          <FadeUp className="mx-auto max-w-4xl">
+            <p className="text-sm text-[#e6edf5]/60">Our mission</p>
+            <p className="mt-5 text-3xl leading-snug font-medium tracking-[-0.02em] text-balance sm:text-4xl sm:leading-snug">
+              {club.missionStatement}
+            </p>
+          </FadeUp>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="eyebrow">Officers</p>
-            <h2 className="font-display mt-1 text-4xl">The people running it</h2>
-          </div>
+      <section
+        className="mx-auto max-w-6xl px-(--gutter) py-20 sm:py-28"
+        aria-labelledby="officers-heading"
+      >
+        <FadeUp className="mb-12 flex flex-wrap items-end justify-between gap-6">
+          <h2
+            id="officers-heading"
+            className="text-4xl font-semibold tracking-[-0.035em] sm:text-5xl"
+          >
+            The people running it
+          </h2>
           <div className="flex gap-2">
             {social.instagram && (
-              <Button asChild variant="outline" size="sm">
-                <a href={social.instagram} target="_blank" rel="noreferrer">
-                  <Instagram className="size-4" />
-                  Instagram
-                </a>
-              </Button>
+              <SocialLink href={social.instagram} icon={Instagram} label="Instagram" />
             )}
             {social.github && (
-              <Button asChild variant="outline" size="sm">
-                <a href={social.github} target="_blank" rel="noreferrer">
-                  <Github className="size-4" />
-                  GitHub
-                </a>
-              </Button>
+              <SocialLink href={social.github} icon={Github} label="GitHub" />
             )}
           </div>
-        </div>
+        </FadeUp>
 
         {officers.length === 0 ? (
-          <p className="text-muted-foreground border-border rounded-lg border border-dashed px-5 py-8 text-center text-sm">
+          <p className="text-muted-foreground border-border rounded-3xl border border-dashed px-5 py-14 text-center text-sm">
             Officer profiles are on their way.
           </p>
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {officers.map((o) => (
-              <li key={o.id} className="border-border flex gap-4 rounded-lg border p-5">
-                <Avatar className="size-14">
-                  <AvatarImage
-                    src={o.imageKey ? `/files/${o.imageKey}` : undefined}
-                    alt=""
-                  />
-                  <AvatarFallback>{initials(o.name)}</AvatarFallback>
-                </Avatar>
-                <div className="min-w-0">
-                  <h3 className="font-display text-2xl leading-tight">{o.name}</h3>
-                  <p className="eyebrow mt-0.5">{o.title}</p>
-                  <p className="text-muted-foreground mt-2 text-sm">{o.bio}</p>
-                  {o.githubUrl && (
-                    <a
-                      href={o.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary mt-2 inline-flex items-center gap-1 font-mono text-xs hover:underline"
-                    >
-                      <Github className="size-3.5" />
-                      {o.githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
-                    </a>
-                  )}
-                </div>
+            {officers.map((o, i) => (
+              <li key={o.id}>
+                <FadeUp delay={(i % 3) * 0.08} className="h-full">
+                  <SpotlightCard
+                    theme={dark ? 'dark' : 'light'}
+                    spotlightColor="rgba(95, 178, 238, 0.9)"
+                    intensity={0.18}
+                    className="h-full rounded-3xl! p-6"
+                    style={
+                      {
+                        '--spotlight-card-surface': 'var(--bits-surface)',
+                        '--spotlight-card-border': 'var(--bits-edge)',
+                      } as React.CSSProperties
+                    }
+                  >
+                    <div className="flex items-center gap-4">
+                      <Avatar className="size-14">
+                        <AvatarImage
+                          src={o.imageKey ? `/files/${o.imageKey}` : undefined}
+                          alt=""
+                        />
+                        <AvatarFallback>{initials(o.name)}</AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <h3 className="truncate text-xl font-semibold tracking-tight">
+                          {o.name}
+                        </h3>
+                        <p className="text-brand-sky text-sm font-medium">{o.title}</p>
+                      </div>
+                    </div>
+                    {o.bio && (
+                      <p className="text-muted-foreground mt-5 text-sm leading-relaxed">
+                        {o.bio}
+                      </p>
+                    )}
+                    {o.githubUrl && (
+                      <a
+                        href={o.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-foreground/80 hover:text-foreground mt-5 inline-flex items-center gap-1.5 font-mono text-xs transition-colors"
+                      >
+                        <Github className="size-3.5" aria-hidden="true" />
+                        {o.githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
+                      </a>
+                    )}
+                  </SpotlightCard>
+                </FadeUp>
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="brand-gradient flex flex-wrap items-center justify-between gap-6 rounded-lg px-6 py-8 sm:px-10">
+      <section className="mx-auto max-w-6xl px-(--gutter) pb-8">
+        <FadeUp className="border-border flex flex-wrap items-center justify-between gap-8 border-t pt-14">
           <div>
-            <p className="eyebrow text-brand-frost/80">Open to all RHS students</p>
-            <p className="font-display text-brand-frost mt-1 text-3xl sm:text-4xl">
-              No experience required. Bring curiosity.
+            <p className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+              No experience required.
+            </p>
+            <p className="text-muted-foreground mt-2 text-lg">
+              Open to every RHS student. Bring curiosity.
             </p>
           </div>
-          <Button
-            asChild
-            size="lg"
-            className="bg-brand-frost text-brand-navy hover:bg-white"
-          >
-            <Link to="/join">How to join</Link>
-          </Button>
-        </div>
+          <Magnet padding={60} magnetStrength={3} maxOffset={14}>
+            <SplitButton to="/signup" size="lg">
+              Join the club
+            </SplitButton>
+          </Magnet>
+        </FadeUp>
       </section>
     </>
+  )
+}
+
+function Fact({
+  icon: Icon,
+  term,
+  value,
+}: {
+  icon: typeof MapPin
+  term: string
+  value: string
+}) {
+  return (
+    <div className="flex gap-3">
+      <Icon className="text-brand-sky mt-0.5 size-5 shrink-0" aria-hidden="true" />
+      <div>
+        <dt className="text-muted-foreground text-sm">{term}</dt>
+        <dd className="mt-1 text-lg font-medium">{value}</dd>
+      </div>
+    </div>
+  )
+}
+
+function SocialLink({
+  href,
+  icon: Icon,
+  label,
+}: {
+  href: string
+  icon: typeof Github
+  label: string
+}) {
+  return (
+    <RaisedButton asChild variant="outline">
+      <a href={href} target="_blank" rel="noreferrer">
+        <Icon aria-hidden="true" />
+        {label}
+      </a>
+    </RaisedButton>
   )
 }

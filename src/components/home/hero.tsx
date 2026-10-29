@@ -1,73 +1,113 @@
+import { Link } from '@tanstack/react-router'
 import { motion } from 'motion/react'
+import { ArrowRight } from 'lucide-react'
+import RotatingText from '#/components/bits/RotatingText'
+import ShinyText from '#/components/bits/ShinyText'
+import Magnet from '#/components/bits/Magnet'
 import { SplitButton } from '#/components/split-button'
-import { Stagger, item } from '#/components/motion'
+import { EASE } from '#/components/motion'
+import { useIsDark } from '#/hooks/use-is-dark'
+import type { Theme } from '#/server/theme'
 import { AsciiBackground } from './ascii-bg'
 
-export const HERO_LINE_1 = 'Learn to code.'
+const ROTATING = ['friends', 'classmates', 'mentors', 'the club']
+
+/** Spring "Ship with" uses to make room as the highlight pill resizes (from the React Bits demo). */
+const PILL_SPRING = { type: 'spring', damping: 30, stiffness: 400 } as const
+
+/** Ease-in for every line that does not rotate: fade and rise into place, one after another. */
+const rise = (delay: number) => ({
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.9, ease: EASE, delay },
+})
 
 /**
- * Full-bleed hero card inset 10px from the viewport on every side with big
- * rounded corners, like the template, drawn over React Bits Gradient ASCII. The ground-colored navbar sits in the
- * top gap and hangs into the card as a notch. Every line rises, sharpens,
- * and fades in on load, in the template's order: badge, headline, copy, CTA.
+ * Full-bleed hero card over React Bits Gradient ASCII. The last word of the
+ * headline cycles through who you build with inside a sky pill (Rotating
+ * Text, the demo's Slide settings); everything else eases in. The join button
+ * leans toward the cursor (Magnet).
  */
-export function Hero() {
+export function Hero({ theme }: { theme: Theme }) {
+  const dark = useIsDark(theme === 'dark')
   return (
-    <section className="relative mx-2.5 min-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-4xl min-[850px]:mt-2.5">
+    <section className="relative mx-2.5 mt-2.5 min-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-4xl">
       <AsciiBackground />
-      {/* Soft navy scrim behind the headline so the glyph field never fights the copy. */}
+      {/* Soft scrim in the ground color behind the headline so the glyph field never fights the copy. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_45%,rgba(12,31,61,0.55)_0%,rgba(12,31,61,0)_100%)]"
-      />
-      {/* Thin guide lines framing the content column, borrowed from the finance template. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none border-white/10 absolute inset-y-0 left-1/2 hidden w-full max-w-5xl -translate-x-1/2 border-x lg:block"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_48%,rgba(243,246,251,0.75)_0%,rgba(243,246,251,0)_100%)] dark:bg-[radial-gradient(60%_50%_at_50%_48%,rgba(18,15,23,0.55)_0%,rgba(18,15,23,0)_100%)]"
       />
 
-      <Stagger
-        stagger={0.12}
-        delay={0.25}
-        className="relative flex min-h-[calc(100dvh-1.25rem)] flex-col items-center justify-center px-6 pt-28 pb-24 text-center"
-      >
-        <motion.p
-          {...item}
-          className="bg-card/80 text-card-foreground ring-border/60 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium shadow-sm ring-1 backdrop-blur"
-        >
-          Fall 2026 applications open
-          <span className="text-brand-sky" aria-hidden="true">
-            ✦
-          </span>
-        </motion.p>
-
-        <h1 className="font-display mt-7 text-[clamp(2.75rem,7.2vw,6.25rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-white">
-          <motion.span {...item} className="block">
-            {HERO_LINE_1}
+      <div className="pointer-events-none relative flex min-h-[calc(100dvh-1.25rem)] flex-col items-center justify-center px-6 pt-32 pb-24 text-center">
+        <h1 className="font-display text-[clamp(2.75rem,7.4vw,6.5rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-[#101826] dark:text-white">
+          <motion.span {...rise(0.3)} className="block">
+            Learn to code.
           </motion.span>
-          <motion.span {...item} className="block">
-            Ship with{' '}
-            <em className="font-serif text-brand-sky font-normal tracking-normal">
-              friends
-            </em>
-            .
+          <motion.span
+            {...rise(0.45)}
+            layout
+            className="flex flex-wrap items-center justify-center gap-x-[0.24em]"
+          >
+            <motion.span layout transition={PILL_SPRING}>
+              Ship with
+            </motion.span>
+            <RotatingText
+              texts={ROTATING}
+              effect="slide"
+              direction="up"
+              rotationInterval={2000}
+              staggerDuration={0.025}
+              staggerFrom="last"
+              splitBy="characters"
+              blur={0}
+              highlight
+              highlightColor="#5fb2ee"
+              auto
+              loop
+              pauseOnHover={false}
+              animatePresenceInitial
+              splitLevelClassName="overflow-hidden pb-[0.06em]"
+            />
           </motion.span>
         </h1>
 
         <motion.p
-          {...item}
-          className="mx-auto mt-6 max-w-2xl text-lg text-balance text-white/85 sm:text-xl"
+          {...rise(0.75)}
+          className="mx-auto mt-6 max-w-2xl text-lg text-balance text-[#101826]/70 sm:text-xl dark:text-white/80"
         >
           Weekly challenges, a points leaderboard, hackathons, and afternoons teaching
           kids to code. Open to every RHS student, no experience needed.
         </motion.p>
 
-        <motion.div {...item} className="mt-9">
-          <SplitButton to="/signup" size="lg">
-            Join the club
-          </SplitButton>
+        <motion.div
+          {...rise(0.9)}
+          className="pointer-events-auto mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-4"
+        >
+          <Magnet padding={60} magnetStrength={3} maxOffset={14}>
+            <SplitButton to="/signup" size="lg">
+              Join the club
+            </SplitButton>
+          </Magnet>
+          {/* React Bits Shiny Text: a slow sheen across the secondary link. */}
+          <Link
+            to="/challenges"
+            className="group inline-flex items-center gap-1.5 text-base font-medium"
+          >
+            <ShinyText
+              text="This week's challenge"
+              color={dark ? 'rgba(255,255,255,0.8)' : 'rgba(16,24,38,0.75)'}
+              shineColor={dark ? '#ffffff' : '#101826'}
+              speed={3}
+              delay={1.2}
+            />
+            <ArrowRight
+              className="size-4 text-[#101826]/75 transition-transform group-hover:translate-x-0.5 dark:text-white/80"
+              aria-hidden="true"
+            />
+          </Link>
         </motion.div>
-      </Stagger>
+      </div>
     </section>
   )
 }

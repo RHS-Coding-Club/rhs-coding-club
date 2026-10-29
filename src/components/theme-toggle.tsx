@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useServerFn } from '@tanstack/react-start'
 import { Moon, Sun } from 'lucide-react'
 import { setTheme } from '#/server/theme'
+import { RaisedButton } from '#/components/raised-button'
 import type { Theme } from '#/server/theme'
 
 /**
@@ -23,14 +24,16 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
 
   const label = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
   return (
-    <button
+    <RaisedButton
       type="button"
+      variant="outline"
+      size="icon-lg"
       onClick={toggle}
       aria-label={label}
       title={label}
-      className="bg-card text-foreground border-border/60 shadow-black/20 hover:bg-muted focus-visible:ring-ring fixed right-5 bottom-5 z-50 inline-flex size-11 items-center justify-center rounded-full border shadow-lg transition-[background-color,transform] outline-none focus-visible:ring-2 active:scale-[0.96]"
+      className="fixed right-5 bottom-5 z-50 rounded-full"
     >
-      {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
-    </button>
+      {theme === 'dark' ? <Sun /> : <Moon />}
+    </RaisedButton>
   )
 }

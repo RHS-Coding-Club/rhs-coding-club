@@ -80,7 +80,7 @@ function RootLayout() {
   return (
     <SmoothScroll>
       <div className="flex min-h-dvh flex-col">
-        <SiteHeader user={user} />
+        <SiteHeader user={user} theme={theme} />
         <main className={isHome ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
           <Outlet />
         </main>

@@ -3,7 +3,7 @@ import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { Menu } from 'lucide-react'
 import { hasRole } from '#/lib/roles'
 import { AdminNav } from '#/components/admin/admin-nav'
-import { Button } from '#/components/ui/button'
+import { RaisedButton } from '#/components/raised-button'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '#/components/ui/sheet'
 
 /** Pathless layout: officers and admins only, wrapped in the admin sidebar shell. */
@@ -35,10 +35,10 @@ function AdminShell() {
         <div className="mb-4 lg:hidden">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Menu className="size-4" />
+              <RaisedButton variant="outline" size="sm">
+                <Menu />
                 Admin menu
-              </Button>
+              </RaisedButton>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-3">
               <SheetTitle className="eyebrow px-2.5 pt-1 pb-3">Admin</SheetTitle>

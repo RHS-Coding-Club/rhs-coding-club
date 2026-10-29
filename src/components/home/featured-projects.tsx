@@ -1,96 +1,123 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, FolderGit2 } from 'lucide-react'
+import CardSwap, { Card } from '#/components/bits/CardSwap'
 import type { HomeData } from '#/services/home'
 import { FadeUp } from '#/components/motion'
+import { useIsDark } from '#/hooks/use-is-dark'
+import type { Theme } from '#/server/theme'
 
-/** Approved member projects, three across, from the previous site. */
+type Project = HomeData['featuredProjects'][number]
+
+/**
+ * Approved member projects on React Bits Card Swap: a 3D stack that sends
+ * the front card to the back every few seconds, or when you fling it.
+ */
 export function FeaturedProjects({
   projects,
+  theme,
 }: {
   projects: HomeData['featuredProjects']
+  theme: Theme
 }) {
+  const dark = useIsDark(theme === 'dark')
+
   return (
     <section
-      className="mx-auto max-w-6xl px-(--gutter) py-24 sm:py-28"
+      className="mx-auto max-w-6xl px-(--gutter) py-16 sm:py-24"
       aria-labelledby="projects-heading"
     >
-      <FadeUp className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-        <div className="max-w-xl">
+      <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-center">
+        <FadeUp className="max-w-md">
           <h2
             id="projects-heading"
-            className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl"
+            className="text-4xl font-semibold tracking-[-0.035em] sm:text-5xl"
           >
-            Featured projects
+            Built by members, shipped for real
           </h2>
-          <p className="text-muted-foreground mt-3 text-base">
-            Built by members, reviewed by officers, shipped to the showcase.
+          <p className="text-muted-foreground mt-4 text-lg">
+            Every project here was reviewed by an officer and approved for the public
+            showcase. Grab the stack and fling it to see the next one.
           </p>
-        </div>
-        <Link
-          to="/projects"
-          className="text-foreground/80 hover:text-foreground inline-flex items-center gap-1 text-sm font-medium transition-colors"
-        >
-          All projects
-          <ArrowUpRight className="size-4" aria-hidden="true" />
-        </Link>
-      </FadeUp>
-
-      {projects.length === 0 ? (
-        <FadeUp className="border-border text-muted-foreground mt-10 rounded-2xl border border-dashed px-6 py-14 text-center text-sm">
-          No approved projects yet. Members submit theirs from the dashboard.
+          <Link
+            to="/projects"
+            className="text-foreground hover:text-brand-sky mt-8 inline-flex items-center gap-1.5 text-base font-medium transition-colors"
+          >
+            Browse every project
+            <ArrowUpRight className="size-4" aria-hidden="true" />
+          </Link>
         </FadeUp>
-      ) : (
-        <ul className="mt-10 grid gap-4 md:grid-cols-3">
-          {projects.map((p, i) => (
-            <FadeUp key={p.id} delay={i * 0.08}>
-              <Link
-                to="/projects"
-                className="group bg-card text-card-foreground border-border flex h-full flex-col overflow-hidden rounded-2xl border transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20"
-              >
-                <div className="bg-brand-navy relative aspect-[16/10] overflow-hidden">
-                  {p.imageKeys[0] ? (
-                    <img
-                      src={`/files/${p.imageKeys[0]}`}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_20%_20%,#5fb2ee_0%,transparent_60%),radial-gradient(60%_70%_at_85%_90%,#1f4f8a_0%,transparent_65%)]">
-                      <FolderGit2
-                        className="absolute right-5 bottom-5 size-8 text-white/70"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-1 flex-col p-5">
-                  <h3 className="text-lg font-semibold tracking-tight group-hover:underline group-hover:underline-offset-4">
-                    {p.title}
-                  </h3>
-                  <p className="text-muted-foreground mt-2 line-clamp-3 text-sm leading-relaxed">
-                    {p.description}
-                  </p>
-                  <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-5">
-                    {p.tech.slice(0, 3).map((t) => (
-                      <span
-                        key={t}
-                        className="bg-secondary text-secondary-foreground rounded-full px-2.5 py-0.5 font-mono text-[11px]"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                    <span className="text-muted-foreground ml-auto text-xs">
-                      {p.authorName}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            </FadeUp>
-          ))}
-        </ul>
-      )}
+
+        {projects.length === 0 ? (
+          <FadeUp className="border-border text-muted-foreground rounded-3xl border border-dashed px-6 py-20 text-center text-sm">
+            No approved projects yet. Members submit theirs from the dashboard.
+          </FadeUp>
+        ) : (
+          <FadeUp delay={0.1} className="h-[380px] sm:h-[440px]">
+            <CardSwap
+              width={420}
+              height={300}
+              cardDistance={46}
+              verticalDistance={54}
+              delay={4500}
+              skewAmount={5}
+              cardRadius={22}
+              theme={dark ? 'dark' : 'light'}
+            >
+              {projects.map((p) => (
+                <Card
+                  key={p.id}
+                  style={{ background: 'var(--bits-tile)', color: 'var(--foreground)' }}
+                >
+                  <ProjectCard project={p} />
+                </Card>
+              ))}
+            </CardSwap>
+          </FadeUp>
+        )}
+      </div>
     </section>
+  )
+}
+
+function ProjectCard({ project }: { project: Project }) {
+  return (
+    <div className="flex h-full flex-col p-2">
+      <div className="bg-brand-navy relative min-h-0 flex-1 overflow-hidden rounded-[16px]">
+        {project.imageKeys[0] ? (
+          <img
+            src={`/files/${project.imageKeys[0]}`}
+            alt=""
+            draggable={false}
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover select-none"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_20%_20%,#5fb2ee_0%,transparent_60%),radial-gradient(60%_70%_at_85%_90%,#1f4f8a_0%,transparent_65%)]">
+            <FolderGit2
+              className="absolute right-4 bottom-4 size-7 text-white/70"
+              aria-hidden="true"
+            />
+          </div>
+        )}
+      </div>
+      <div className="px-2.5 pt-3.5 pb-1.5">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="truncate text-base font-semibold tracking-tight">
+            {project.title}
+          </h3>
+          <span className="shrink-0 text-xs opacity-60">{project.authorName}</span>
+        </div>
+        <div className="mt-2 flex gap-1.5 overflow-hidden">
+          {project.tech.slice(0, 3).map((t) => (
+            <span
+              key={t}
+              className="rounded-full px-2 py-0.5 font-mono text-[11px] whitespace-nowrap"
+              style={{ background: 'var(--swap-badge)' }}
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }

@@ -8,7 +8,7 @@ import {
   AccordionTrigger,
 } from '#/components/ui/accordion'
 
-/** Template FAQ: centered heading, two pill buttons, accordion of bordered cards. */
+/** Heading and contact link on the left, accordion of questions on the right. */
 export function Faq({
   club,
   points,
@@ -41,49 +41,36 @@ export function Faq({
 
   return (
     <section
-      className="mx-auto max-w-3xl px-(--gutter) py-24 sm:py-28"
+      className="mx-auto grid max-w-6xl gap-12 px-(--gutter) py-16 sm:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]"
       aria-labelledby="faq-heading"
     >
-      <FadeUp className="text-center">
-        <p className="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">
-          Frequently asked questions
-        </p>
+      <FadeUp className="max-w-sm">
         <h2
           id="faq-heading"
-          className="mt-3 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl"
+          className="text-4xl font-semibold tracking-[-0.035em] sm:text-5xl"
         >
-          Everything you need to know
+          Questions, answered
         </h2>
-        <p className="text-muted-foreground mt-3 text-base">
-          Still curious about something? Reach out and an officer will answer.
-        </p>
-        <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <Link
-            to="/signup"
-            className="bg-foreground text-background hover:bg-foreground/90 focus-visible:ring-ring inline-flex h-10 items-center rounded-full px-5 text-sm font-medium transition-[background-color,transform] outline-none focus-visible:ring-2 active:scale-[0.98]"
-          >
-            Join the club
-          </Link>
+        <p className="text-muted-foreground mt-4 text-lg">
+          Anything else, ask an officer.{' '}
           <Link
             to="/contact"
-            className="bg-card text-card-foreground ring-border/70 hover:bg-muted focus-visible:ring-ring inline-flex h-10 items-center rounded-full px-5 text-sm font-medium ring-1 transition-[background-color,transform] outline-none focus-visible:ring-2 active:scale-[0.98]"
+            className="text-foreground decoration-brand-sky underline decoration-2 underline-offset-4"
           >
-            Contact us
+            Send us a message
           </Link>
-        </div>
+          .
+        </p>
       </FadeUp>
 
-      <Accordion type="single" collapsible className="mt-12 space-y-3">
+      <Accordion type="single" collapsible className="border-border border-t">
         {items.map((item, i) => (
-          <FadeUp key={item.q} delay={i * 0.05} distance={20}>
-            <AccordionItem
-              value={item.q}
-              className="bg-card ring-border/60 rounded-2xl border-b-0 px-5 ring-1"
-            >
-              <AccordionTrigger className="py-4 text-base font-medium hover:no-underline">
+          <FadeUp key={item.q} delay={i * 0.05} distance={16}>
+            <AccordionItem value={item.q} className="border-border">
+              <AccordionTrigger className="py-5 text-lg font-medium hover:no-underline">
                 {item.q}
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-5 text-sm leading-relaxed">
+              <AccordionContent className="text-muted-foreground pb-6 text-base leading-relaxed">
                 {item.a}
               </AccordionContent>
             </AccordionItem>

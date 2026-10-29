@@ -1,6 +1,6 @@
 import { useRouter } from '@tanstack/react-router'
 import type { ErrorComponentProps } from '@tanstack/react-router'
-import { Button } from '#/components/ui/button'
+import { RaisedButton } from '#/components/raised-button'
 
 export function ErrorBoundary({ error }: ErrorComponentProps) {
   const router = useRouter()
@@ -10,7 +10,7 @@ export function ErrorBoundary({ error }: ErrorComponentProps) {
       <p className="eyebrow">Something broke</p>
       <h1 className="font-display text-5xl">That didn't work.</h1>
       <p className="text-muted-foreground">{message}</p>
-      <Button onClick={() => router.invalidate()}>Try again</Button>
+      <RaisedButton onClick={() => router.invalidate()}>Try again</RaisedButton>
     </section>
   )
 }

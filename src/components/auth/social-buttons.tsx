@@ -1,24 +1,26 @@
 import { signIn } from '#/lib/auth-client'
-import { Button } from '#/components/ui/button'
+import { RaisedButton } from '#/components/raised-button'
 
 export function SocialButtons({ callbackURL }: { callbackURL: string }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3">
-        <Button
+        <RaisedButton
           type="button"
           variant="outline"
+          size="lg"
           onClick={() => signIn.social({ provider: 'google', callbackURL })}
         >
           Google
-        </Button>
-        <Button
+        </RaisedButton>
+        <RaisedButton
           type="button"
           variant="outline"
+          size="lg"
           onClick={() => signIn.social({ provider: 'github', callbackURL })}
         >
           GitHub
-        </Button>
+        </RaisedButton>
       </div>
       <div className="text-muted-foreground flex items-center gap-3 text-xs">
         <span className="bg-border h-px flex-1" />

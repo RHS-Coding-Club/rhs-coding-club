@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
+import { useIsDark } from '#/hooks/use-is-dark'
 import { ClientOnly } from '@tanstack/react-router'
 import type { Theme } from '#/server/theme'
 import { cn } from '#/lib/utils'
@@ -59,20 +60,6 @@ function Fallback({ className }: { className?: string }) {
       )}
     />
   )
-}
-
-/** Tracks the <html> class so the shader recolors when the theme toggle flips. */
-function useIsDark(initial: boolean) {
-  const [dark, setDark] = useState(initial)
-  useEffect(() => {
-    const root = document.documentElement
-    const read = () => setDark(root.classList.contains('dark'))
-    read()
-    const mo = new MutationObserver(read)
-    mo.observe(root, { attributes: true, attributeFilter: ['class'] })
-    return () => mo.disconnect()
-  }, [])
-  return dark
 }
 
 function useReducedMotion() {

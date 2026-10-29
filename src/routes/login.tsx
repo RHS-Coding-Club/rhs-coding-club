@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { signIn } from '#/lib/auth-client'
 import { AuthShell } from '#/components/auth/auth-shell'
 import { SocialButtons } from '#/components/auth/social-buttons'
-import { Button } from '#/components/ui/button'
+import { RaisedButton } from '#/components/raised-button'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
 
@@ -69,9 +69,9 @@ function LoginPage() {
             {error}
           </p>
         )}
-        <Button type="submit" disabled={pending}>
-          {pending ? 'Signing in…' : 'Log in'}
-        </Button>
+        <RaisedButton type="submit" size="lg" loading={pending} loadingText="Signing in…">
+          Log in
+        </RaisedButton>
       </form>
       <p className="text-muted-foreground text-sm">
         New here?{' '}
