@@ -2,6 +2,16 @@ import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core'
 import { ROLES } from '#/lib/roles'
 import { timestamps } from './helpers'
 
+export const EMAIL_TOPICS = [
+  'newChallenge',
+  'eventReminder',
+  'weeklyDigest',
+  'projectDecision',
+  'applicationDecision',
+  'newsletter',
+] as const
+export type EmailTopic = (typeof EMAIL_TOPICS)[number]
+
 // Better Auth core tables, matching the layout its CLI generates for SQLite,
 // plus the club's own columns on `user`. Keep column names in sync with
 // `bun run auth:schema` output if Better Auth is upgraded.
@@ -19,6 +29,14 @@ export const user = sqliteTable('user', {
   bio: text('bio'),
   gradYear: integer('grad_year'),
   skills: text('skills', { mode: 'json' }).$type<string[]>().default([]).notNull(),
+  /** R2 key of an uploaded avatar; wins over the OAuth `image` URL when set. */
+  avatarKey: text('avatar_key'),
+  githubUsername: text('github_username'),
+  /** Opt-outs per notification type; a missing key means subscribed. */
+  emailPrefs: text('email_prefs', { mode: 'json' })
+    .$type<Partial<Record<EmailTopic, boolean>>>()
+    .default({})
+    .notNull(),
 })
 
 export const session = sqliteTable(

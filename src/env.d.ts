@@ -14,5 +14,6 @@ declare namespace Cloudflare {
     RESEND_API_KEY: string
     EMAIL_FROM: string
     GITHUB_TOKEN: string
+    TRUSTED_ORIGINS?: string
   }
 }

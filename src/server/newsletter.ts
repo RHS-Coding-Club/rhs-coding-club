@@ -9,7 +9,7 @@ export const newsletterSchema = z.object({
 
 /** Public: the footer signup. Duplicates are a silent success. */
 export const subscribeNewsletter = createServerFn({ method: 'POST' })
-  .inputValidator(newsletterSchema)
+  .validator(newsletterSchema)
   .handler(async ({ data }) => {
     const result = await subscribeEmail(getDb(), data.email)
     return { ok: true as const, created: result.created }

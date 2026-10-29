@@ -33,6 +33,11 @@ function createAuth() {
   return betterAuth({
     appName: 'RHS Coding Club',
     baseURL: env.APP_URL,
+    // Extra origins allowed to call /api/auth (e.g. a second local dev port).
+    trustedOrigins: (env.TRUSTED_ORIGINS ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
     secret: env.BETTER_AUTH_SECRET,
     database: drizzleAdapter(getDb(), { provider: 'sqlite', schema }),
     emailAndPassword: { enabled: true, minPasswordLength: 8 },

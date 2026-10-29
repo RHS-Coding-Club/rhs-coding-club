@@ -3,7 +3,7 @@
   "name": "rhs-coding-club",
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry",
+  "main": "src/server.ts",
   "observability": { "enabled": true },
 
   // Public, non-secret configuration for the deployed Worker. Secrets go in
@@ -24,4 +24,8 @@
   ],
 
   "r2_buckets": [{ "binding": "FILES", "bucket_name": "rhs-coding-club-files" }],
+
+  // Background jobs (src/services/cron.ts): hourly announcements, reminders,
+  // and GitHub invite sync; the weekly digest on Monday mornings.
+  "triggers": { "crons": ["0 * * * *", "0 16 * * 1"] },
 }

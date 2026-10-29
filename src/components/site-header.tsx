@@ -36,7 +36,6 @@ const ITEMS: CardNavItem[] = [
     links: [
       { label: 'Challenges', href: '/challenges' },
       { label: 'Leaderboard', href: '/leaderboard' },
-      { label: 'Hall of Fame', href: '/hall-of-fame' },
     ],
   },
   {

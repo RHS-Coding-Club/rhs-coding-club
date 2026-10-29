@@ -62,6 +62,8 @@ export const challenge = sqliteTable(
     points: integer('points').notNull(),
     weekNo: integer('week_no').notNull(),
     publishedAt: integer('published_at', { mode: 'timestamp_ms' }),
+    /** Set when the "new challenge" email went out, so publishing announces once. */
+    announcedAt: integer('announced_at', { mode: 'timestamp_ms' }),
     createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
     legacyAuthorEmail: text('legacy_author_email'),
     ...timestamps,
@@ -140,6 +142,11 @@ export const event = sqliteTable(
     location: text('location').notNull(),
     tags: jsonStringArray('tags'),
     coverKey: text('cover_key'),
+    /** Short code members type (or scan as a QR) to check in; null until generated. */
+    checkInCode: text('check_in_code'),
+    checkInOpen: integer('check_in_open', { mode: 'boolean' }).default(false).notNull(),
+    /** Set when the 24-hour reminder email went out, so the cron sends it once. */
+    reminderSentAt: integer('reminder_sent_at', { mode: 'timestamp_ms' }),
     createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
     ...timestamps,
   },
@@ -212,6 +219,27 @@ export const project = sqliteTable(
   (t) => [
     index('project_status_idx').on(t.status, t.featured, t.createdAt),
     index('project_author_idx').on(t.authorId),
+  ],
+)
+
+/** Teammates credited on a project. The author is always a member too. */
+export const projectMember = sqliteTable(
+  'project_member',
+  {
+    id: id(),
+    projectId: text('project_id')
+      .notNull()
+      .references(() => project.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (t) => [
+    uniqueIndex('project_member_uidx').on(t.projectId, t.userId),
+    index('project_member_user_idx').on(t.userId),
   ],
 )
 
@@ -369,6 +397,17 @@ export const newsletterSubscriber = sqliteTable('newsletter_subscriber', {
     .notNull()
     .$defaultFn(() => new Date()),
   unsubscribedAt: integer('unsubscribed_at', { mode: 'timestamp_ms' }),
+})
+
+/** A newsletter sent to subscribers. `content` is a rich-text document (JSON). */
+export const newsletterIssue = sqliteTable('newsletter_issue', {
+  id: id(),
+  subject: text('subject').notNull(),
+  content: text('content').notNull(),
+  sentAt: integer('sent_at', { mode: 'timestamp_ms' }),
+  recipientCount: integer('recipient_count').default(0).notNull(),
+  createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+  ...timestamps,
 })
 
 export const contactMessage = sqliteTable('contact_message', {
