@@ -1,30 +1,29 @@
 import { motion } from 'motion/react'
-import type { Theme } from '#/server/theme'
 import { SplitButton } from '#/components/split-button'
 import { Stagger, item } from '#/components/motion'
-import { GrainientBackground } from './grainient-bg'
+import { AsciiBackground } from './ascii-bg'
 
 export const HERO_LINE_1 = 'Learn to code.'
 
 /**
  * Full-bleed hero card inset 10px from the viewport on every side with big
- * rounded corners, like the template. The ground-colored navbar sits in the
+ * rounded corners, like the template, drawn over React Bits Gradient ASCII. The ground-colored navbar sits in the
  * top gap and hangs into the card as a notch. Every line rises, sharpens,
  * and fades in on load, in the template's order: badge, headline, copy, CTA.
  */
-export function Hero({ theme }: { theme: Theme }) {
+export function Hero() {
   return (
     <section className="relative mx-2.5 min-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-4xl min-[850px]:mt-2.5">
-      <GrainientBackground initialTheme={theme} />
-      {/* Light navy scrim: just enough for the headline to sit on the gradient. */}
+      <AsciiBackground />
+      {/* Soft navy scrim behind the headline so the glyph field never fights the copy. */}
       <div
         aria-hidden="true"
-        className="from-brand-navy/40 via-brand-navy/15 to-brand-navy/30 pointer-events-none absolute inset-0 bg-gradient-to-b"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_45%,rgba(12,31,61,0.55)_0%,rgba(12,31,61,0)_100%)]"
       />
       {/* Thin guide lines framing the content column, borrowed from the finance template. */}
       <div
         aria-hidden="true"
-        className="border-foreground/10 pointer-events-none absolute inset-y-0 left-1/2 hidden w-full max-w-5xl -translate-x-1/2 border-x lg:block"
+        className="pointer-events-none border-white/10 absolute inset-y-0 left-1/2 hidden w-full max-w-5xl -translate-x-1/2 border-x lg:block"
       />
 
       <Stagger
@@ -48,7 +47,7 @@ export function Hero({ theme }: { theme: Theme }) {
           </motion.span>
           <motion.span {...item} className="block">
             Ship with{' '}
-            <em className="font-serif font-normal tracking-normal text-[#0f2f57] [html:not(.dark)_&]:text-[#0f2f57]">
+            <em className="font-serif text-brand-sky font-normal tracking-normal">
               friends
             </em>
             .

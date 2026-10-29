@@ -16,10 +16,9 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   const data = Route.useLoaderData()
-  const { theme } = Route.useRouteContext()
   return (
     <>
-      <Hero theme={theme} />
+      <Hero />
       <RevealParagraph />
       <FeatureBento data={data} />
       <Community stats={data.stats} awards={data.recentAwards} />

@@ -31,3 +31,6 @@ blob-report
 *.pem
 *.log
 *.tsbuildinfo
+
+# local scratch
+scratchpad/
