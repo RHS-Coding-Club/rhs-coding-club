@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Link, createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { AtSign, LockKeyhole, UserRound } from 'lucide-react'
 import { z } from 'zod'
 import { signUp } from '#/lib/auth-client'
 import { safeRedirect } from '#/lib/format'
-import { AuthShell } from '#/components/auth/auth-shell'
+import { AuthDivider, AuthLayout } from '#/components/auth/auth-layout'
+import { AuthField, FinePrint } from '#/components/auth/auth-field'
 import { SocialButtons } from '#/components/auth/social-buttons'
 import { RaisedButton } from '#/components/raised-button'
-import { Input } from '#/components/ui/input'
-import { Label } from '#/components/ui/label'
+import { getClubPulse } from '#/server/public'
 
 const searchSchema = z.object({ redirect: z.string().optional() })
 
@@ -16,14 +17,17 @@ export const Route = createFileRoute('/signup')({
   beforeLoad: ({ context, search }) => {
     if (context.user) throw redirect({ to: safeRedirect(search.redirect) })
   },
+  loader: () => getClubPulse(),
   head: () => ({ meta: [{ title: 'Join · RHS Coding Club' }] }),
   component: SignupPage,
 })
 
 function SignupPage() {
   const router = useRouter()
+  const pulse = Route.useLoaderData()
+  const { redirect: requested } = Route.useSearch()
   // New accounts start as guests, so the membership application is the next step.
-  const next = safeRedirect(Route.useSearch().redirect, '/join')
+  const next = safeRedirect(requested, '/join')
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
 
@@ -37,8 +41,8 @@ function SignupPage() {
       email: String(form.get('email')),
       password: String(form.get('password')),
     })
-    setPending(false)
     if (err) {
+      setPending(false)
       setError(err.message ?? 'Could not create your account.')
       return
     }
@@ -47,47 +51,69 @@ function SignupPage() {
   }
 
   return (
-    <AuthShell
-      title="Create your account"
-      subtitle="Sign up, then fill out the short membership application. Any RHS student can apply."
+    <AuthLayout
+      title="Join the club"
+      subtitle="Make an account, then fill out the short membership application."
+      pulse={pulse}
     >
       <SocialButtons callbackURL={next} />
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" autoComplete="name" required minLength={2} />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" autoComplete="email" required />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-          />
-          <p className="text-muted-foreground text-xs">At least 8 characters.</p>
-        </div>
+      <AuthDivider>OR</AuthDivider>
+      <form onSubmit={onSubmit} className="flex flex-col gap-3">
+        <p className="text-muted-foreground text-xs">Sign up with your email</p>
+        <AuthField
+          id="name"
+          label="Name"
+          icon={<UserRound />}
+          autoComplete="name"
+          placeholder="Your name"
+          required
+          minLength={2}
+        />
+        <AuthField
+          id="email"
+          label="Email"
+          icon={<AtSign />}
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          required
+        />
+        <AuthField
+          id="password"
+          label="Password"
+          icon={<LockKeyhole />}
+          type="password"
+          autoComplete="new-password"
+          placeholder="Password (8+ characters)"
+          required
+          minLength={8}
+        />
         {error && (
           <p role="alert" className="text-destructive text-sm">
             {error}
           </p>
         )}
-        <RaisedButton type="submit" size="lg" loading={pending} loadingText="Creating…">
+        <RaisedButton
+          type="submit"
+          size="lg"
+          className="mt-1 w-full"
+          loading={pending}
+          loadingText="Creating…"
+        >
           Create account
         </RaisedButton>
       </form>
       <p className="text-muted-foreground text-sm">
-        Already have one?{' '}
-        <Link to="/login" className="text-primary underline-offset-4 hover:underline">
+        Already a member?{' '}
+        <Link
+          to="/login"
+          search={{ redirect: requested }}
+          className="text-foreground font-medium underline-offset-4 hover:underline"
+        >
           Log in
         </Link>
       </p>
-    </AuthShell>
+      <FinePrint action="signing up" />
+    </AuthLayout>
   )
 }

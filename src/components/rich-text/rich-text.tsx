@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import type { ReactNode } from 'react'
 import {
   headingLevel,
+  headingOutline,
   parseRichText,
   plainText,
   safeHref,
@@ -52,8 +53,14 @@ function CodeBlock({ node }: { node: RichNode }) {
   )
 }
 
-function renderNode(node: RichNode, key: number): ReactNode {
-  const kids = () => (node.content ?? []).map(renderNode)
+/** Heading ids from `headingOutline`, handed out in document order. */
+interface Ctx {
+  ids: string[]
+  next: number
+}
+
+function renderNode(node: RichNode, key: number, ctx: Ctx): ReactNode {
+  const kids = () => (node.content ?? []).map((child, i) => renderNode(child, i, ctx))
   switch (node.type) {
     case 'doc':
       return <Fragment key={key}>{kids()}</Fragment>
@@ -61,7 +68,12 @@ function renderNode(node: RichNode, key: number): ReactNode {
       return <p key={key}>{kids()}</p>
     case 'heading': {
       const Tag = `h${headingLevel(node.attrs)}` as const
-      return <Tag key={key}>{kids()}</Tag>
+      const id = ctx.ids[ctx.next++]
+      return (
+        <Tag key={key} id={id}>
+          {kids()}
+        </Tag>
+      )
     }
     case 'bulletList':
       return <ul key={key}>{kids()}</ul>
@@ -128,6 +140,7 @@ function renderNode(node: RichNode, key: number): ReactNode {
 /**
  * Renders a stored rich-text document (JSON string or parsed) as prose. Safe
  * by construction: only allow-listed nodes and marks become elements.
+ * Headings get anchor ids from `headingOutline`.
  */
 export function RichText({
   value,
@@ -137,5 +150,6 @@ export function RichText({
   className?: string
 }) {
   const doc = typeof value === 'string' || value == null ? parseRichText(value) : value
-  return <div className={cn('rich-text', className)}>{renderNode(doc, 0)}</div>
+  const ctx: Ctx = { ids: headingOutline(doc).map((h) => h.id), next: 0 }
+  return <div className={cn('rich-text', className)}>{renderNode(doc, 0, ctx)}</div>
 }

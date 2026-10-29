@@ -14,6 +14,7 @@ import { SiteHeader } from '#/components/site-header'
 import { SiteFooter } from '#/components/site-footer'
 import { ThemeToggle } from '#/components/theme-toggle'
 import { SmoothScroll } from '#/components/smooth-scroll'
+import { SparkRoot } from '#/components/spark'
 import { Toaster } from '#/components/ui/sonner'
 import appCss from '#/styles.css?url'
 
@@ -76,21 +77,26 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 function RootLayout() {
   const { user, theme } = Route.useRouteContext()
   // The header floats over the page. The home hero runs underneath it (like
-  // the template); every other page pads for it.
-  const isHome = useRouterState({ select: (s) => s.location.pathname === '/' })
+  // the template); every other page pads for it. Sign-in and sign-up are full
+  // screen with their own "Home" button, so they drop the header and footer.
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const isHome = pathname === '/'
+  const bare = pathname === '/login' || pathname === '/signup'
   return (
     // reducedMotion="user": with the OS setting on, motion skips transforms and
     // layout animation site-wide and keeps fades, without changing markup.
     <MotionConfig reducedMotion="user">
       <SmoothScroll>
-        <div className="flex min-h-dvh flex-col">
-          <SiteHeader user={user} theme={theme} />
-          <main className={isHome ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
-            <Outlet />
-          </main>
-          <SiteFooter theme={theme} />
-          <ThemeToggle initial={theme} />
-        </div>
+        <SparkRoot>
+          <div className="flex min-h-dvh flex-col">
+            {!bare && <SiteHeader user={user} theme={theme} />}
+            <main className={isHome || bare ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
+              <Outlet />
+            </main>
+            {!bare && <SiteFooter theme={theme} />}
+            <ThemeToggle initial={theme} />
+          </div>
+        </SparkRoot>
       </SmoothScroll>
     </MotionConfig>
   )

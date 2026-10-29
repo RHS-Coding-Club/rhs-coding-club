@@ -32,6 +32,12 @@ export interface ClickSparkProps {
   ring?: boolean
   layer?: 'front' | 'back'
   disabled?: boolean
+  // Local change: `only` limits sparks to clicks on elements matching a
+  // selector, and `fixedLayer` draws them in a viewport-fixed layer. Together
+  // they let one ClickSpark at the app root spark "Join the club" buttons,
+  // and the burst survives the route change the click starts.
+  only?: string
+  fixedLayer?: boolean
   className?: string
   style?: CSSProperties
   children?: ReactNode
@@ -57,6 +63,8 @@ interface Settings {
   glow: number
   ring: boolean
   disabled: boolean
+  only: string | null
+  fixed: boolean
 }
 
 interface Spark {
@@ -168,6 +176,8 @@ const ClickSpark = forwardRef<ClickSparkHandle, ClickSparkProps>(
       ring = false,
       layer = 'front',
       disabled = false,
+      only,
+      fixedLayer = false,
       className = '',
       style,
       children,
@@ -193,6 +203,8 @@ const ClickSpark = forwardRef<ClickSparkHandle, ClickSparkProps>(
       glow: clamp(glow, 0, 1),
       ring,
       disabled,
+      only: only ?? null,
+      fixed: fixedLayer,
     }
     const settingsRef = useRef(settings)
     settingsRef.current = settings
@@ -390,7 +402,7 @@ const ClickSpark = forwardRef<ClickSparkHandle, ClickSparkProps>(
       const spawn = (clientX: number, clientY: number) => {
         const s = settingsRef.current
         if (s.disabled) return
-        const rect = root.getBoundingClientRect()
+        const rect = s.fixed ? { left: 0, top: 0 } : root.getBoundingClientRect()
         const offset = Math.floor(Math.random() * s.colors.length)
         const full = s.spread >= 359.5
         const arc = (s.spread * Math.PI) / 180
@@ -474,14 +486,21 @@ const ClickSpark = forwardRef<ClickSparkHandle, ClickSparkProps>(
         if (!raf) raf = requestAnimationFrame(frame)
       }
 
+      const allowed = (event: Event) => {
+        const only = settingsRef.current.only
+        return !only || (event.target instanceof Element && !!event.target.closest(only))
+      }
+
       const onPointerDown = (event: PointerEvent) => {
         if (event.pointerType !== 'mouse' || event.button !== 0) return
+        if (!allowed(event)) return
         lastPress = { time: performance.now(), x: event.clientX, y: event.clientY }
         spawn(event.clientX, event.clientY)
       }
 
       const onClick = (event: MouseEvent) => {
         if ('pointerType' in event && event.pointerType === 'mouse') return
+        if (!allowed(event)) return
         if (event.detail === 0) {
           const target = event.target instanceof Element ? event.target : root
           const rect = target.getBoundingClientRect()
@@ -499,6 +518,11 @@ const ClickSpark = forwardRef<ClickSparkHandle, ClickSparkProps>(
 
       engineRef.current = {
         spark: (x?: number, y?: number) => {
+          // Local change: with `fixedLayer`, x and y are viewport coordinates.
+          if (settingsRef.current.fixed) {
+            spawn(x ?? window.innerWidth / 2, y ?? window.innerHeight / 2)
+            return
+          }
           const rect = root.getBoundingClientRect()
           spawn(rect.left + (x ?? rect.width / 2), rect.top + (y ?? rect.height / 2))
         },
@@ -531,7 +555,7 @@ const ClickSpark = forwardRef<ClickSparkHandle, ClickSparkProps>(
         <span
           ref={layerRef}
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-0 overflow-visible ${layer === 'back' ? 'z-[-1]' : 'z-[1]'}`}
+          className={`pointer-events-none ${fixedLayer ? 'fixed z-[60]' : 'absolute'} inset-0 overflow-visible ${fixedLayer ? '' : layer === 'back' ? 'z-[-1]' : 'z-[1]'}`}
         />
       </div>
     )

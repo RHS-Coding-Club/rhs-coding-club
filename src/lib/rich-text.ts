@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { slugify } from '#/lib/format'
 
 // Rich text (blog posts, challenge prompts, newsletter issues) is stored as
 // a Tiptap/ProseMirror JSON document in a text column. It is never stored or
@@ -116,6 +117,39 @@ export function safeSrc(src: unknown): string | null {
 export function headingLevel(attrs: RichNode['attrs']): 2 | 3 | 4 {
   const level = Number(attrs?.level)
   return level <= 2 ? 2 : level >= 4 ? 4 : 3
+}
+
+export interface HeadingAnchor {
+  id: string
+  level: 2 | 3 | 4
+  text: string
+}
+
+/**
+ * Every heading in document order with a stable anchor id ("what-is-new",
+ * then "what-is-new-2" for a repeat). The renderer gives headings these
+ * ids, so a table of contents can link to them.
+ */
+export function headingOutline(doc: RichNode): HeadingAnchor[] {
+  const out: HeadingAnchor[] = []
+  const seen = new Map<string, number>()
+  const walk = (node: RichNode) => {
+    if (node.type === 'heading') {
+      const text = plainText(node).trim()
+      const base = slugify(text) || 'section'
+      const n = (seen.get(base) ?? 0) + 1
+      seen.set(base, n)
+      out.push({
+        id: n === 1 ? base : `${base}-${n}`,
+        level: headingLevel(node.attrs),
+        text,
+      })
+      return
+    }
+    for (const child of node.content ?? []) walk(child)
+  }
+  walk(doc)
+  return out
 }
 
 const ESC: Record<string, string> = {

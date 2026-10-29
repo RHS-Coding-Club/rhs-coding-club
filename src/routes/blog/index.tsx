@@ -3,6 +3,8 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { ArrowUpRight, NotebookPen, Rss } from 'lucide-react'
 import { z } from 'zod'
 import GradientText from '#/components/bits/GradientText'
+import { PageHero } from '#/components/page-hero'
+import { AeroShardsBackground } from '#/components/blog/aero-shards-bg'
 import { FadeUp } from '#/components/motion'
 import { EmptyState } from '#/components/empty-state'
 import { RaisedButton } from '#/components/raised-button'
@@ -64,8 +66,9 @@ function BlogPage() {
 
   return (
     <>
-      <header className="mx-auto max-w-6xl px-(--gutter) pt-16 pb-12 sm:pt-24">
-        <h1 className="text-[clamp(3.25rem,10vw,8rem)] leading-[0.95] font-semibold tracking-[-0.055em]">
+      <PageHero
+        background={<AeroShardsBackground initialDark={theme === 'dark'} />}
+        title={
           <GradientText
             colors={
               dark
@@ -74,40 +77,35 @@ function BlogPage() {
             }
             animationSpeed={10}
             direction="diagonal"
-            className="pb-[0.08em]"
+            // The gradient is clipped to the text box, so give the
+            // descender on the "g" room below the line and take it back.
+            className="-mb-[0.18em] [&>span>span]:pb-[0.18em]"
           >
             The blog
           </GradientText>
-        </h1>
-        <FadeUp delay={0.15}>
-          <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
-            <p className="text-muted-foreground max-w-2xl text-xl leading-relaxed">
-              Hackathon recaps, how-tos for the weekly challenges, and news from lunch
-              meetings in Mr. Derrick&apos;s room. Written by officers and members.
-            </p>
-            <RaisedButton asChild variant="ghost">
-              <a href="/blog/rss.xml">
-                <Rss aria-hidden="true" />
-                RSS feed
-              </a>
-            </RaisedButton>
-          </div>
-        </FadeUp>
-
+        }
+        description="Hackathon recaps, how-tos for the weekly challenges, and news from lunch meetings in Mr. Derrick's room. Written by officers and members."
+        actions={
+          <RaisedButton asChild variant="secondary">
+            <a href="/blog/rss.xml">
+              <Rss aria-hidden="true" />
+              RSS feed
+            </a>
+          </RaisedButton>
+        }
+      >
         {tags.length > 0 && (
-          <FadeUp delay={0.25}>
-            <nav aria-label="Filter by tag" className="mt-10 flex flex-wrap gap-2">
-              <TagLink tag={undefined} active={!tag} count={posts.length} />
-              {tags.map(([t, n]) => (
-                <TagLink key={t} tag={t} active={tag === t} count={n} />
-              ))}
-            </nav>
-          </FadeUp>
+          <nav aria-label="Filter by tag" className="flex flex-wrap gap-2">
+            <TagLink tag={undefined} active={!tag} count={posts.length} />
+            {tags.map(([t, n]) => (
+              <TagLink key={t} tag={t} active={tag === t} count={n} />
+            ))}
+          </nav>
         )}
-      </header>
+      </PageHero>
 
       {posts.length === 0 ? (
-        <div className="mx-auto max-w-6xl px-(--gutter) pb-24">
+        <div className="mx-auto max-w-6xl px-(--gutter) py-16 sm:py-24">
           <EmptyState icon={<NotebookPen />} title="No posts yet">
             The officers are writing the first one. Check back after the next meeting.
           </EmptyState>
@@ -115,7 +113,7 @@ function BlogPage() {
       ) : (
         <>
           {lead && (
-            <section aria-label="Latest post" className="mx-2.5">
+            <section aria-label="Latest post" className="mx-2.5 mt-2.5">
               <FadeUp>
                 <LeadPost post={lead} />
               </FadeUp>

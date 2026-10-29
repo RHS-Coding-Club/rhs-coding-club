@@ -1,28 +1,15 @@
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { Link, useRouter } from '@tanstack/react-router'
-import { LayoutDashboard, LogOut, ShieldCheck, UserCog } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import CardNav from '#/components/bits/CardNav'
 import TechText from '#/components/bits/TechText'
 import type { CardNavItem } from '#/components/bits/CardNav'
-import { signOut } from '#/lib/auth-client'
 import type { SessionUser } from '#/server/auth'
-import { hasRole } from '#/lib/roles'
-import { initials } from '#/lib/format'
-import { avatarUrl } from '#/lib/files'
 import { Logo } from '#/components/logo'
+import { AccountMenu } from '#/components/account-menu'
 import { RaisedButton } from '#/components/raised-button'
 import { useIsDark } from '#/hooks/use-is-dark'
 import type { Theme } from '#/server/theme'
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '#/components/ui/dropdown-menu'
 
 /**
  * Three cards, one per area of the site. Compete and Community are tinted in
@@ -207,66 +194,5 @@ function GuestActions() {
         <Link to="/signup">Join</Link>
       </RaisedButton>
     </>
-  )
-}
-
-function AccountMenu({ user }: { user: SessionUser }) {
-  const router = useRouter()
-
-  async function handleSignOut() {
-    await signOut()
-    await router.invalidate()
-    await router.navigate({ to: '/' })
-  }
-
-  return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="focus-visible:ring-ring mr-1 rounded-full outline-none focus-visible:ring-2"
-          aria-label="Account menu"
-        >
-          <Avatar className="size-9">
-            <AvatarImage src={avatarUrl(user)} alt="" />
-            <AvatarFallback className="text-xs">{initials(user.name)}</AvatarFallback>
-          </Avatar>
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={14} className="w-56 rounded-2xl">
-        <DropdownMenuLabel className="flex flex-col">
-          <span className="truncate">{user.name}</span>
-          <span className="text-muted-foreground truncate font-mono text-xs font-normal">
-            {user.role}
-          </span>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to="/dashboard">
-            <LayoutDashboard className="size-4" />
-            Dashboard
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/account">
-            <UserCog className="size-4" />
-            Account settings
-          </Link>
-        </DropdownMenuItem>
-        {hasRole(user.role, 'officer') && (
-          <DropdownMenuItem asChild>
-            <Link to="/admin">
-              <ShieldCheck className="size-4" />
-              Admin
-            </Link>
-          </DropdownMenuItem>
-        )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={handleSignOut}>
-          <LogOut className="size-4" />
-          Sign out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   )
 }

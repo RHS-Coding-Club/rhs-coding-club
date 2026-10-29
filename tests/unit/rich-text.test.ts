@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   EMPTY_DOC,
   excerpt,
+  headingOutline,
   parseRichText,
   plainText,
   richTextField,
@@ -83,5 +84,30 @@ describe('richTextField', () => {
     expect(field.safeParse(JSON.stringify(EMPTY_DOC)).success).toBe(false)
     expect(field.safeParse(JSON.stringify(doc)).success).toBe(true)
     expect(field.safeParse('{"type":"nope"}').success).toBe(false)
+  })
+})
+
+describe('headingOutline', () => {
+  it('lists headings in order with unique slug ids', () => {
+    const h = (level: number, text: string) => ({
+      type: 'heading',
+      attrs: { level },
+      content: [{ type: 'text', text }],
+    })
+    const outline = headingOutline({
+      type: 'doc',
+      content: [
+        h(2, 'What is new'),
+        h(3, 'Found a bug?'),
+        h(2, 'What is new'),
+        h(2, '!!!'),
+      ],
+    })
+    expect(outline).toEqual([
+      { id: 'what-is-new', level: 2, text: 'What is new' },
+      { id: 'found-a-bug', level: 3, text: 'Found a bug?' },
+      { id: 'what-is-new-2', level: 2, text: 'What is new' },
+      { id: 'section', level: 2, text: '!!!' },
+    ])
   })
 })

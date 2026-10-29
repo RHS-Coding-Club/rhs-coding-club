@@ -4,6 +4,7 @@ import { FadeUp } from '#/components/motion'
 import { RaisedButton } from '#/components/raised-button'
 import { RichText } from '#/components/rich-text/rich-text'
 import { PostByline } from '#/components/blog/post-byline'
+import { PostOutline } from '#/components/blog/post-outline'
 import { ReadingProgress } from '#/components/blog/reading-progress'
 import { ShareButton } from '#/components/blog/share-button'
 import { hasRole } from '#/lib/roles'
@@ -124,9 +125,21 @@ function PostPage() {
         </FadeUp>
       </header>
 
-      <FadeUp delay={0.1} className="mx-auto max-w-3xl px-(--gutter) py-12 sm:py-16">
-        <RichText value={post.content} className="text-lg [&_p]:text-pretty" />
-      </FadeUp>
+      {/* The text stays centered; on wide screens the table of contents
+          sits in the left rail beside it and follows you down the page. */}
+      <div className="mx-auto grid max-w-3xl px-(--gutter) py-12 sm:py-16 xl:max-w-none xl:grid-cols-[minmax(0,1fr)_minmax(0,calc(48rem-2*var(--gutter)))_minmax(0,1fr)] xl:gap-10 xl:px-(--gutter)">
+        <aside className="hidden xl:block xl:justify-self-end">
+          <PostOutline content={post.content} className="sticky top-32" />
+        </aside>
+        <FadeUp delay={0.1} className="min-w-0">
+          <PostOutline
+            content={post.content}
+            defaultOpen={false}
+            className="border-border mb-10 border-b pb-6 xl:hidden"
+          />
+          <RichText value={post.content} className="text-lg [&_p]:text-pretty" />
+        </FadeUp>
+      </div>
 
       {(prev || next) && (
         <nav

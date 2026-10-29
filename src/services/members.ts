@@ -15,8 +15,8 @@ import type { SQL } from 'drizzle-orm'
 import type { Db } from '#/db'
 import { schema } from '#/db'
 import type { EmailTopic, PointSource } from '#/db/schema'
-import { badgesForUsers } from '#/lib/badges'
-import { semesterStart } from '#/lib/dates'
+import { badgeStats, badgesForUsers } from '#/lib/badges'
+import { semesterStart, weekKey } from '#/lib/dates'
 import { hasRole } from '#/lib/roles'
 import type { Role } from '#/lib/roles'
 import type { EmailPrefsInput, Profile } from '#/lib/schemas/account'
@@ -351,6 +351,9 @@ export type MemberProfile = NonNullable<Awaited<ReturnType<typeof getMemberProfi
  * their numbers, this week's challenge, RSVPs, projects, badges, and ledger.
  * Officers also get the admin queue counts.
  */
+/** How many weeks of points the dashboard charts. */
+const WEEKS = 12
+
 export async function getDashboard(
   db: Db,
   viewer: { id: string; role: Role },
@@ -362,61 +365,83 @@ export async function getDashboard(
   }
 
   const since = semesterStart(now)
-  const [allTime, semester, rank, challenge, rsvps, projects, badges, ledger, queues] =
-    await Promise.all([
-      pointsFor(db, viewer.id),
-      pointsFor(db, viewer.id, since),
-      rankIn(db, viewer.id, since),
-      db.query.challenge.findFirst({
-        where: and(
-          isNotNull(schema.challenge.publishedAt),
-          lte(schema.challenge.publishedAt, now),
+  const weeksFrom = new Date(now.getTime() - (WEEKS - 1) * 7 * 86_400_000)
+  const [
+    allTime,
+    semester,
+    rank,
+    challenge,
+    rsvps,
+    projects,
+    badges,
+    ledger,
+    queues,
+    stats,
+    recent,
+  ] = await Promise.all([
+    pointsFor(db, viewer.id),
+    pointsFor(db, viewer.id, since),
+    rankIn(db, viewer.id, since),
+    db.query.challenge.findFirst({
+      where: and(
+        isNotNull(schema.challenge.publishedAt),
+        lte(schema.challenge.publishedAt, now),
+      ),
+      orderBy: [desc(schema.challenge.weekNo), desc(schema.challenge.publishedAt)],
+      columns: {
+        id: true,
+        title: true,
+        description: true,
+        difficulty: true,
+        points: true,
+        weekNo: true,
+      },
+    }),
+    db
+      .select({
+        id: schema.event.id,
+        title: schema.event.title,
+        startsAt: schema.event.startsAt,
+        location: schema.event.location,
+        status: schema.rsvp.status,
+      })
+      .from(schema.rsvp)
+      .innerJoin(schema.event, eq(schema.event.id, schema.rsvp.eventId))
+      .where(
+        and(
+          eq(schema.rsvp.userId, viewer.id),
+          inArray(schema.rsvp.status, ['yes', 'maybe']),
+          gte(schema.event.endsAt, now),
         ),
-        orderBy: [desc(schema.challenge.weekNo), desc(schema.challenge.publishedAt)],
-        columns: {
-          id: true,
-          title: true,
-          description: true,
-          difficulty: true,
-          points: true,
-          weekNo: true,
-        },
-      }),
-      db
-        .select({
-          id: schema.event.id,
-          title: schema.event.title,
-          startsAt: schema.event.startsAt,
-          location: schema.event.location,
-          status: schema.rsvp.status,
-        })
-        .from(schema.rsvp)
-        .innerJoin(schema.event, eq(schema.event.id, schema.rsvp.eventId))
-        .where(
-          and(
-            eq(schema.rsvp.userId, viewer.id),
-            inArray(schema.rsvp.status, ['yes', 'maybe']),
-            gte(schema.event.endsAt, now),
-          ),
-        )
-        .orderBy(schema.event.startsAt)
-        .limit(4),
-      db
-        .select({
-          id: schema.project.id,
-          title: schema.project.title,
-          status: schema.project.status,
-          rejectionReason: schema.project.rejectionReason,
-          createdAt: schema.project.createdAt,
-        })
-        .from(schema.project)
-        .where(onProject(viewer.id))
-        .orderBy(desc(schema.project.createdAt))
-        .limit(6),
-      badgesForUsers(db, [viewer.id]),
-      describedHistory(db, viewer.id, 8),
-      hasRole(viewer.role, 'officer') ? getAdminOverview(db) : Promise.resolve(null),
-    ])
+      )
+      .orderBy(schema.event.startsAt)
+      .limit(4),
+    db
+      .select({
+        id: schema.project.id,
+        title: schema.project.title,
+        status: schema.project.status,
+        rejectionReason: schema.project.rejectionReason,
+        createdAt: schema.project.createdAt,
+      })
+      .from(schema.project)
+      .where(onProject(viewer.id))
+      .orderBy(desc(schema.project.createdAt))
+      .limit(6),
+    badgesForUsers(db, [viewer.id]),
+    describedHistory(db, viewer.id, 8),
+    hasRole(viewer.role, 'officer') ? getAdminOverview(db) : Promise.resolve(null),
+    badgeStats(db, viewer.id),
+    db
+      .select({ delta: schema.pointEntry.delta, createdAt: schema.pointEntry.createdAt })
+      .from(schema.pointEntry)
+      .where(
+        and(
+          eq(schema.pointEntry.userId, viewer.id),
+          gte(schema.pointEntry.createdAt, new Date(`${weekKey(weeksFrom)}T00:00:00Z`)),
+        ),
+      ),
+  ])
 
   const submission = challenge
     ? await db.query.submission.findFirst({
@@ -428,9 +453,25 @@ export async function getDashboard(
       })
     : undefined
 
+  // Points per week for the last WEEKS weeks, oldest first, empty weeks as 0.
+  const byWeek = new Map<string, number>()
+  for (const e of recent) {
+    const k = weekKey(e.createdAt)
+    byWeek.set(k, (byWeek.get(k) ?? 0) + e.delta)
+  }
+  const weeks = Array.from({ length: WEEKS }, (_, i) => {
+    const week = weekKey(new Date(weeksFrom.getTime() + i * 7 * 86_400_000))
+    return { week, points: byWeek.get(week) ?? 0 }
+  })
+
   return {
     kind: 'member' as const,
-    points: { allTime, semester, rank },
+    points: { allTime, semester, rank, weeks },
+    stats: {
+      challenges: stats.challenges,
+      events: stats.events,
+      projects: stats.projects,
+    },
     challenge: challenge ? { ...challenge, submission: submission ?? null } : null,
     rsvps,
     projects,

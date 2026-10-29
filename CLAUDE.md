@@ -36,7 +36,7 @@ The RHS Coding Club website, rewritten from scratch (September 2026) on TanStack
 
 ## Conventions
 
-- File-based routes in `src/routes`. `_authed` = any signed-in user, `_admin` = officer or admin. Admin pages live under `_admin/admin/`.
+- File-based routes in `src/routes`. `_authed` = any signed-in user, `_admin` = officer or admin. Admin pages live under `_admin/admin/`; their navigation is the bottom dock (`src/components/admin/admin-dock.tsx`), so add a new page to `ADMIN_NAV` in `admin-nav.tsx` and to the dock's `GROUPS`.
 - Server functions grouped by domain in `src/server/*.ts`. One file per domain, exported `createServerFn`s, named as verbs (`listChallenges`, `reviewSubmission`).
 - Drizzle tables: camelCase keys, snake_case columns, text UUID ids from `helpers.id()`, `timestamp_ms` integers for dates, JSON text for string arrays.
 - Public pages open with `PageHero` (a React Bits background that reads in both themes). React Bits live in `src/components/bits` (vendored; local changes are commented). Buttons are `RaisedButton`; `SplitButton` only for "Join the club".

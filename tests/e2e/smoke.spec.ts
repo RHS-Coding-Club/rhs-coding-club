@@ -1,6 +1,20 @@
 import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 const PASSWORD = 'password123'
+
+/**
+ * Signs in through the real form. Waits for hydration first (a pre-hydration
+ * submit is a native GET that goes nowhere) and for the redirect after, so
+ * the next navigation carries the session.
+ */
+async function logIn(page: Page, email: string) {
+  await page.goto('/login', { waitUntil: 'networkidle' })
+  await page.getByLabel('Email').fill(email)
+  await page.getByLabel('Password').fill(PASSWORD)
+  await page.getByRole('button', { name: 'Log in' }).click()
+  await expect(page).not.toHaveURL(/\/login/)
+}
 
 test('home page renders', async ({ page }) => {
   await page.goto('/')
@@ -27,29 +41,20 @@ test('unauthenticated dashboard redirects to login', async ({ page }) => {
 })
 
 test('member can log in and reach the dashboard', async ({ page }) => {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill('member@test.local')
-  await page.getByLabel('Password').fill(PASSWORD)
-  await page.getByRole('button', { name: 'Log in' }).click()
+  await logIn(page, 'member@test.local')
   await expect(page).toHaveURL(/\/dashboard/)
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Hey, Max')
 })
 
 test('member is kept out of admin', async ({ page }) => {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill('member@test.local')
-  await page.getByLabel('Password').fill(PASSWORD)
-  await page.getByRole('button', { name: 'Log in' }).click()
+  await logIn(page, 'member@test.local')
   await expect(page).toHaveURL(/\/dashboard/)
   await page.goto('/admin')
   await expect(page).toHaveURL(/\/dashboard/)
 })
 
 test('officer reaches admin', async ({ page }) => {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill('officer@test.local')
-  await page.getByLabel('Password').fill(PASSWORD)
-  await page.getByRole('button', { name: 'Log in' }).click()
+  await logIn(page, 'officer@test.local')
   await page.goto('/admin')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/waiting|caught up/)
 })
@@ -85,12 +90,12 @@ test('theme toggle persists across reloads', async ({ page }) => {
 })
 
 test('admin overview shows pending queues', async ({ page }) => {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill('admin@test.local')
-  await page.getByLabel('Password').fill(PASSWORD)
-  await page.getByRole('button', { name: 'Log in' }).click()
+  await logIn(page, 'admin@test.local')
   await page.goto('/admin')
-  await expect(page.getByRole('link', { name: /Projects to approve/ })).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: /Showcase entries to approve/ }),
+  ).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Admin pages' })).toBeAttached()
 })
 
 const PUBLIC_PAGES = [
@@ -121,10 +126,7 @@ for (const path of PUBLIC_PAGES) {
 }
 
 test('guest is asked to apply before submitting a challenge', async ({ page }) => {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill('guest@test.local')
-  await page.getByLabel('Password').fill(PASSWORD)
-  await page.getByRole('button', { name: 'Log in' }).click()
+  await logIn(page, 'guest@test.local')
   await expect(page).toHaveURL(/\/dashboard/)
   await page.goto('/challenges/c_seed_1')
   await expect(page.getByRole('link', { name: /apply/i }).first()).toBeVisible()

@@ -170,6 +170,49 @@ export async function getHomeData(db: Db, now = new Date()) {
 
 export type HomeData = Awaited<ReturnType<typeof getHomeData>>
 
+/**
+ * A few live numbers for the sign-in and sign-up pages: this week's
+ * challenge, the next event, and how many members there are.
+ */
+export async function getClubPulseData(db: Db, now = new Date()) {
+  const [challenge, nextEvent, members, live] = await Promise.all([
+    db.query.challenge.findFirst({
+      where: and(
+        isNotNull(schema.challenge.publishedAt),
+        lte(schema.challenge.publishedAt, now),
+      ),
+      orderBy: [desc(schema.challenge.weekNo), desc(schema.challenge.publishedAt)],
+      columns: { title: true, points: true, weekNo: true },
+    }),
+    db.query.event.findFirst({
+      where: gte(schema.event.startsAt, now),
+      orderBy: schema.event.startsAt,
+      columns: { title: true, startsAt: true },
+    }),
+    db
+      .select({ n: count() })
+      .from(schema.user)
+      .where(inArray(schema.user.role, MEMBER_ROLES)),
+    db
+      .select({ n: count() })
+      .from(schema.challenge)
+      .where(
+        and(
+          isNotNull(schema.challenge.publishedAt),
+          lte(schema.challenge.publishedAt, now),
+        ),
+      ),
+  ])
+  return {
+    challenge: challenge ?? null,
+    nextEvent: nextEvent ?? null,
+    members: members[0]?.n ?? 0,
+    challenges: live[0]?.n ?? 0,
+  }
+}
+
+export type ClubPulse = Awaited<ReturnType<typeof getClubPulseData>>
+
 export async function getAboutData(db: Db) {
   const [club, social, officers] = await Promise.all([
     getSetting(db, 'club-info'),

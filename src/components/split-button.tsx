@@ -23,6 +23,8 @@ export function SplitButton({
   return (
     <Link
       to={to}
+      // SparkRoot bursts on anything marked data-spark.
+      data-spark=""
       className={cn(
         'group focus-visible:ring-ring focus-visible:ring-offset-background inline-flex shrink-0 items-stretch overflow-hidden rounded-full font-medium shadow-sm transition-[transform,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98]',
         lg ? 'text-base' : 'text-sm',

@@ -411,6 +411,10 @@ html.lenis body {
   .rich-text > * + * {
     margin-top: 1.1em;
   }
+  .rich-text :is(h2, h3, h4) {
+    /* Clear the floating header when a table-of-contents link jumps here. */
+    scroll-margin-top: 7rem;
+  }
   .rich-text h2 {
     margin-top: 2em;
     font-size: 1.6rem;
@@ -533,5 +537,22 @@ html.lenis body {
   }
   .hljs-strong {
     font-weight: 600;
+  }
+}
+
+/* Floating paths on the auth pages (from Efferd UI auth-5): each line draws
+   in and erases itself, fading its stroke at both ends so the loop has no seam. */
+@keyframes floating-path {
+  0% {
+    stroke-dashoffset: 1;
+    stroke-opacity: 0;
+  }
+  15%,
+  85% {
+    stroke-opacity: var(--stroke-opacity);
+  }
+  100% {
+    stroke-dashoffset: -1;
+    stroke-opacity: 0;
   }
 }

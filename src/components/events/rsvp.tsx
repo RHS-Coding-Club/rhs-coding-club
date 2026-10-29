@@ -139,6 +139,8 @@ export function RsvpSegments({
             type="button"
             role="radio"
             aria-checked={active}
+            // Picking "Going" bursts the root spark (SparkRoot).
+            data-spark={c.value === 'yes' && !active ? '' : undefined}
             tabIndex={i === focusIndex ? 0 : -1}
             onClick={() => onChoose(c.value)}
             onKeyDown={(e) => onKeyDown(e, i)}

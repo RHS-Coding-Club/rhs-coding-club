@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { QrCode } from 'lucide-react'
 import { checkInToEvent } from '#/server/events'
 import type { CheckInResult } from '#/services/events'
@@ -8,6 +8,7 @@ import { cn } from '#/lib/utils'
 import { RaisedButton } from '#/components/raised-button'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
+import { useSpark } from '#/components/spark'
 import { errorMessage } from './rsvp'
 
 /** Human copy for every way a check-in can be refused. */
@@ -53,6 +54,8 @@ export function CheckInBox({
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   const ready = normalizeCode(code).length === CODE_LENGTH
+  const spark = useSpark()
+  const button = useRef<HTMLButtonElement>(null)
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -66,6 +69,7 @@ export function CheckInBox({
       const result = await checkInToEvent({ data: { eventId, code } })
       const problem = checkInProblem(result)
       if (problem) setError(problem)
+      else if (result.status === 'checked-in') spark(button.current)
       onResult(result)
     } catch (err) {
       setError(errorMessage(err, 'Could not check you in. Try again.'))
@@ -94,7 +98,13 @@ export function CheckInBox({
           aria-describedby={`${id}-hint${error ? ` ${id}-error` : ''}`}
           className="h-12 min-w-0 flex-1 text-center font-mono text-xl tracking-[0.35em] uppercase placeholder:tracking-[0.35em] placeholder:opacity-40"
         />
-        <RaisedButton type="submit" size="xl" loading={pending} loadingText="Checking">
+        <RaisedButton
+          ref={button}
+          type="submit"
+          size="xl"
+          loading={pending}
+          loadingText="Checking"
+        >
           Check in
         </RaisedButton>
       </div>

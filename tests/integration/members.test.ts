@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { getDb, schema } from '#/db'
+import { weekKey } from '#/lib/dates'
 import { setSetting, getSetting } from '#/services/settings'
 import {
   describedHistory,
@@ -201,7 +202,11 @@ describe('getDashboard', () => {
   it('gives members their numbers, challenge, upcoming RSVPs, and projects', async () => {
     const d = await getDashboard(db, { id: 'm1', role: 'member' }, now)
     if (d.kind !== 'member') throw new Error('expected member dashboard')
-    expect(d.points).toEqual({ allTime: 275, semester: 275, rank: 1 })
+    expect(d.points).toMatchObject({ allTime: 275, semester: 275, rank: 1 })
+    expect(d.points.weeks).toHaveLength(12)
+    expect(d.points.weeks.at(-1)?.week).toBe(weekKey(now))
+    expect(d.points.weeks.reduce((n, w) => n + w.points, 0)).toBe(275)
+    expect(d.stats.challenges).toBe(1)
     expect(d.challenge?.id).toBe('c1')
     expect(d.challenge?.submission?.status).toBe('pass')
     expect(d.rsvps.map((r) => r.id)).toEqual(['e2'])

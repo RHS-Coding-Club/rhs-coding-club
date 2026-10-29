@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import { useIsDark } from '#/hooks/use-is-dark'
+import { CopilotMascot } from './copilot-mascot'
 
 // WebGL2 and the glyph atlas only load in the browser (PageHero renders the
 // background client-only, inside Suspense).
@@ -9,7 +10,8 @@ const GradientASCII = lazy(() => import('#/components/bits/GradientASCII'))
  * /github hero: React Bits Gradient ASCII in its "eclipse" shape, a ring of
  * code glyphs (the org's avatar, in a way) sitting to the right of the copy.
  * Binary-only characters keep it reading as a repo, not the home hero.
- * Light mode switches the shader to ink-on-paper.
+ * Light mode switches the shader to ink-on-paper. The Copilot mark sits in
+ * the dark middle of the ring and watches the cursor.
  */
 export function GithubHeroBackground({ initialDark }: { initialDark: boolean }) {
   const dark = useIsDark(initialDark)
@@ -39,6 +41,7 @@ export function GithubHeroBackground({ initialDark }: { initialDark: boolean }) 
         clickEffect="burst"
         fontFamily="'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace"
       />
+      <CopilotMascot className="absolute top-1/2 left-1/2 w-[clamp(4.5rem,9vw,8.5rem)] -translate-x-1/2 -translate-y-1/2 text-[#101826] dark:text-white" />
     </div>
   )
 }

@@ -1,12 +1,13 @@
-import { useState } from 'react'
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
-import { Menu } from 'lucide-react'
 import { hasRole } from '#/lib/roles'
-import { AdminNav } from '#/components/admin/admin-nav'
-import { RaisedButton } from '#/components/raised-button'
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '#/components/ui/sheet'
+import { getOverview } from '#/server/admin'
+import { AdminDock } from '#/components/admin/admin-dock'
 
-/** Pathless layout: officers and admins only, wrapped in the admin sidebar shell. */
+/**
+ * Pathless layout: officers and admins only. Pages get the full width; the
+ * navigation is a dock pinned to the bottom of the screen, badged with the
+ * queue counts (reloaded whenever a page invalidates the router).
+ */
 export const Route = createFileRoute('/_admin')({
   beforeLoad: ({ context, location }) => {
     if (!context.user) {
@@ -17,37 +18,20 @@ export const Route = createFileRoute('/_admin')({
     }
     return { user: context.user }
   },
+  loader: () => getOverview(),
   component: AdminShell,
 })
 
 function AdminShell() {
-  const { user } = Route.useRouteContext()
-  const [open, setOpen] = useState(false)
+  const { user, theme } = Route.useRouteContext()
+  const counts = Route.useLoaderData()
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl gap-8 px-4 py-6 sm:px-6">
-      <aside className="bg-sidebar border-sidebar-border sticky top-20 hidden h-[calc(100dvh-6rem)] w-56 shrink-0 self-start overflow-y-auto rounded-lg border p-3 lg:block">
-        <p className="eyebrow px-2.5 pt-1 pb-3">Admin</p>
-        <AdminNav role={user.role} />
-      </aside>
-
-      <div className="min-w-0 flex-1">
-        <div className="mb-4 lg:hidden">
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <RaisedButton variant="outline" size="sm">
-                <Menu />
-                Admin menu
-              </RaisedButton>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-3">
-              <SheetTitle className="eyebrow px-2.5 pt-1 pb-3">Admin</SheetTitle>
-              <AdminNav role={user.role} onNavigate={() => setOpen(false)} />
-            </SheetContent>
-          </Sheet>
-        </div>
+    <>
+      <div className="mx-auto w-full max-w-7xl px-4 pt-6 pb-36 sm:px-6">
         <Outlet />
       </div>
-    </div>
+      <AdminDock role={user.role} counts={counts} initialDark={theme === 'dark'} />
+    </>
   )
 }

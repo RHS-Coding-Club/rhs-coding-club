@@ -1,32 +1,47 @@
+import { useState } from 'react'
 import { signIn } from '#/lib/auth-client'
 import { RaisedButton } from '#/components/raised-button'
+import { GithubIcon, GoogleIcon } from './brand-icons'
 
+type Provider = 'google' | 'github'
+
+/** "Continue with Google / GitHub", stacked full width, each with its logo. */
 export function SocialButtons({ callbackURL }: { callbackURL: string }) {
+  const [pending, setPending] = useState<Provider | null>(null)
+
+  const go = (provider: Provider) => {
+    setPending(provider)
+    void signIn.social({ provider, callbackURL }).catch(() => setPending(null))
+  }
+
   return (
-    <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-2 gap-3">
-        <RaisedButton
-          type="button"
-          variant="outline"
-          size="lg"
-          onClick={() => signIn.social({ provider: 'google', callbackURL })}
-        >
-          Google
-        </RaisedButton>
-        <RaisedButton
-          type="button"
-          variant="outline"
-          size="lg"
-          onClick={() => signIn.social({ provider: 'github', callbackURL })}
-        >
-          GitHub
-        </RaisedButton>
-      </div>
-      <div className="text-muted-foreground flex items-center gap-3 text-xs">
-        <span className="bg-border h-px flex-1" />
-        or with email
-        <span className="bg-border h-px flex-1" />
-      </div>
+    <div className="grid gap-2.5">
+      <RaisedButton
+        type="button"
+        variant="outline"
+        size="lg"
+        className="w-full"
+        loading={pending === 'google'}
+        loadingText="Opening Google…"
+        disabled={pending !== null}
+        onClick={() => go('google')}
+      >
+        <GoogleIcon />
+        Continue with Google
+      </RaisedButton>
+      <RaisedButton
+        type="button"
+        variant="outline"
+        size="lg"
+        className="w-full"
+        loading={pending === 'github'}
+        loadingText="Opening GitHub…"
+        disabled={pending !== null}
+        onClick={() => go('github')}
+      >
+        <GithubIcon />
+        Continue with GitHub
+      </RaisedButton>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import {
   CalendarDays,
   Code2,
   FileText,
+  FolderGit2,
   Github,
   Inbox,
   LayoutDashboard,
@@ -21,28 +22,59 @@ import { cn } from '#/lib/utils'
 
 export const ADMIN_NAV = [
   { to: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true },
-  { to: '/admin/applications', label: 'Applications', icon: UserCheck },
-  { to: '/admin/submissions', label: 'Submissions', icon: Code2 },
+  {
+    to: '/admin/applications',
+    label: 'Applications',
+    icon: UserCheck,
+    queue: 'pendingApplications',
+  },
+  {
+    to: '/admin/submissions',
+    label: 'Submissions',
+    icon: Code2,
+    queue: 'pendingSubmissions',
+  },
   { to: '/admin/challenges', label: 'Challenges', icon: FileText },
   { to: '/admin/events', label: 'Events', icon: CalendarDays },
-  { to: '/admin/projects', label: 'Projects', icon: Library },
+  {
+    to: '/admin/projects',
+    label: 'Projects',
+    icon: FolderGit2,
+    queue: 'pendingProjects',
+  },
   { to: '/admin/blog', label: 'Blog', icon: BookOpen },
   { to: '/admin/resources', label: 'Resources', icon: Library },
   { to: '/admin/badges', label: 'Badges', icon: Award },
-  { to: '/admin/github', label: 'GitHub org', icon: Github },
+  {
+    to: '/admin/github',
+    label: 'GitHub org',
+    icon: Github,
+    queue: 'pendingGithubRequests',
+  },
   { to: '/admin/newsletter', label: 'Newsletter', icon: Mail },
-  { to: '/admin/messages', label: 'Messages', icon: Inbox },
+  { to: '/admin/messages', label: 'Messages', icon: Inbox, queue: 'unreadMessages' },
   { to: '/admin/users', label: 'Users', icon: Users, minRole: 'admin' },
   { to: '/admin/officers', label: 'Officers', icon: ShieldCheck, minRole: 'admin' },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ] as const
 
+/** Overview counts that badge a nav item (see `getAdminOverview`). */
+export type AdminQueueKey =
+  | 'pendingApplications'
+  | 'pendingSubmissions'
+  | 'pendingProjects'
+  | 'pendingGithubRequests'
+  | 'unreadMessages'
+
+/** The full admin page list, used in the dock's "More" sheet on phones. */
 export function AdminNav({
   role,
+  counts,
   onNavigate,
   className,
 }: {
   role: Role
+  counts?: Partial<Record<AdminQueueKey, number>>
   onNavigate?: () => void
   className?: string
 }) {
@@ -51,6 +83,7 @@ export function AdminNav({
       {ADMIN_NAV.map((item) => {
         const locked = 'minRole' in item && !hasRole(role, item.minRole)
         const Icon = item.icon
+        const n = 'queue' in item ? (counts?.[item.queue] ?? 0) : 0
         return (
           <Link
             key={item.to}
@@ -58,14 +91,19 @@ export function AdminNav({
             onClick={onNavigate}
             activeOptions={{ exact: 'exact' in item && item.exact }}
             className={cn(
-              'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm',
+              'text-muted-foreground hover:bg-muted hover:text-foreground flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm',
               locked && 'pointer-events-none opacity-40',
             )}
-            activeProps={{ className: 'bg-sidebar-accent text-foreground font-medium' }}
+            activeProps={{ className: 'bg-muted text-foreground font-medium' }}
             aria-disabled={locked || undefined}
           >
             <Icon className="size-4 shrink-0" />
             {item.label}
+            {n > 0 && (
+              <span className="tabular ml-auto rounded-full bg-[#e5484d] px-1.5 py-0.5 font-mono text-[11px] leading-none text-white">
+                {n}
+              </span>
+            )}
           </Link>
         )
       })}

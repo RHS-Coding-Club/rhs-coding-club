@@ -1,9 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { KeyRound, Mail, Trash2, UserRound } from 'lucide-react'
 import { DangerZone } from '#/components/account/danger-zone'
 import { EmailPrefs } from '#/components/account/email-prefs'
 import { ProfileForm } from '#/components/account/profile-form'
 import { SignInMethods } from '#/components/account/sign-in-methods'
 import { FadeUp } from '#/components/motion'
+import { OutlineMenu } from '#/components/outline-menu'
+import type { OutlineSection } from '#/components/outline-menu'
 import { expandPrefs } from '#/lib/schemas/account'
 import { ROLE_LABEL } from '#/lib/schemas/users'
 import { cn } from '#/lib/utils'
@@ -20,12 +23,12 @@ export const Route = createFileRoute('/_authed/account')({
   component: AccountPage,
 })
 
-const SECTIONS = [
-  { id: 'profile', label: 'Profile' },
-  { id: 'email', label: 'Email' },
-  { id: 'sign-in', label: 'Sign-in methods' },
-  { id: 'danger', label: 'Delete account' },
-] as const
+const OUTLINE: OutlineSection[] = [
+  { id: 'profile', label: 'Profile', icon: <UserRound className="size-3.5" /> },
+  { id: 'email', label: 'Email', icon: <Mail className="size-3.5" /> },
+  { id: 'sign-in', label: 'Sign-in methods', icon: <KeyRound className="size-3.5" /> },
+  { id: 'danger', label: 'Delete account', icon: <Trash2 className="size-3.5" /> },
+]
 
 function AccountPage() {
   const { user, accounts, providers } = Route.useLoaderData()
@@ -43,20 +46,14 @@ function AccountPage() {
       </FadeUp>
 
       <div className="mt-12 grid gap-10 lg:grid-cols-[13rem_minmax(0,1fr)]">
-        <nav aria-label="Account sections" className="hidden lg:block">
-          <ul className="sticky top-32 flex flex-col gap-1">
-            {SECTIONS.map((s) => (
-              <li key={s.id}>
-                <a
-                  href={`#${s.id}`}
-                  className="text-muted-foreground hover:text-foreground hover:bg-muted/60 block rounded-xl px-3 py-2 text-sm transition-colors"
-                >
-                  {s.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <aside className="hidden lg:block">
+          <OutlineMenu
+            sections={OUTLINE}
+            title="Settings"
+            startActive
+            className="sticky top-32"
+          />
+        </aside>
 
         <div className="flex min-w-0 flex-col gap-6">
           <Panel
