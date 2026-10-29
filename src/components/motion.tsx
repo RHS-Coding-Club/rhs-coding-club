@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
 import type { Variants } from 'motion/react'
 import type { ComponentProps } from 'react'
 
@@ -27,7 +27,9 @@ type FadeUpProps = Omit<ComponentProps<typeof motion.div>, 'children'> & {
 
 /**
  * Wraps a block that should rise and fade in the first time it scrolls into
- * view. Static (fully visible) when the visitor prefers reduced motion.
+ * view. With reduced motion on, the root MotionConfig drops the rise and
+ * keeps a plain fade. The markup never branches on the preference, so the
+ * server HTML always hydrates (a branch here left sections stuck at opacity 0).
  */
 export function FadeUp({
   delay = 0,
@@ -36,8 +38,6 @@ export function FadeUp({
   children,
   ...rest
 }: FadeUpProps) {
-  const reduced = useReducedMotion()
-  if (reduced) return <div className={rest.className}>{children}</div>
   return (
     <motion.div
       initial={{ opacity: 0, y: distance }}
@@ -65,10 +65,9 @@ export function Stagger({
   stagger?: number
   delay?: number
 }) {
-  const reduced = useReducedMotion()
   return (
     <motion.div
-      initial={reduced ? 'visible' : 'hidden'}
+      initial="hidden"
       animate="visible"
       variants={{
         hidden: {},

@@ -693,7 +693,9 @@ export const Beams = ({
       gl.deleteProgram(compositeProgram.program)
       gl.deleteBuffer(buffer)
       gl.deleteVertexArray(vao)
-      gl.getExtension('WEBGL_lose_context')?.loseContext()
+      // Local change: upstream calls WEBGL_lose_context.loseContext() here. React's
+      // development double-mount re-runs this effect on the same <canvas>, and a
+      // lost context never draws again, so the context is left alive instead.
     }
   }, [])
 

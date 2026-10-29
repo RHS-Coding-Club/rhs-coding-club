@@ -5,7 +5,10 @@ import { ROLES } from '#/lib/roles'
 export const authClient = createAuthClient({
   plugins: [
     inferAdditionalFields({
-      user: { role: { type: [...ROLES], required: false, input: false } },
+      user: {
+        role: { type: [...ROLES], required: false, input: false },
+        avatarKey: { type: 'string', required: false, input: false },
+      },
     }),
   ],
 })

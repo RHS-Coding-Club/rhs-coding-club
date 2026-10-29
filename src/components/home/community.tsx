@@ -2,6 +2,7 @@ import { Award } from 'lucide-react'
 import Counter from '#/components/bits/Counter'
 import type { HomeData } from '#/services/home'
 import { fmtDate, initials } from '#/lib/format'
+import { avatarUrl } from '#/lib/files'
 import { FadeUp } from '#/components/motion'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 
@@ -74,7 +75,10 @@ export function Community({
                 className="bg-card ring-border/70 flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 text-sm ring-1"
               >
                 <Avatar className="size-7">
-                  <AvatarImage src={a.userImage ?? undefined} alt="" />
+                  <AvatarImage
+                    src={avatarUrl({ avatarKey: a.userAvatarKey, image: a.userImage })}
+                    alt=""
+                  />
                   <AvatarFallback className="text-[10px]">
                     {initials(a.userName)}
                   </AvatarFallback>

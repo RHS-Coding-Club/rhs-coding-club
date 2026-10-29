@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { Link, useRouter } from '@tanstack/react-router'
-import { LayoutDashboard, LogOut, ShieldCheck } from 'lucide-react'
+import { LayoutDashboard, LogOut, ShieldCheck, UserCog } from 'lucide-react'
 import CardNav from '#/components/bits/CardNav'
 import TechText from '#/components/bits/TechText'
 import type { CardNavItem } from '#/components/bits/CardNav'
@@ -9,6 +9,7 @@ import { signOut } from '#/lib/auth-client'
 import type { SessionUser } from '#/server/auth'
 import { hasRole } from '#/lib/roles'
 import { initials } from '#/lib/format'
+import { avatarUrl } from '#/lib/files'
 import { Logo } from '#/components/logo'
 import { RaisedButton } from '#/components/raised-button'
 import { useIsDark } from '#/hooks/use-is-dark'
@@ -227,7 +228,7 @@ function AccountMenu({ user }: { user: SessionUser }) {
           aria-label="Account menu"
         >
           <Avatar className="size-9">
-            <AvatarImage src={user.image ?? undefined} alt="" />
+            <AvatarImage src={avatarUrl(user)} alt="" />
             <AvatarFallback className="text-xs">{initials(user.name)}</AvatarFallback>
           </Avatar>
         </button>
@@ -244,6 +245,12 @@ function AccountMenu({ user }: { user: SessionUser }) {
           <Link to="/dashboard">
             <LayoutDashboard className="size-4" />
             Dashboard
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/account">
+            <UserCog className="size-4" />
+            Account settings
           </Link>
         </DropdownMenuItem>
         {hasRole(user.role, 'officer') && (

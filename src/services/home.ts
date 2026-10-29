@@ -86,6 +86,7 @@ export async function getHomeData(db: Db, now = new Date()) {
         userId: schema.user.id,
         userName: schema.user.name,
         userImage: schema.user.image,
+        userAvatarKey: schema.user.avatarKey,
         badgeName: schema.badge.name,
         rarity: schema.badge.rarity,
       })
@@ -118,6 +119,7 @@ export async function getHomeData(db: Db, now = new Date()) {
         userId: schema.user.id,
         name: schema.user.name,
         image: schema.user.image,
+        avatarKey: schema.user.avatarKey,
         points: sql<number>`coalesce(${sum(schema.pointEntry.delta)}, 0)`.mapWith(Number),
       })
       .from(schema.pointEntry)
@@ -128,7 +130,7 @@ export async function getHomeData(db: Db, now = new Date()) {
           inArray(schema.user.role, MEMBER_ROLES),
         ),
       )
-      .groupBy(schema.user.id, schema.user.name, schema.user.image)
+      .groupBy(schema.user.id)
       .orderBy(desc(sql`coalesce(${sum(schema.pointEntry.delta)}, 0)`), schema.user.name)
       .limit(5),
     db.query.badge.findMany({

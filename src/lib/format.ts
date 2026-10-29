@@ -58,3 +58,13 @@ export function fmtDate(
   }).format(d)
   return style === 'datetime' ? text.replace(/, (\d+:\d+ [AP]M)$/, ' · $1') : text
 }
+
+/** A `?redirect=` value, only if it's a path on this site (never another origin). */
+export function safeRedirect(value: string | undefined, fallback = '/dashboard'): string {
+  return value &&
+    value.startsWith('/') &&
+    !value.startsWith('//') &&
+    !value.startsWith('/\\')
+    ? value
+    : fallback
+}

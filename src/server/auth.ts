@@ -1,5 +1,7 @@
 import { createMiddleware, createServerFn } from '@tanstack/react-start'
 import { getRequestHeaders } from '@tanstack/react-start/server'
+import { eq } from 'drizzle-orm'
+import { getDb, schema } from '#/db'
 import { getAuth } from '#/lib/auth'
 import { hasRole, isRole } from '#/lib/roles'
 import type { Role } from '#/lib/roles'
@@ -9,6 +11,8 @@ export interface SessionUser {
   name: string
   email: string
   image: string | null
+  /** R2 key of an uploaded avatar; render with `avatarUrl(user)`. */
+  avatarKey: string | null
   role: Role
 }
 
@@ -25,16 +29,22 @@ export class AuthError extends Error {
 async function readSessionUser(): Promise<SessionUser | null> {
   const session = await getAuth().api.getSession({ headers: getRequestHeaders() })
   if (!session) return null
-  const { user } = session
-  // `role` is an additional field; read it defensively so a bad value can
-  // never grant more than guest.
-  const role = (user as { role?: unknown }).role
+  // The session comes from a 5-minute cookie cache, so role and avatar are
+  // re-read from the user row: a promotion, demotion, or new avatar applies on
+  // the very next request instead of when the cache expires.
+  const row = await getDb().query.user.findFirst({
+    where: eq(schema.user.id, session.user.id),
+    columns: { name: true, image: true, role: true, avatarKey: true },
+  })
+  if (!row) return null
   return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    image: user.image ?? null,
-    role: isRole(role) ? role : 'guest',
+    id: session.user.id,
+    name: row.name,
+    email: session.user.email,
+    image: row.image ?? null,
+    avatarKey: row.avatarKey ?? null,
+    // Read defensively so a bad value can never grant more than guest.
+    role: isRole(row.role) ? row.role : 'guest',
   }
 }
 

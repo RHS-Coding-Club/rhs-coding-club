@@ -6,6 +6,7 @@ import {
   useRouterState,
 } from '@tanstack/react-router'
 import type { QueryClient } from '@tanstack/react-query'
+import { MotionConfig } from 'motion/react'
 import { getSessionUser } from '#/server/auth'
 import type { SessionUser } from '#/server/auth'
 import { getTheme } from '#/server/theme'
@@ -78,15 +79,19 @@ function RootLayout() {
   // the template); every other page pads for it.
   const isHome = useRouterState({ select: (s) => s.location.pathname === '/' })
   return (
-    <SmoothScroll>
-      <div className="flex min-h-dvh flex-col">
-        <SiteHeader user={user} theme={theme} />
-        <main className={isHome ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
-          <Outlet />
-        </main>
-        <SiteFooter theme={theme} />
-        <ThemeToggle initial={theme} />
-      </div>
-    </SmoothScroll>
+    // reducedMotion="user": with the OS setting on, motion skips transforms and
+    // layout animation site-wide and keeps fades, without changing markup.
+    <MotionConfig reducedMotion="user">
+      <SmoothScroll>
+        <div className="flex min-h-dvh flex-col">
+          <SiteHeader user={user} theme={theme} />
+          <main className={isHome ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
+            <Outlet />
+          </main>
+          <SiteFooter theme={theme} />
+          <ThemeToggle initial={theme} />
+        </div>
+      </SmoothScroll>
+    </MotionConfig>
   )
 }

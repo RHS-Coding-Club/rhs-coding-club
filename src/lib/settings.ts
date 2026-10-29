@@ -18,7 +18,11 @@ export const clubInfoSchema = z.object({
     .default(
       'We teach each other to code, then teach the next kid. Every RHS student is welcome, no experience required.',
     ),
-  contactEmail: z.string().email().or(z.literal('')).default(''),
+  contactEmail: z
+    .string()
+    .email('Enter a valid email address.')
+    .or(z.literal(''))
+    .default(''),
   meetingLocation: z.string().max(120).default("Mr. Derrick's classroom"),
   meetingSchedule: z.string().max(120).default('Lunch, every week'),
 })
@@ -63,7 +67,7 @@ export const githubOrgSchema = z.object({
 
 export const emailSchema = z.object({
   senderName: z.string().max(80).default('RHS Coding Club'),
-  replyTo: z.string().email().or(z.literal('')).default(''),
+  replyTo: z.string().email('Enter a valid email address.').or(z.literal('')).default(''),
   notifications: z
     .object({
       newChallenge: z.boolean().default(true),

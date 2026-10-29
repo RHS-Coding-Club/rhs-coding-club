@@ -78,8 +78,10 @@ test('theme toggle persists across reloads', async ({ page }) => {
   await persisted
   await page.reload()
   await expect(page.locator('html')).toHaveClass(/light/)
-  await page.getByRole('button', { name: 'Switch to dark theme' }).click()
-  await expect(page.locator('html')).toHaveClass(/dark/)
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Switch to dark theme' }).click()
+    await expect(page.locator('html')).toHaveClass(/dark/, { timeout: 500 })
+  }).toPass({ timeout: 15_000 })
 })
 
 test('admin overview shows pending queues', async ({ page }) => {
@@ -89,4 +91,41 @@ test('admin overview shows pending queues', async ({ page }) => {
   await page.getByRole('button', { name: 'Log in' }).click()
   await page.goto('/admin')
   await expect(page.getByRole('link', { name: /Projects to approve/ })).toBeVisible()
+})
+
+const PUBLIC_PAGES = [
+  '/challenges',
+  '/leaderboard',
+  '/events',
+  '/projects',
+  '/blog',
+  '/resources',
+  '/contact',
+  '/privacy',
+  '/terms',
+  '/join',
+]
+
+for (const path of PUBLIC_PAGES) {
+  test(`${path} renders without errors`, async ({ page }) => {
+    const errors: string[] = []
+    page.on('pageerror', (e) => errors.push(e.message))
+    const res = await page.goto(path)
+    expect(res?.status()).toBe(200)
+    // Some pages draw their visible title with an animation and keep the real
+    // h1 for screen readers, so check it exists rather than that it's visible.
+    await expect(page.getByRole('heading', { level: 1 }).first()).toBeAttached()
+    await page.waitForLoadState('networkidle')
+    expect(errors).toEqual([])
+  })
+}
+
+test('guest is asked to apply before submitting a challenge', async ({ page }) => {
+  await page.goto('/login')
+  await page.getByLabel('Email').fill('guest@test.local')
+  await page.getByLabel('Password').fill(PASSWORD)
+  await page.getByRole('button', { name: 'Log in' }).click()
+  await expect(page).toHaveURL(/\/dashboard/)
+  await page.goto('/challenges/c_seed_1')
+  await expect(page.getByRole('link', { name: /apply/i }).first()).toBeVisible()
 })

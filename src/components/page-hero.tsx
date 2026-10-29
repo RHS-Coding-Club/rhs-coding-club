@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import type { ReactNode } from 'react'
 import { ClientOnly } from '@tanstack/react-router'
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
 import { cn } from '#/lib/utils'
 import { EASE } from '#/components/motion'
 
@@ -39,15 +39,13 @@ export function PageHero({
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }) {
-  const reduced = useReducedMotion()
-  const rise = (delay: number) =>
-    reduced
-      ? {}
-      : {
-          initial: { opacity: 0, y: 16 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.8, ease: EASE, delay },
-        }
+  // Same markup with reduced motion on; the root MotionConfig turns the rise
+  // into a plain fade.
+  const rise = (delay: number) => ({
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.8, ease: EASE, delay },
+  })
 
   return (
     <section

@@ -25,6 +25,10 @@ The RHS Coding Club website, rewritten from scratch (September 2026) on TanStack
 6. **Badges are awarded by the badge engine** in `src/lib/badges.ts` after any points change, attendance mark, or project approval. Do not award badges ad hoc.
 7. **Files go to R2** under `FILES`, served through `/files/$key`. Store keys, not URLs.
 8. **Settings** are one row per group in `setting`, each validated by a Zod schema in `src/lib/settings.ts`.
+9. **Points go through `src/services/points.ts`**: `settlePoints` (idempotent per source row; amount 0 reverses) or `adjustPoints` (officer manual). Both run the badge engine.
+10. **Rich text** (posts, challenge prompts, newsletters) is stored as Tiptap JSON, edited with `RichTextEditor`, and rendered with `RichText` (an allow-list renderer). Never store or inject HTML.
+11. **Email** goes through `src/services/email.ts` (Resend; logs to the console until `RESEND_API_KEY` and `EMAIL_FROM` are set) with the layout in `email-templates.ts`. Respect `recipientsFor`/`recipientById` so opt-outs and club-wide toggles apply.
+12. **Background jobs** run from the cron triggers in `wrangler.jsonc` via `src/server.ts` -> `src/services/cron.ts`. Every job must be idempotent (claim before sending).
 
 ## Roles
 
@@ -35,6 +39,8 @@ The RHS Coding Club website, rewritten from scratch (September 2026) on TanStack
 - File-based routes in `src/routes`. `_authed` = any signed-in user, `_admin` = officer or admin. Admin pages live under `_admin/admin/`.
 - Server functions grouped by domain in `src/server/*.ts`. One file per domain, exported `createServerFn`s, named as verbs (`listChallenges`, `reviewSubmission`).
 - Drizzle tables: camelCase keys, snake_case columns, text UUID ids from `helpers.id()`, `timestamp_ms` integers for dates, JSON text for string arrays.
+- Public pages open with `PageHero` (a React Bits background that reads in both themes). React Bits live in `src/components/bits` (vendored; local changes are commented). Buttons are `RaisedButton`; `SplitButton` only for "Join the club".
+- Motion: never branch markup on `useReducedMotion` (it breaks hydration); the root `MotionConfig reducedMotion="user"` handles it.
 - Shadcn components in `src/components/ui` are generated; don't hand-edit them beyond styling tokens. Add with `bunx shadcn add <name>`.
 - Tailwind only; brand tokens live in `src/styles.css`. Dark is the default theme. Display type is `font-display` (Instrument Serif), body is DM Sans, code and numeric labels are `font-mono`.
 - Tests: pure logic in `tests/unit`, anything touching D1 or Better Auth in `tests/integration` (runs inside workerd with a fresh migrated database per file), browser flows in `tests/e2e`.

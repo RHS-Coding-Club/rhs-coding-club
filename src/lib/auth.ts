@@ -1,12 +1,15 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { env } from 'cloudflare:workers'
+import { APIError } from 'better-auth/api'
+import { count, eq } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
 import { ROLES, initialRoleFor, parseBootstrapAdmins } from '#/lib/roles'
 
 // Server-only. Built lazily so bindings are read per isolate, never at import
-// time on the client. The role column is the only Better Auth "additional
-// field": everything else on the user row is managed by our own server functions.
+// time on the client. `role` and `avatarKey` are Better Auth "additional
+// fields" (read-only from the client, so they ride along on the session);
+// everything else on the user row is managed by our own server functions.
 //
 // Sign-in and sign-up always go through the /api/auth/* handler, which sets
 // cookies on its own response, so the TanStack Start cookies plugin is not
@@ -57,6 +60,27 @@ function createAuth() {
           required: false,
           defaultValue: 'guest',
           input: false,
+        },
+        avatarKey: { type: 'string', required: false, input: false },
+      },
+      deleteUser: {
+        enabled: true,
+        // The club must always keep one admin; the last one hands the role
+        // to someone else before leaving.
+        beforeDelete: async (u) => {
+          const role = (u as { role?: unknown }).role
+          if (role !== 'admin') return
+          const row = await getDb()
+            .select({ n: count() })
+            .from(schema.user)
+            .where(eq(schema.user.role, 'admin'))
+            .then((rows) => rows.at(0))
+          if ((row?.n ?? 0) <= 1) {
+            throw new APIError('BAD_REQUEST', {
+              message:
+                'You are the only admin. Make someone else an admin before deleting your account.',
+            })
+          }
         },
       },
     },

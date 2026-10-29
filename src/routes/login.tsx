@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 import { signIn } from '#/lib/auth-client'
+import { safeRedirect } from '#/lib/format'
 import { AuthShell } from '#/components/auth/auth-shell'
 import { SocialButtons } from '#/components/auth/social-buttons'
 import { RaisedButton } from '#/components/raised-button'
@@ -13,7 +14,7 @@ const searchSchema = z.object({ redirect: z.string().optional() })
 export const Route = createFileRoute('/login')({
   validateSearch: searchSchema,
   beforeLoad: ({ context, search }) => {
-    if (context.user) throw redirect({ to: search.redirect ?? '/dashboard' })
+    if (context.user) throw redirect({ to: safeRedirect(search.redirect) })
   },
   head: () => ({ meta: [{ title: 'Log in · RHS Coding Club' }] }),
   component: LoginPage,
@@ -21,7 +22,8 @@ export const Route = createFileRoute('/login')({
 
 function LoginPage() {
   const router = useRouter()
-  const { redirect: redirectTo } = Route.useSearch()
+  const { redirect: requested } = Route.useSearch()
+  const next = safeRedirect(requested)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
 
@@ -40,7 +42,7 @@ function LoginPage() {
       return
     }
     await router.invalidate()
-    await router.navigate({ to: redirectTo ?? '/dashboard' })
+    await router.navigate({ to: next })
   }
 
   return (
@@ -48,7 +50,7 @@ function LoginPage() {
       title="Welcome back"
       subtitle="Log in to submit challenges, RSVP, and track your points."
     >
-      <SocialButtons callbackURL={redirectTo ?? '/dashboard'} />
+      <SocialButtons callbackURL={next} />
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="email">Email</Label>
@@ -75,7 +77,11 @@ function LoginPage() {
       </form>
       <p className="text-muted-foreground text-sm">
         New here?{' '}
-        <Link to="/signup" className="text-primary underline-offset-4 hover:underline">
+        <Link
+          to="/signup"
+          search={{ redirect: requested }}
+          className="text-primary underline-offset-4 hover:underline"
+        >
           Create an account
         </Link>
       </p>

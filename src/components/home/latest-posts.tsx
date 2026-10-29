@@ -42,7 +42,7 @@ export function LatestPosts({ posts }: { posts: HomeData['latestPosts'] }) {
           <FlowingMenu
             items={posts.map((p) => ({
               text: p.title,
-              link: '/blog',
+              link: `/blog/${p.slug}`,
               meta: p.publishedAt ? fmtDate(p.publishedAt, 'short') : undefined,
               marquee: p.summary,
             }))}

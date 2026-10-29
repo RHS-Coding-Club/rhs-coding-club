@@ -41,7 +41,8 @@ export function Faq({
 
   return (
     <section
-      className="mx-auto grid max-w-6xl gap-12 px-(--gutter) py-16 sm:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]"
+      id="faq"
+      className="mx-auto grid max-w-6xl scroll-mt-(--header-offset) gap-12 px-(--gutter) py-16 sm:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]"
       aria-labelledby="faq-heading"
     >
       <FadeUp className="max-w-sm">

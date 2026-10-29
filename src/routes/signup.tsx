@@ -1,15 +1,20 @@
 import { useState } from 'react'
 import { Link, createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { z } from 'zod'
 import { signUp } from '#/lib/auth-client'
+import { safeRedirect } from '#/lib/format'
 import { AuthShell } from '#/components/auth/auth-shell'
 import { SocialButtons } from '#/components/auth/social-buttons'
 import { RaisedButton } from '#/components/raised-button'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
 
+const searchSchema = z.object({ redirect: z.string().optional() })
+
 export const Route = createFileRoute('/signup')({
-  beforeLoad: ({ context }) => {
-    if (context.user) throw redirect({ to: '/dashboard' })
+  validateSearch: searchSchema,
+  beforeLoad: ({ context, search }) => {
+    if (context.user) throw redirect({ to: safeRedirect(search.redirect) })
   },
   head: () => ({ meta: [{ title: 'Join · RHS Coding Club' }] }),
   component: SignupPage,
@@ -17,6 +22,8 @@ export const Route = createFileRoute('/signup')({
 
 function SignupPage() {
   const router = useRouter()
+  // New accounts start as guests, so the membership application is the next step.
+  const next = safeRedirect(Route.useSearch().redirect, '/join')
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
 
@@ -36,15 +43,15 @@ function SignupPage() {
       return
     }
     await router.invalidate()
-    await router.navigate({ to: '/dashboard' })
+    await router.navigate({ to: next })
   }
 
   return (
     <AuthShell
       title="Create your account"
-      subtitle="Sign up, then apply for membership from your dashboard. Any RHS student can apply."
+      subtitle="Sign up, then fill out the short membership application. Any RHS student can apply."
     >
-      <SocialButtons callbackURL="/dashboard" />
+      <SocialButtons callbackURL={next} />
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="name">Name</Label>
