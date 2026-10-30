@@ -83,6 +83,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.20.0",
+    "marked": "^18.1.2",
     "prettier": "^3.8.1",
     "shadcn": "^4.23.0",
     "tailwindcss": "^4.1.18",

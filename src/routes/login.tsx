@@ -78,6 +78,12 @@ function LoginPage() {
           placeholder="Password"
           required
         />
+        <Link
+          to="/forgot-password"
+          className="text-muted-foreground hover:text-foreground -mt-1 self-end text-xs underline-offset-4 hover:underline"
+        >
+          Forgot password?
+        </Link>
         {error && (
           <p role="alert" className="text-destructive text-sm">
             {error}

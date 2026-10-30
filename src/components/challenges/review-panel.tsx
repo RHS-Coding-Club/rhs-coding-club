@@ -157,14 +157,17 @@ export function ReviewPanel({
             {sub.reviewerName && ` by ${sub.reviewerName}`}
           </p>
         )}
-        <RaisedButton asChild variant="outline" className="w-full justify-between">
-          <a href={sub.url} target="_blank" rel="noopener noreferrer">
-            <span className="truncate font-mono text-xs">
-              {sub.url.replace(/^https:\/\//, '')}
-            </span>
-            <ExternalLink aria-hidden="true" />
-          </a>
-        </RaisedButton>
+        {/* Submissions imported from the old site have pasted code, no link. */}
+        {sub.url && (
+          <RaisedButton asChild variant="outline" className="w-full justify-between">
+            <a href={sub.url} target="_blank" rel="noopener noreferrer">
+              <span className="truncate font-mono text-xs">
+                {sub.url.replace(/^https:\/\//, '')}
+              </span>
+              <ExternalLink aria-hidden="true" />
+            </a>
+          </RaisedButton>
+        )}
       </div>
 
       {sub.code ? (

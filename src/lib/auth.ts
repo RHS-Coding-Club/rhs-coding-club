@@ -4,6 +4,8 @@ import { env } from 'cloudflare:workers'
 import { APIError } from 'better-auth/api'
 import { count, eq } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
+import { sendEmail } from '#/services/email'
+import { renderEmail } from '#/services/email-templates'
 import { ROLES, initialRoleFor, parseBootstrapAdmins } from '#/lib/roles'
 
 // Server-only. Built lazily so bindings are read per isolate, never at import
@@ -43,7 +45,39 @@ function createAuth() {
       .filter(Boolean),
     secret: env.BETTER_AUTH_SECRET,
     database: drizzleAdapter(getDb(), { provider: 'sqlite', schema }),
-    emailAndPassword: { enabled: true, minPasswordLength: 8 },
+    emailAndPassword: {
+      enabled: true,
+      minPasswordLength: 8,
+      revokeSessionsOnPasswordReset: true,
+      // Also how members imported from the old site claim their account: the
+      // reset creates their first password, and the email proves they own it.
+      // Not awaited, so response time doesn't reveal whether an email exists.
+      sendResetPassword: async ({ user, url }) => {
+        const { html, text } = renderEmail({
+          preheader: 'Choose a new password for your RHS Coding Club account.',
+          heading: 'Reset your password',
+          paragraphs: [
+            `Hi ${user.name.split(' ')[0] || user.name}, someone asked to set a new password for the RHS Coding Club account on this email.`,
+            'The link works for one hour and only once.',
+          ],
+          cta: { label: 'Choose a new password', href: url },
+          footer:
+            "If you didn't ask for this, ignore this email. Your password won't change.",
+        })
+        void sendEmail(getDb(), {
+          to: user.email,
+          subject: 'Reset your RHS Coding Club password',
+          html,
+          text,
+        })
+      },
+      onPasswordReset: async ({ user }) => {
+        await getDb()
+          .update(schema.user)
+          .set({ emailVerified: true })
+          .where(eq(schema.user.id, user.id))
+      },
+    },
     socialProviders,
     account: {
       accountLinking: { enabled: true, trustedProviders: ['google', 'github'] },

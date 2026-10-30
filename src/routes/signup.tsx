@@ -30,10 +30,13 @@ function SignupPage() {
   const next = safeRedirect(requested, '/join')
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  // Members brought over from the old site already have an account.
+  const [exists, setExists] = useState(false)
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
+    setExists(false)
     setPending(true)
     const form = new FormData(e.currentTarget)
     const { error: err } = await signUp.email({
@@ -43,6 +46,7 @@ function SignupPage() {
     })
     if (err) {
       setPending(false)
+      setExists(err.code?.startsWith('USER_ALREADY_EXISTS') ?? false)
       setError(err.message ?? 'Could not create your account.')
       return
     }
@@ -90,7 +94,24 @@ function SignupPage() {
         />
         {error && (
           <p role="alert" className="text-destructive text-sm">
-            {error}
+            {exists ? (
+              <>
+                You already have an account, maybe from the old club site.{' '}
+                <Link
+                  to="/forgot-password"
+                  className="font-medium underline underline-offset-4"
+                >
+                  Set a password
+                </Link>{' '}
+                or{' '}
+                <Link to="/login" className="font-medium underline underline-offset-4">
+                  log in
+                </Link>
+                .
+              </>
+            ) : (
+              error
+            )}
           </p>
         )}
         <RaisedButton

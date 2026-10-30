@@ -225,20 +225,23 @@ function SubmissionSummary({
           <dt className="text-muted-foreground text-xs">Platform</dt>
           <dd className="mt-0.5 font-medium">{mine.platform}</dd>
         </div>
-        <div className="col-span-2">
-          <dt className="text-muted-foreground text-xs">Link</dt>
-          <dd className="mt-0.5 min-w-0">
-            <a
-              href={mine.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary inline-flex max-w-full items-center gap-1.5 font-mono text-xs underline-offset-4 hover:underline"
-            >
-              <span className="truncate">{mine.url.replace(/^https:\/\//, '')}</span>
-              <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
-            </a>
-          </dd>
-        </div>
+        {/* Submissions imported from the old site have pasted code, no link. */}
+        {mine.url && (
+          <div className="col-span-2">
+            <dt className="text-muted-foreground text-xs">Link</dt>
+            <dd className="mt-0.5 min-w-0">
+              <a
+                href={mine.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary inline-flex max-w-full items-center gap-1.5 font-mono text-xs underline-offset-4 hover:underline"
+              >
+                <span className="truncate">{mine.url.replace(/^https:\/\//, '')}</span>
+                <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
+              </a>
+            </dd>
+          </div>
+        )}
         <div className="col-span-2">
           <dt className="text-muted-foreground text-xs">Submitted</dt>
           <dd className="mt-0.5">{fmtDate(mine.submittedAt, 'datetime')}</dd>

@@ -74,14 +74,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   )
 }
 
+/** Full-screen auth pages: no site header or footer. */
+const AUTH_PAGES = new Set(['/login', '/signup', '/forgot-password', '/reset-password'])
+
 function RootLayout() {
   const { user, theme } = Route.useRouteContext()
   // The header floats over the page. The home hero runs underneath it (like
-  // the template); every other page pads for it. Sign-in and sign-up are full
+  // the template); every other page pads for it. The auth pages are full
   // screen with their own "Home" button, so they drop the header and footer.
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isHome = pathname === '/'
-  const bare = pathname === '/login' || pathname === '/signup'
+  const bare = AUTH_PAGES.has(pathname)
   return (
     // reducedMotion="user": with the OS setting on, motion skips transforms and
     // layout animation site-wide and keeps fades, without changing markup.
