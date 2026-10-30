@@ -221,6 +221,73 @@ describe('runReset', () => {
   })
 })
 
+describe('file cleanup', () => {
+  const shot = 'project/11111111-1111-4111-a111-111111111111.png'
+  const ownAvatar = 'avatar/22222222-2222-4222-a222-222222222222.png'
+  const fakeBucket = () => {
+    const deleted: string[] = []
+    return {
+      deleted,
+      bucket: {
+        delete: async (keys: string | string[]) => {
+          deleted.push(...(Array.isArray(keys) ? keys : [keys]))
+        },
+      } as unknown as R2Bucket,
+    }
+  }
+
+  it('never deletes a file a surviving row still uses, even if a deleted account pointed at it', async () => {
+    await db.insert(schema.project).values({
+      id: 'pr_keep',
+      title: 'Kept',
+      description: '',
+      authorId: 'admin2',
+      status: 'approved',
+      imageKeys: [shot],
+    })
+    // A guest pointed their avatar at someone else's screenshot, and a
+    // second guest has an avatar of their own.
+    await db
+      .update(schema.user)
+      .set({ avatarKey: shot })
+      .where(eq(schema.user.id, 'gst1'))
+    await db.insert(schema.user).values({
+      id: 'gst2',
+      name: 'Gia',
+      email: 'gia@club.org',
+      role: 'guest',
+      avatarKey: ownAvatar,
+    })
+    const { bucket, deleted } = fakeBucket()
+    const res = await runReset(db, bucket, { actions: ['guests'], actorId: ACTOR }, now)
+    expect(deleted).toEqual([ownAvatar])
+    expect(res.filesRemoved).toBe(1)
+  })
+
+  it('keeps images that rich text still embeds', async () => {
+    await db.insert(schema.post).values({
+      id: 'p_keep',
+      title: 'Post',
+      slug: 'post',
+      summary: '',
+      content: JSON.stringify({
+        type: 'doc',
+        content: [{ type: 'image', attrs: { src: `/files/${ownAvatar}` } }],
+      }),
+    })
+    await db.insert(schema.user).values({
+      id: 'gst3',
+      name: 'Gil',
+      email: 'gil@club.org',
+      role: 'guest',
+      avatarKey: ownAvatar,
+    })
+    const { bucket, deleted } = fakeBucket()
+    await runReset(db, bucket, { actions: ['guests'], actorId: ACTOR }, now)
+    expect(deleted).toEqual([])
+  })
+})
+
 describe('exportBackup', () => {
   it('includes the data but never login secrets', async () => {
     const backup = JSON.parse(await exportBackup(db, now)) as {

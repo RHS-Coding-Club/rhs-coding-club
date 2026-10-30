@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { hasRole } from '#/lib/roles'
 import type { Role } from '#/lib/roles'
 import type { ProjectStatus } from '#/db/schema'
+import { storedImageKey } from '#/lib/files'
 
 // Shared between the submit/edit form and the project server functions, plus
 // the small pure rules (who may see or edit a project) both sides agree on.
@@ -61,9 +62,7 @@ export function dedupeTags(tags: string[]) {
   return out
 }
 
-export const imageKeySchema = z
-  .string()
-  .regex(/^project\/[0-9a-f-]{36}\.[a-z]{3,4}$/, 'Unknown image.')
+export const imageKeySchema = storedImageKey('project')
 
 export const projectInputSchema = z.object({
   title: z

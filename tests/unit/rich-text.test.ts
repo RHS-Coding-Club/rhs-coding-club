@@ -111,3 +111,14 @@ describe('headingOutline', () => {
     ])
   })
 })
+
+describe('storedImageKey', () => {
+  it('accepts only keys of its own upload purpose', async () => {
+    const { storedImageKey } = await import('#/lib/files')
+    const key = 'avatar/22222222-2222-4222-a222-222222222222.png'
+    expect(storedImageKey('avatar').safeParse(key).success).toBe(true)
+    expect(storedImageKey('project').safeParse(key).success).toBe(false)
+    expect(storedImageKey('avatar').safeParse('avatar/../secret.png').success).toBe(false)
+    expect(storedImageKey('avatar').safeParse('avatar/x.exe').success).toBe(false)
+  })
+})

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { storedImageKey } from '#/lib/files'
 
 // Admin badge editor: the shared schema and display tables. Ships to the
 // browser. Awarding itself lives in src/lib/badges.ts (the badge engine).
@@ -64,7 +65,7 @@ export const badgeSchema = z
       .trim()
       .min(3, 'Describe how to earn it.')
       .max(240, 'Under 240 characters.'),
-    imageKey: z.string().max(300).nullable(),
+    imageKey: storedImageKey('badge').nullable(),
     rarity: z.enum(RARITIES),
     criteriaType: z.enum(CRITERIA),
     threshold: z

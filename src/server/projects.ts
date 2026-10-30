@@ -23,10 +23,16 @@ import {
   setProjectFeatured,
   updateProject as updateProjectRow,
 } from '#/services/projects'
+import { unreferencedKeys } from '#/services/file-refs'
 
-/** Best-effort cleanup of screenshots nobody references any more. */
+/**
+ * Best-effort cleanup of screenshots nobody references any more. Keys come
+ * from members' forms, so another project (or a post) could share one:
+ * only delete what no row still points at.
+ */
 async function deleteImages(keys: string[]) {
-  await Promise.all(keys.map((k) => deleteFile(env.FILES, k).catch(() => undefined)))
+  const orphaned = await unreferencedKeys(getDb(), keys)
+  await Promise.all(orphaned.map((k) => deleteFile(env.FILES, k).catch(() => undefined)))
 }
 
 /** Public: the approved showcase. */

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { CODE_LENGTH, isLocalDateTime, normalizeCode } from '#/lib/events'
+import { storedImageKey } from '#/lib/files'
 
 // Shared by the event forms and the server functions that receive them.
 
@@ -44,7 +45,7 @@ export const eventFormSchema = z
     endsAt: localDateTime,
     location: z.string().trim().min(2, 'Where is it?').max(160),
     tags: z.array(tag).max(6, 'Pick up to six tags.'),
-    coverKey: z.string().max(200).nullable(),
+    coverKey: storedImageKey('event').nullable(),
   })
   .refine((v) => v.endsAt > v.startsAt, {
     path: ['endsAt'],

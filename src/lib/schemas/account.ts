@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { EmailTopic } from '#/db/schema'
+import { storedImageKey } from '#/lib/files'
 
 // Account settings: the profile form and email preferences. Shared by the
 // /account forms and the server functions. Ships to the browser, so no
@@ -76,7 +77,7 @@ export const profileSchema = z.object({
     .refine((v) => v.length <= SKILLS_MAX, `Pick up to ${SKILLS_MAX} skills.`),
   githubUsername: githubUsernameField,
   /** R2 key from ImageUpload; null falls back to the sign-in provider's image. */
-  avatarKey: z.string().max(200).nullable(),
+  avatarKey: storedImageKey('avatar').nullable(),
 })
 
 export type ProfileInput = z.input<typeof profileSchema>

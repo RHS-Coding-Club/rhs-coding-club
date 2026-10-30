@@ -6,13 +6,15 @@ import type { Db } from '#/db'
 import { schema } from '#/db'
 import { RESET_ACTIONS } from '#/lib/schemas/reset'
 import type { ResetAction } from '#/lib/schemas/reset'
+import { unreferencedKeys } from './file-refs'
+import { isValidKey } from './files'
 import { pointsWindowStart } from './points'
 import { setSetting } from './settings'
 
 // The admin reset tool. Every action is a set of statements run together in
 // one D1 batch (all or nothing). Admin accounts and the admin running it are
 // never deleted or demoted. Images owned by deleted rows are removed from R2
-// afterwards, best effort.
+// afterwards, best effort, and only if nothing that survived still uses them.
 
 const t = schema
 
@@ -155,15 +157,16 @@ const ORDER: ResetAction[] = [
   'season',
 ]
 
-/** R2 keys owned by rows an action deletes, gathered before the delete. */
+/** R2 keys owned by rows an action deletes, gathered before the delete. Candidates only: they're re-checked against what survives before anything is removed. */
 async function filesFor(db: Db, actions: Set<ResetAction>, actorId: string) {
   const keys: string[] = []
-  const add = (v: string | null | undefined) => {
-    if (v) keys.push(v)
+  // Only keys of the kind each column should hold (keys come from forms).
+  const of = (purpose: string) => (v: string | null | undefined) => {
+    if (v?.startsWith(`${purpose}/`) && isValidKey(v)) keys.push(v)
   }
   if (actions.has('projects')) {
     for (const p of await db.select({ k: t.project.imageKeys }).from(t.project))
-      p.k.forEach(add)
+      p.k.forEach(of('project'))
   }
   if (actions.has('events'))
     (
@@ -171,21 +174,21 @@ async function filesFor(db: Db, actions: Set<ResetAction>, actorId: string) {
         .select({ k: t.event.coverKey })
         .from(t.event)
         .where(isNotNull(t.event.coverKey))
-    ).forEach((r) => add(r.k))
+    ).forEach((r) => of('event')(r.k))
   if (actions.has('officers'))
     (
       await db
         .select({ k: t.officer.imageKey })
         .from(t.officer)
         .where(isNotNull(t.officer.imageKey))
-    ).forEach((r) => add(r.k))
+    ).forEach((r) => of('officer')(r.k))
   if (actions.has('badges'))
     (
       await db
         .select({ k: t.badge.imageKey })
         .from(t.badge)
         .where(isNotNull(t.badge.imageKey))
-    ).forEach((r) => add(r.k))
+    ).forEach((r) => of('badge')(r.k))
   const people = actions.has('accounts')
     ? deletable(actorId)
     : actions.has('guests')
@@ -197,7 +200,7 @@ async function filesFor(db: Db, actions: Set<ResetAction>, actorId: string) {
         .select({ k: t.user.avatarKey })
         .from(t.user)
         .where(and(people, isNotNull(t.user.avatarKey)))
-    ).forEach((r) => add(r.k))
+    ).forEach((r) => of('avatar')(r.k))
   return [...new Set(keys)]
 }
 
@@ -313,10 +316,13 @@ export async function runReset(
   if (actions.has('season'))
     await setSetting(db, 'season', { startedAt: now.getTime() }, actorId)
 
+  // Only files nothing that survived still points at (another member could
+  // have reused a key, and rich text can embed any upload).
+  const orphaned = bucket ? await unreferencedKeys(db, files) : []
   let filesRemoved = 0
-  if (bucket && files.length) {
-    for (let i = 0; i < files.length; i += 1000) {
-      const chunk = files.slice(i, i + 1000)
+  if (bucket && orphaned.length) {
+    for (let i = 0; i < orphaned.length; i += 1000) {
+      const chunk = orphaned.slice(i, i + 1000)
       try {
         await bucket.delete(chunk)
         filesRemoved += chunk.length

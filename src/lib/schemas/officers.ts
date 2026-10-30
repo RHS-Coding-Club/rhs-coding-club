@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { storedImageKey } from '#/lib/files'
 
 // Admin > Officers: the profiles shown on /about.
 
@@ -28,7 +29,7 @@ export const officerSchema = z.object({
     (v) => v === null || /^https:\/\/(www\.)?github\.com\/[\w.-]+\/?$/i.test(v),
     'Use a GitHub profile link, like https://github.com/octocat.',
   ),
-  imageKey: z.string().max(200).nullable(),
+  imageKey: storedImageKey('officer').nullable(),
   isActive: z.boolean(),
 })
 
