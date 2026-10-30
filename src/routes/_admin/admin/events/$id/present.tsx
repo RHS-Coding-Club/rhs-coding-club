@@ -13,7 +13,7 @@ import { Logo } from '#/components/logo'
 import { RaisedButton } from '#/components/raised-button'
 import { UserAvatar } from '#/components/user-avatar'
 import { QrCode } from '#/components/events/qr-code'
-import { ThreadsBackground } from '#/components/events/threads-bg'
+import { AeroShardsBackground } from '#/components/blog/aero-shards-bg'
 import { errorMessage } from '#/components/events/rsvp'
 
 export const Route = createFileRoute('/_admin/admin/events/$id/present')({
@@ -77,15 +77,10 @@ function PresentPage() {
       aria-modal="true"
       aria-label={`Check-in for ${data.event.title}`}
     >
-      <div aria-hidden="true" className="absolute inset-0 opacity-70">
+      <div aria-hidden="true" className="absolute inset-0">
         <ClientOnly>
           <Suspense>
-            <ThreadsBackground
-              initialDark={theme === 'dark'}
-              seed={4}
-              angle={-20}
-              intensity={0.6}
-            />
+            <AeroShardsBackground initialDark={theme === 'dark'} />
           </Suspense>
         </ClientOnly>
       </div>

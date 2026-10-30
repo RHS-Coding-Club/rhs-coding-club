@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { forwardRef, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { ArrowUpRight, NotebookPen, Rss } from 'lucide-react'
 import { z } from 'zod'
@@ -8,6 +8,7 @@ import { AeroShardsBackground } from '#/components/blog/aero-shards-bg'
 import { FadeUp } from '#/components/motion'
 import { EmptyState } from '#/components/empty-state'
 import { RaisedButton } from '#/components/raised-button'
+import { Popover, PopoverContent, PopoverTrigger } from '#/components/ui/popover'
 import { PostByline } from '#/components/blog/post-byline'
 import { fmtDate } from '#/lib/format'
 import { cn } from '#/lib/utils'
@@ -54,13 +55,11 @@ function BlogPage() {
   const { theme } = Route.useRouteContext()
   const dark = useIsDark(theme === 'dark')
 
-  const tags = useMemo(() => {
-    const counts = new Map<string, number>()
-    for (const p of posts) for (const t of p.tags) counts.set(t, (counts.get(t) ?? 0) + 1)
-    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-  }, [posts])
-
-  const shown = tag ? posts.filter((p) => p.tags.includes(tag)) : posts
+  const tags = useMemo(() => tagCounts(posts), [posts])
+  const wanted = tag?.toLowerCase()
+  const shown = wanted
+    ? posts.filter((p) => p.tags.some((t) => t.toLowerCase() === wanted))
+    : posts
   const lead = tag ? undefined : shown[0]
   const rest = tag ? shown : shown.slice(1)
 
@@ -94,14 +93,7 @@ function BlogPage() {
           </RaisedButton>
         }
       >
-        {tags.length > 0 && (
-          <nav aria-label="Filter by tag" className="flex flex-wrap gap-2">
-            <TagLink tag={undefined} active={!tag} count={posts.length} />
-            {tags.map(([t, n]) => (
-              <TagLink key={t} tag={t} active={tag === t} count={n} />
-            ))}
-          </nav>
-        )}
+        {tags.length > 0 && <TagRow tags={tags} active={wanted} total={posts.length} />}
       </PageHero>
 
       {posts.length === 0 ? (
@@ -162,22 +154,173 @@ function BlogPage() {
   )
 }
 
+/**
+ * Tags across all posts, grouped case-insensitively (the old site has both
+ * "Git" and "git"), shown in their most common spelling, most used first.
+ */
+function tagCounts(posts: PostListItem[]) {
+  const groups = new Map<string, { n: number; spellings: Map<string, number> }>()
+  for (const p of posts)
+    for (const t of p.tags) {
+      const key = t.toLowerCase()
+      const g = groups.get(key) ?? { n: 0, spellings: new Map() }
+      g.n++
+      g.spellings.set(t, (g.spellings.get(t) ?? 0) + 1)
+      groups.set(key, g)
+    }
+  return [...groups.entries()]
+    .map(([key, g]) => ({
+      key,
+      label: [...g.spellings.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? key,
+      n: g.n,
+    }))
+    .sort((a, b) => b.n - a.n || a.label.localeCompare(b.label))
+}
+
+type TagCount = ReturnType<typeof tagCounts>[number]
+
+const GAP = 8
+
+/**
+ * The tag filter, always one line: "All", the active tag, then the most
+ * used tags, as many as fit the width (measured, so it works from phone to
+ * desktop). The rest sit behind a "+N more" pill that opens a popover.
+ */
+function TagRow({
+  tags,
+  active,
+  total,
+}: {
+  tags: TagCount[]
+  active: string | undefined
+  total: number
+}) {
+  // The active tag always gets a visible slot.
+  const ordered = useMemo(
+    () =>
+      active
+        ? [
+            ...tags.filter((t) => t.key === active),
+            ...tags.filter((t) => t.key !== active),
+          ]
+        : tags,
+    [tags, active],
+  )
+  const rowRef = useRef<HTMLDivElement>(null)
+  const measureRef = useRef<HTMLDivElement>(null)
+  const [fit, setFit] = useState(ordered.length)
+
+  useLayoutEffect(() => {
+    const row = rowRef.current
+    const ruler = measureRef.current
+    if (!row || !ruler) return
+    const measure = () => {
+      const widths = [...ruler.children].map((el) => (el as HTMLElement).offsetWidth)
+      const [all = 0, ...rest] = widths
+      const more = rest.pop() ?? 0 // the last ruler child is the "+N more" pill
+      const room = row.clientWidth
+      let used = all
+      let n = 0
+      for (const [i, w] of rest.entries()) {
+        const needsMore = i < rest.length - 1
+        const next = used + GAP + w + (needsMore ? GAP + more : 0)
+        if (next > room) break
+        used += GAP + w
+        n++
+      }
+      setFit(n)
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(row)
+    return () => ro.disconnect()
+  }, [ordered])
+
+  const visible = ordered.slice(0, fit)
+  const hidden = ordered.slice(fit)
+
+  return (
+    <nav aria-label="Filter by tag" className="relative">
+      {/* Off-screen ruler: every pill at its natural width. */}
+      <div
+        ref={measureRef}
+        aria-hidden="true"
+        className="pointer-events-none invisible absolute flex gap-2 whitespace-nowrap"
+      >
+        <TagLink tag={undefined} active={false} count={total} tabIndex={-1} />
+        {ordered.map((t) => (
+          <TagLink key={t.key} tag={t.label} active={false} count={t.n} tabIndex={-1} />
+        ))}
+        <MorePill count={ordered.length} />
+      </div>
+
+      <div ref={rowRef} className="flex flex-nowrap gap-2 overflow-hidden">
+        <TagLink tag={undefined} active={!active} count={total} />
+        {visible.map((t) => (
+          <TagLink key={t.key} tag={t.label} active={t.key === active} count={t.n} />
+        ))}
+        {hidden.length > 0 && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <MorePill count={hidden.length} />
+            </PopoverTrigger>
+            <PopoverContent
+              align="start"
+              className="flex w-80 flex-wrap gap-2 rounded-3xl p-3"
+            >
+              {hidden.map((t) => (
+                <TagLink
+                  key={t.key}
+                  tag={t.label}
+                  active={t.key === active}
+                  count={t.n}
+                />
+              ))}
+            </PopoverContent>
+          </Popover>
+        )}
+      </div>
+    </nav>
+  )
+}
+
+const MorePill = forwardRef<
+  HTMLButtonElement,
+  { count: number } & React.ComponentProps<'button'>
+>(({ count, className, ...rest }, ref) => (
+  <button
+    ref={ref}
+    type="button"
+    {...rest}
+    className={cn(
+      'focus-visible:ring-ring/50 bg-card text-foreground/80 ring-border/80 hover:text-foreground hover:ring-foreground/30 inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm ring-1 transition-colors outline-none focus-visible:ring-3',
+      className,
+    )}
+  >
+    +{count} more
+  </button>
+))
+MorePill.displayName = 'MorePill'
+
 function TagLink({
   tag,
   active,
   count,
+  tabIndex,
 }: {
   tag: string | undefined
   active: boolean
   count: number
+  tabIndex?: number
 }) {
   return (
     <Link
       to="/blog"
       search={tag ? { tag } : {}}
       aria-current={active ? 'page' : undefined}
+      tabIndex={tabIndex}
       className={cn(
-        'focus-visible:ring-ring/50 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm ring-1 transition-colors outline-none focus-visible:ring-3',
+        'focus-visible:ring-ring/50 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm ring-1 transition-colors outline-none focus-visible:ring-3',
         active
           ? 'bg-foreground text-background ring-foreground'
           : 'bg-card text-foreground/80 ring-border/80 hover:text-foreground hover:ring-foreground/30',
