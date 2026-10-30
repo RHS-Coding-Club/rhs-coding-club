@@ -28,7 +28,7 @@ describe('updateProfile', () => {
       gradYear: 2028,
       skills: ['Python', ' python ', 'React'],
       githubUsername: 'https://github.com/maxm',
-      avatarKey: 'avatars/abc.png',
+      avatarKey: 'avatar/0f0e0d0c-0b0a-4090-8070-605040302010.png',
     })
     await updateProfile(db, 'm1', input)
     const { user } = await getAccount(db, 'm1')
@@ -38,7 +38,7 @@ describe('updateProfile', () => {
       gradYear: 2028,
       skills: ['Python', 'React'],
       githubUsername: 'maxm',
-      avatarKey: 'avatars/abc.png',
+      avatarKey: 'avatar/0f0e0d0c-0b0a-4090-8070-605040302010.png',
     })
   })
 
