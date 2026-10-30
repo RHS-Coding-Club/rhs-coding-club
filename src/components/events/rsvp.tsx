@@ -39,7 +39,8 @@ export function errorMessage(
 
 /**
  * Optimistic RSVP: the choice shows instantly, the server write runs in a
- * transition, and the loader refreshes the counts. A failed write snaps
+ * transition, and the loader refreshes the counts before the transition
+ * ends, so the optimistic value hands over to saved data without a flicker. A failed write snaps
  * back to the saved answer and explains why.
  */
 export function useRsvp(eventId: string, saved: RsvpChoice | null) {
@@ -53,8 +54,14 @@ export function useRsvp(eventId: string, saved: RsvpChoice | null) {
       setOptimistic(next)
       try {
         await rsvpToEvent({ data: { eventId, status: next } })
-        await router.invalidate()
+        // Saved: confirm now, not after the refresh below.
         toast.success(CONFIRM[next])
+        // `sync` waits for the reloaded data to be on screen. Without it the
+        // router keeps the old data while refetching in the background, so
+        // the transition ended (and the optimistic choice let go) while the
+        // page still showed the previous RSVP: the buttons and the going
+        // count snapped back for a moment, then forward again.
+        await router.invalidate({ sync: true })
       } catch (err) {
         toast.error(errorMessage(err, 'Could not save your RSVP.'))
       }
