@@ -9,7 +9,7 @@ const Grainient = lazy(() => import('#/components/bits/Grainient'))
 /**
  * /resources hero: React Bits Grainient as a slow, grainy wash that settles
  * into the page ground on the left (where the copy sits). Dark mode melts
- * from the #120f17 stage into navy and sky; light mode runs the shader's
+ * from the #121924 stage into navy and sky; light mode runs the shader's
  * light mode on pale blues so the title stays ink on paper.
  */
 export function ResourcesHeroBackground({ initialDark }: { initialDark: boolean }) {
@@ -18,7 +18,7 @@ export function ResourcesHeroBackground({ initialDark }: { initialDark: boolean 
   return (
     <Grainient
       key={dark ? 'dark' : 'light'}
-      color1={dark ? '#120f17' : '#f3f6fb'}
+      color1={dark ? '#121924' : '#f3f6fb'}
       color2={dark ? '#1f4f8a' : '#9ccbf2'}
       color3={dark ? '#5fb2ee' : '#5fb2ee'}
       lightMode={!dark}

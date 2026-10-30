@@ -27,7 +27,7 @@ export function AeroShardsBackground({ initialDark }: { initialDark: boolean }) 
       key={dark ? 'dark' : 'light'}
       shardColor={dark ? '#5fb2ee' : '#1f4f8a'}
       accentColor={dark ? '#a9d4f5' : '#2a7fc4'}
-      backgroundColor={dark ? '#120f17' : '#f3f6fb'}
+      backgroundColor={dark ? '#121924' : '#f3f6fb'}
       lightMode={!dark}
       placement="right"
       count={1100}

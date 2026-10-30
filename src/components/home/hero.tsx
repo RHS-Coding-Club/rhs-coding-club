@@ -36,7 +36,7 @@ export function Hero({ theme }: { theme: Theme }) {
       {/* Soft scrim in the ground color behind the headline so the glyph field never fights the copy. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_48%,rgba(243,246,251,0.75)_0%,rgba(243,246,251,0)_100%)] dark:bg-[radial-gradient(60%_50%_at_50%_48%,rgba(18,15,23,0.55)_0%,rgba(18,15,23,0)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_48%,rgba(243,246,251,0.75)_0%,rgba(243,246,251,0)_100%)] dark:bg-[radial-gradient(60%_50%_at_50%_48%,rgba(18,25,36,0.55)_0%,rgba(18,25,36,0)_100%)]"
       />
 
       <div className="pointer-events-none relative flex min-h-[calc(100dvh-1.25rem)] flex-col items-center justify-center px-6 pt-32 pb-24 text-center">

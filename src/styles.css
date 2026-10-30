@@ -21,6 +21,8 @@
 
   /* light theme (alternate) */
   --background: #f4f7fb;
+  /* ground of the shader heroes */
+  --stage: #f3f6fb;
   --foreground: #101826;
   --card: #ffffff;
   --card-foreground: #101826;
@@ -71,6 +73,7 @@
 
 .dark {
   --background: #0b0f15;
+  --stage: #121924;
   --foreground: #e8eef6;
   --card: #121924;
   --card-foreground: #e8eef6;
@@ -128,6 +131,7 @@
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-stage: var(--stage);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);

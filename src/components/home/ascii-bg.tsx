@@ -7,17 +7,17 @@ import { useIsDark } from '#/hooks/use-is-dark'
 const GradientASCII = lazy(() => import('#/components/bits/GradientASCII'))
 
 /**
- * Ground under the glyphs: React Bits' demo stage color in dark mode, a pale
+ * Ground under the glyphs: the site's dark surface in dark mode, a pale
  * blue-white in light mode (where the shader draws the glyphs as ink).
  */
-const GROUND = 'bg-[#f3f6fb] dark:bg-[#120f17]'
+const GROUND = 'bg-stage'
 
 /** The component's default palette, as shown in the React Bits demo. */
 const ASCII_COLORS = ['#1e3fd8', '#f6f8ff', '#a5d8ff', '#38bdf8']
 
 /**
  * Hero backdrop: React Bits Gradient ASCII in the colors of its demo on
- * reactbits.dev. Dark mode glows on the demo's #120f17 stage; light mode
+ * reactbits.dev. Dark mode glows on the site's stage color; light mode
  * switches the shader to `lightMode` on a pale ground. Renders a plain CSS
  * gradient on the server and while the WebGL chunk loads, so the fold always
  * has color. The component itself freezes its animation when the visitor

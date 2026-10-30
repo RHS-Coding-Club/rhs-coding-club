@@ -50,7 +50,7 @@ export function PageHero({
   return (
     <section
       className={cn(
-        'relative mx-2.5 overflow-hidden rounded-4xl bg-[#f3f6fb] dark:bg-[#120f17]',
+        'relative mx-2.5 overflow-hidden rounded-4xl bg-stage',
         size === 'sm' && 'min-h-[18rem]',
         size === 'md' && 'min-h-[24rem] sm:min-h-[28rem]',
         size === 'lg' && 'min-h-[30rem] sm:min-h-[36rem]',
@@ -67,7 +67,7 @@ export function PageHero({
       {/* Scrim from the left so the copy always reads over the background. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(243,246,251,0.92)_0%,rgba(243,246,251,0.55)_45%,rgba(243,246,251,0)_80%)] dark:bg-[linear-gradient(90deg,rgba(18,15,23,0.85)_0%,rgba(18,15,23,0.45)_45%,rgba(18,15,23,0)_80%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(243,246,251,0.92)_0%,rgba(243,246,251,0.55)_45%,rgba(243,246,251,0)_80%)] dark:bg-[linear-gradient(90deg,rgba(18,25,36,0.85)_0%,rgba(18,25,36,0.45)_45%,rgba(18,25,36,0)_80%)]"
       />
       <div
         className={cn(

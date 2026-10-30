@@ -22,7 +22,7 @@ export function coverHeight(id: string) {
 
 const DARK = [
   { from: '#0f1a2b', to: '#1f4f8a', accent: '#5fb2ee', ink: '#e6edf5', line: '#5fb2ee' },
-  { from: '#120f17', to: '#1b2f4d', accent: '#8ccaf4', ink: '#e6edf5', line: '#5fb2ee' },
+  { from: '#121924', to: '#1b2f4d', accent: '#8ccaf4', ink: '#e6edf5', line: '#5fb2ee' },
   { from: '#0b2440', to: '#123a66', accent: '#a9d4f5', ink: '#f3f6fb', line: '#a9d4f5' },
   { from: '#5fb2ee', to: '#a9d4f5', accent: '#101826', ink: '#101826', line: '#1f4f8a' },
   { from: '#101826', to: '#0e3b66', accent: '#5fb2ee', ink: '#e6edf5', line: '#1f4f8a' },

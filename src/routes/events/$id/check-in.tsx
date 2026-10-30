@@ -88,7 +88,7 @@ function CheckInPage() {
 
   return (
     <section className="px-2.5 pb-10">
-      <div className="relative grid min-h-[calc(100dvh-var(--header-offset)-2.5rem)] place-items-center overflow-hidden rounded-4xl bg-[#f3f6fb] px-4 py-14 dark:bg-[#120f17]">
+      <div className="relative grid min-h-[calc(100dvh-var(--header-offset)-2.5rem)] place-items-center overflow-hidden rounded-4xl bg-stage px-4 py-14">
         <div aria-hidden="true" className="absolute inset-0">
           <ClientOnly>
             <Suspense>
@@ -98,7 +98,7 @@ function CheckInPage() {
         </div>
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_60%_at_50%_50%,rgba(243,246,251,0.9)_0%,rgba(243,246,251,0.35)_70%,rgba(243,246,251,0)_100%)] dark:bg-[radial-gradient(55%_60%_at_50%_50%,rgba(18,15,23,0.85)_0%,rgba(18,15,23,0.35)_70%,rgba(18,15,23,0)_100%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_60%_at_50%_50%,rgba(243,246,251,0.9)_0%,rgba(243,246,251,0.35)_70%,rgba(243,246,251,0)_100%)] dark:bg-[radial-gradient(55%_60%_at_50%_50%,rgba(18,25,36,0.85)_0%,rgba(18,25,36,0.35)_70%,rgba(18,25,36,0)_100%)]"
         />
 
         <div className="bg-card/90 ring-border/70 relative w-full max-w-md rounded-4xl p-7 text-center shadow-(--bits-shadow) ring-1 backdrop-blur-md sm:p-9">

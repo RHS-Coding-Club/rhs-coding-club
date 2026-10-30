@@ -72,7 +72,7 @@ function PresentPage() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-[#f3f6fb] text-[#101826] dark:bg-[#120f17] dark:text-white"
+      className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-stage text-[#101826] dark:text-white"
       role="dialog"
       aria-modal="true"
       aria-label={`Check-in for ${data.event.title}`}
@@ -86,7 +86,7 @@ function PresentPage() {
       </div>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(243,246,251,0.95)_0%,rgba(243,246,251,0.7)_55%,rgba(243,246,251,0.4)_100%)] dark:bg-[linear-gradient(90deg,rgba(18,15,23,0.92)_0%,rgba(18,15,23,0.65)_55%,rgba(18,15,23,0.35)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(243,246,251,0.95)_0%,rgba(243,246,251,0.7)_55%,rgba(243,246,251,0.4)_100%)] dark:bg-[linear-gradient(90deg,rgba(18,25,36,0.92)_0%,rgba(18,25,36,0.65)_55%,rgba(18,25,36,0.35)_100%)]"
       />
 
       <header className="relative flex items-center justify-between gap-4 px-6 pt-5 sm:px-10">
@@ -244,7 +244,7 @@ function LiveCount({ data }: { data: PresentData }) {
             >
               <UserAvatar
                 user={u}
-                className="size-[clamp(2.5rem,3.6vw,3.5rem)] ring-4 ring-[#f3f6fb] dark:ring-[#120f17]"
+                className="size-[clamp(2.5rem,3.6vw,3.5rem)] ring-4 ring-stage"
               />
               <span className="sr-only">{u.name}</span>
             </motion.li>
