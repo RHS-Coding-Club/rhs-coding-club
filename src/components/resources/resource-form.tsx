@@ -1,216 +1,145 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Plus, X } from 'lucide-react';
-import { Resource } from '@/lib/firebase-collections';
-import { CreateResourceData } from '@/lib/services/resources';
+import { useState } from 'react'
+import { LEVELS, LEVEL_LABEL, parseTags } from '#/lib/schemas/resources'
+import type { Level } from '#/lib/schemas/resources'
+import type { FieldErrors } from '#/lib/schemas/community'
+import { Input } from '#/components/ui/input'
+import { Label } from '#/components/ui/label'
+import { Textarea } from '#/components/ui/textarea'
+import { RadioGroup, RadioGroupItem } from '#/components/ui/radio-group'
 
-interface ResourceFormProps {
-  resource?: Resource;
-  onSubmit: (data: CreateResourceData) => Promise<void>;
-  children: React.ReactNode;
+export interface ResourceFormValues {
+  title: string
+  url: string
+  description: string
+  level: Level
+  tags: string[]
 }
 
-export function ResourceForm({ resource, onSubmit, children }: ResourceFormProps) {
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<CreateResourceData>({
-    title: resource?.title || '',
-    description: resource?.description || '',
-    url: resource?.url || '',
-    tags: resource?.tags || [],
-    level: resource?.level || 'beginner',
-  });
-  const [tagInput, setTagInput] = useState('');
+export const EMPTY_RESOURCE: ResourceFormValues = {
+  title: '',
+  url: '',
+  description: '',
+  level: 'beginner',
+  tags: [],
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.title.trim() || !formData.description.trim() || !formData.url.trim()) {
-      return;
-    }
+/** Reads the shared resource fields out of a submitted form. */
+export function readResourceForm(form: HTMLFormElement): ResourceFormValues {
+  const f = new FormData(form)
+  return {
+    title: String(f.get('title') ?? ''),
+    url: String(f.get('url') ?? ''),
+    description: String(f.get('description') ?? ''),
+    level: String(f.get('level') ?? 'beginner') as Level,
+    tags: parseTags(String(f.get('tags') ?? '')),
+  }
+}
 
-    try {
-      setLoading(true);
-      await onSubmit(formData);
-      setOpen(false);
-      if (!resource) {
-        // Reset form for new resource
-        setFormData({
-          title: '',
-          description: '',
-          url: '',
-          tags: [],
-          level: 'beginner',
-        });
-      }
-    } catch (error) {
-      console.error('Error submitting resource:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const addTag = () => {
-    const tag = tagInput.trim().toLowerCase();
-    if (tag && !formData.tags.includes(tag)) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, tag],
-      }));
-      setTagInput('');
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove),
-    }));
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addTag();
-    }
-  };
+/**
+ * The fields of a resource (title, link, level, description, tags), shared by
+ * the member "Suggest a resource" dialog and the officer editor. Uncontrolled;
+ * read with `readResourceForm`.
+ */
+export function ResourceFields({
+  initial = EMPTY_RESOURCE,
+  errors,
+  idPrefix = 'resource',
+}: {
+  initial?: ResourceFormValues
+  errors: FieldErrors
+  idPrefix?: string
+}) {
+  const [level, setLevel] = useState<Level>(initial.level)
+  const id = (name: string) => `${idPrefix}-${name}`
+  const err = (name: string) =>
+    errors[name] ? (
+      <p id={id(`${name}-error`)} role="alert" className="text-destructive text-sm">
+        {errors[name]}
+      </p>
+    ) : null
+  const aria = (name: string) => ({
+    'aria-invalid': errors[name] ? true : undefined,
+    'aria-describedby': errors[name] ? id(`${name}-error`) : undefined,
+  })
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>
-              {resource ? 'Edit Resource' : 'Add New Resource'}
-            </DialogTitle>
-            <DialogDescription>
-              {resource 
-                ? 'Update the resource information below.'
-                : 'Add a new learning resource for the community.'
-              }
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Enter resource title"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Enter resource description"
-                rows={3}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="url">URL</Label>
-              <Input
-                id="url"
-                type="url"
-                value={formData.url}
-                onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                placeholder="https://example.com"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="level">Difficulty Level</Label>
-              <Select 
-                value={formData.level} 
-                onValueChange={(value: 'beginner' | 'intermediate' | 'advanced') => 
-                  setFormData(prev => ({ ...prev, level: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select difficulty level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="beginner">Beginner</SelectItem>
-                  <SelectItem value="intermediate">Intermediate</SelectItem>
-                  <SelectItem value="advanced">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="tags">Tags</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="tags"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Add tags"
-                />
-                <Button type="button" onClick={addTag} size="icon">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              {formData.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className="cursor-pointer"
-                      onClick={() => removeTag(tag)}
-                    >
-                      {tag}
-                      <X className="h-3 w-3 ml-1" />
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : (resource ? 'Update' : 'Add')} Resource
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor={id('title')}>Title</Label>
+        <Input
+          id={id('title')}
+          name="title"
+          defaultValue={initial.title}
+          placeholder="CS50's Introduction to Computer Science"
+          required
+          maxLength={120}
+          {...aria('title')}
+        />
+        {err('title')}
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor={id('url')}>Link</Label>
+        <Input
+          id={id('url')}
+          name="url"
+          type="url"
+          inputMode="url"
+          defaultValue={initial.url}
+          placeholder="https://"
+          required
+          {...aria('url')}
+        />
+        {err('url')}
+      </div>
+      <fieldset className="flex flex-col gap-2">
+        <legend className="mb-2 text-sm leading-none font-medium">Level</legend>
+        <RadioGroup
+          name="level"
+          value={level}
+          onValueChange={(v) => setLevel(v as Level)}
+          className="grid grid-cols-3 gap-2"
+        >
+          {LEVELS.map((l) => (
+            <Label
+              key={l}
+              htmlFor={id(`level-${l}`)}
+              className="border-border has-[[data-state=checked]]:border-brand-sky has-[[data-state=checked]]:bg-brand-sky/10 flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-normal"
+            >
+              <RadioGroupItem id={id(`level-${l}`)} value={l} />
+              {LEVEL_LABEL[l]}
+            </Label>
+          ))}
+        </RadioGroup>
+        {err('level')}
+      </fieldset>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor={id('description')}>What is it, and who is it for?</Label>
+        <Textarea
+          id={id('description')}
+          name="description"
+          defaultValue={initial.description}
+          rows={3}
+          maxLength={500}
+          placeholder="Harvard's free intro course. Long, but the problem sets are worth it."
+          required
+          {...aria('description')}
+        />
+        {err('description')}
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor={id('tags')}>
+          Tags{' '}
+          <span className="text-muted-foreground font-normal">(comma separated)</span>
+        </Label>
+        <Input
+          id={id('tags')}
+          name="tags"
+          defaultValue={initial.tags.join(', ')}
+          placeholder="python, course"
+          {...aria('tags')}
+        />
+        {err('tags')}
+      </div>
+    </div>
+  )
 }

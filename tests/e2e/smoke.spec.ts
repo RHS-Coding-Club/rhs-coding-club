@@ -1,0 +1,133 @@
+import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
+
+const PASSWORD = 'password123'
+
+/**
+ * Signs in through the real form. Waits for hydration first (a pre-hydration
+ * submit is a native GET that goes nowhere) and for the redirect after, so
+ * the next navigation carries the session.
+ */
+async function logIn(page: Page, email: string) {
+  await page.goto('/login', { waitUntil: 'networkidle' })
+  await page.getByLabel('Email').fill(email)
+  await page.getByLabel('Password').fill(PASSWORD)
+  await page.getByRole('button', { name: 'Log in' }).click()
+  await expect(page).not.toHaveURL(/\/login/)
+}
+
+test('home page renders', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Learn to code.')
+  await expect(page.getByRole('link', { name: 'Join the club' }).first()).toBeVisible()
+})
+
+test('footer newsletter form subscribes an email', async ({ page }) => {
+  await page.goto('/')
+  const email = `e2e-${Date.now()}-${Math.floor(Math.random() * 1e6)}@test.local`
+  const input = page.getByLabel('Newsletter signup')
+  await input.scrollIntoViewIfNeeded()
+  // Submits before hydration do nothing, so retry until the success text lands.
+  await expect(async () => {
+    await input.fill(email)
+    await page.getByRole('button', { name: 'Subscribe' }).click()
+    await expect(page.getByText('You are on the list')).toBeVisible({ timeout: 2000 })
+  }).toPass({ timeout: 15_000 })
+})
+
+test('unauthenticated dashboard redirects to login', async ({ page }) => {
+  await page.goto('/dashboard')
+  await expect(page).toHaveURL(/\/login/)
+})
+
+test('member can log in and reach the dashboard', async ({ page }) => {
+  await logIn(page, 'member@test.local')
+  await expect(page).toHaveURL(/\/dashboard/)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Hey, Max')
+})
+
+test('member is kept out of admin', async ({ page }) => {
+  await logIn(page, 'member@test.local')
+  await expect(page).toHaveURL(/\/dashboard/)
+  await page.goto('/admin')
+  await expect(page).toHaveURL(/\/dashboard/)
+})
+
+test('officer reaches admin', async ({ page }) => {
+  await logIn(page, 'officer@test.local')
+  await page.goto('/admin')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/waiting|caught up/)
+})
+
+test('about page lists officers from the database', async ({ page }) => {
+  await page.goto('/about')
+  await expect(
+    page.getByRole('heading', { level: 2, name: 'The people running it' }),
+  ).toBeVisible()
+  await expect(page.getByRole('heading', { level: 3, name: 'Jashan Maan' })).toBeVisible()
+})
+
+test('theme toggle persists across reloads', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  // The toggle flips the class immediately and persists the cookie in the
+  // background; wait for that request so the reload does not cancel it.
+  const persisted = page.waitForResponse(
+    (res) => res.request().method() === 'POST' && res.ok(),
+  )
+  // Clicks before hydration do nothing, so retry until the class flips.
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Switch to light theme' }).click()
+    await expect(page.locator('html')).toHaveClass(/light/, { timeout: 500 })
+  }).toPass({ timeout: 15_000 })
+  await persisted
+  await page.reload()
+  await expect(page.locator('html')).toHaveClass(/light/)
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Switch to dark theme' }).click()
+    await expect(page.locator('html')).toHaveClass(/dark/, { timeout: 500 })
+  }).toPass({ timeout: 15_000 })
+})
+
+test('admin overview shows pending queues', async ({ page }) => {
+  await logIn(page, 'admin@test.local')
+  await page.goto('/admin')
+  await expect(
+    page.getByRole('link', { name: /Showcase entries to approve/ }),
+  ).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Admin pages' })).toBeAttached()
+})
+
+const PUBLIC_PAGES = [
+  '/challenges',
+  '/leaderboard',
+  '/events',
+  '/projects',
+  '/blog',
+  '/resources',
+  '/contact',
+  '/privacy',
+  '/terms',
+  '/join',
+]
+
+for (const path of PUBLIC_PAGES) {
+  test(`${path} renders without errors`, async ({ page }) => {
+    const errors: string[] = []
+    page.on('pageerror', (e) => errors.push(e.message))
+    const res = await page.goto(path)
+    expect(res?.status()).toBe(200)
+    // Some pages draw their visible title with an animation and keep the real
+    // h1 for screen readers, so check it exists rather than that it's visible.
+    await expect(page.getByRole('heading', { level: 1 }).first()).toBeAttached()
+    await page.waitForLoadState('networkidle')
+    expect(errors).toEqual([])
+  })
+}
+
+test('guest is asked to apply before submitting a challenge', async ({ page }) => {
+  await logIn(page, 'guest@test.local')
+  await expect(page).toHaveURL(/\/dashboard/)
+  await page.goto('/challenges/c_seed_1')
+  await expect(page.getByRole('link', { name: /apply/i }).first()).toBeVisible()
+})

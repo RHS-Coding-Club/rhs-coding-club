@@ -1,114 +1,47 @@
-"use client";
+import { useServerFn } from '@tanstack/react-start'
+import { Moon, Sun } from 'lucide-react'
+import { setTheme } from '#/server/theme'
+import { RaisedButton } from '#/components/raised-button'
+import { useIsDark } from '#/hooks/use-is-dark'
+import type { Theme } from '#/server/theme'
 
-import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Moon, Sun } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-
-type ThemeToggleProps = React.ComponentProps<typeof Button>;
-
-export function ThemeToggle({ className, ...props }: ThemeToggleProps) {
-  const { theme, setTheme, systemTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleThemeToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const currentTheme = theme === "system" ? systemTheme : theme;
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-    // Check if browser supports View Transitions API
-    if (!document.startViewTransition) {
-      setTheme(newTheme);
-      return;
-    }
-
-    // Get button position for ripple origin
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-
-    const root = document.documentElement;
-    root.style.setProperty("--x", `${x}px`);
-    root.style.setProperty("--y", `${y}px`);
-
-    // Use View Transitions API for smooth ripple effect
-    const transition = document.startViewTransition(() => {
-      setTheme(newTheme);
-    });
-
-    // Ensure the transition completes properly
-    transition.ready.catch(() => {
-      // Fallback if transition fails
-      setTheme(newTheme);
-    });
-  };
-
-  if (!mounted) {
-    return (
-      <Button 
-        variant="outline" 
-        size="icon"
-        className={cn("cursor-pointer self-center", className)} 
-        disabled
-        aria-label="Toggle theme"
-      >
-        <Sun className="h-[1.2rem] w-[1.2rem]" />
-      </Button>
-    );
+/**
+ * Returns a function that flips the theme: swaps the <html> class right away
+ * and persists the choice in a cookie via a server function.
+ */
+export function useFlipTheme() {
+  const persist = useServerFn(setTheme)
+  return () => {
+    const root = document.documentElement
+    const next: Theme = root.classList.contains('dark') ? 'light' : 'dark'
+    root.classList.toggle('dark', next === 'dark')
+    root.classList.toggle('light', next === 'light')
+    void persist({ data: next })
+    return next
   }
+}
 
-  // Determine the actual current theme (accounting for system preference)
-  const currentTheme = theme === "system" ? systemTheme : theme;
-  const isDark = currentTheme === "dark";
+/**
+ * Floating theme switch, bottom-right on every page. Admin pages hide it;
+ * their dock has its own switch.
+ */
+export function ThemeToggle({ initial }: { initial: Theme }) {
+  // Follows the <html> class, so it stays right when the admin dock flips it.
+  const dark = useIsDark(initial === 'dark')
+  const flip = useFlipTheme()
 
+  const label = dark ? 'Switch to light theme' : 'Switch to dark theme'
   return (
-    <Button 
-      variant="outline" 
-      size="icon"
-      className={cn("cursor-pointer relative overflow-hidden self-center", className)} 
-      {...props} 
-      onClick={handleThemeToggle}
-      aria-label="Toggle theme"
+    <RaisedButton
+      type="button"
+      variant="outline"
+      size="icon-lg"
+      onClick={flip}
+      aria-label={label}
+      title={label}
+      className="fixed right-5 bottom-5 z-50 rounded-full [body:has(#admin-dock)_&]:hidden"
     >
-      <AnimatePresence mode="wait" initial={false}>
-        {isDark ? (
-          <motion.div
-            key="moon"
-            initial={{ y: -30, rotate: -90, opacity: 0 }}
-            animate={{ y: 0, rotate: 0, opacity: 1 }}
-            exit={{ y: 30, rotate: 90, opacity: 0 }}
-            transition={{ 
-              duration: 0.3,
-              ease: "easeInOut",
-              rotate: { duration: 0.4, ease: "backOut" }
-            }}
-            className="absolute"
-          >
-            <Moon className="h-[1.2rem] w-[1.2rem]" />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="sun"
-            initial={{ y: -30, rotate: -180, opacity: 0, scale: 0.6 }}
-            animate={{ y: 0, rotate: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 30, rotate: 180, opacity: 0, scale: 0.6 }}
-            transition={{ 
-              duration: 0.3,
-              ease: "easeInOut",
-              scale: { duration: 0.4, ease: "backOut" },
-              rotate: { duration: 0.5, ease: "backOut" }
-            }}
-            className="absolute"
-          >
-            <Sun className="h-[1.2rem] w-[1.2rem]" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </Button>
-  );
+      {dark ? <Sun /> : <Moon />}
+    </RaisedButton>
+  )
 }
