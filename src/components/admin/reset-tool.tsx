@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import ElectricBorder from '#/components/bits/ElectricBorder'
 import SpotlightCard from '#/components/bits/SpotlightCard'
 import Stepper, { Step } from '#/components/bits/Stepper'
+import { STEPPER_VARS } from '#/components/bits-theme'
 import { RaisedButton } from '#/components/raised-button'
 import { Checkbox } from '#/components/ui/checkbox'
 import { Input } from '#/components/ui/input'
@@ -143,7 +144,8 @@ export function ResetTool({
       linear
       showFooter={false}
       theme={dark ? 'dark' : 'light'}
-      accentColor={destructive ? '#e5484d' : '#5fb2ee'}
+      accentColor="#5fb2ee"
+      style={STEPPER_VARS}
       width="100%"
       radius={28}
       contentClassName="pt-6"

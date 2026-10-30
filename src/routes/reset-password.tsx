@@ -37,9 +37,9 @@ function ResetPasswordPage() {
         subtitle="Reset links work once, for one hour. Ask for a fresh one and use the newest email."
         pulse={pulse}
       >
-        <div className="flex items-start gap-3 rounded-2xl bg-amber-500/10 p-4 text-sm ring-1 ring-amber-500/25">
+        <div className="bg-brand-sky/10 ring-brand-sky/25 flex items-start gap-3 rounded-2xl p-4 text-sm ring-1">
           <TriangleAlert
-            className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-300"
+            className="text-brand-sky mt-0.5 size-5 shrink-0"
             aria-hidden="true"
           />
           <p>Your password hasn&apos;t changed.</p>

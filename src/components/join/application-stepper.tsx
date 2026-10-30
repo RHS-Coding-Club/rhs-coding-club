@@ -3,6 +3,7 @@ import { useRouter } from '@tanstack/react-router'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import Stepper, { Step } from '#/components/bits/Stepper'
+import { STEPPER_VARS } from '#/components/bits-theme'
 import { fieldErrors, serverMessage } from '#/components/account/form-helpers'
 import { RaisedButton } from '#/components/raised-button'
 import { Input } from '#/components/ui/input'
@@ -120,6 +121,7 @@ export function ApplicationStepper({
         showFooter={false}
         theme={dark ? 'dark' : 'light'}
         accentColor="#5fb2ee"
+        style={STEPPER_VARS}
         width="100%"
         radius={28}
         className="mx-auto"
