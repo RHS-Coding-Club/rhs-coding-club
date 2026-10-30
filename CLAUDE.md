@@ -21,7 +21,7 @@ The RHS Coding Club website, rewritten from scratch (September 2026) on TanStack
 2. **Authorization lives in server-function middleware.** Use `requireUser`, `requireMember`, `requireOfficer`, `requireAdmin` from `src/server/auth.ts`. Route `beforeLoad` redirects are UX, not security.
 3. **Validate every input with Zod** in the server function's `.validator()`. Share schemas between forms and server functions via `src/lib/schemas/`.
 4. **Bindings come from `import { env } from 'cloudflare:workers'`**, read lazily inside functions, never at module top level in code that could reach the client.
-5. **Points are a ledger** (`point_entry`). Never store a mutable total. Leaderboards sum the ledger over a window.
+5. **Points are a ledger** (`point_entry`). Never store a mutable total. Leaderboards sum the ledger over a window; "this semester" starts at `pointsWindowStart()` (the semester start, or a later points season begun from the admin reset tool), never `semesterStart()` directly.
 6. **Badges are awarded by the badge engine** in `src/lib/badges.ts` after any points change, attendance mark, or project approval. Do not award badges ad hoc.
 7. **Files go to R2** under `FILES`, served through `/files/$key`. Store keys, not URLs.
 8. **Settings** are one row per group in `setting`, each validated by a Zod schema in `src/lib/settings.ts`.
