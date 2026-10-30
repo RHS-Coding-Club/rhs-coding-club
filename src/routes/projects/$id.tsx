@@ -62,15 +62,6 @@ function ProjectPage() {
 
   return (
     <>
-      {project.status !== 'approved' && (
-        <StatusBanner
-          status={project.status}
-          reason={project.rejectionReason}
-          canEdit={canEdit}
-          id={project.id}
-        />
-      )}
-
       <PageHero
         size="sm"
         background={<BeamsBackground initialDark={initialDark} />}
@@ -126,6 +117,15 @@ function ProjectPage() {
           </>
         }
       />
+
+      {project.status !== 'approved' && (
+        <StatusBanner
+          status={project.status}
+          reason={project.rejectionReason}
+          canEdit={canEdit}
+          id={project.id}
+        />
+      )}
 
       <section className="mx-auto max-w-6xl px-(--gutter) pt-10 sm:pt-14">
         <FadeUp>
@@ -292,7 +292,7 @@ function StatusBanner({
 }) {
   const rejected = status === 'rejected'
   return (
-    <div className="mx-auto mb-4 max-w-6xl px-(--gutter)">
+    <div className="mx-auto mt-4 max-w-6xl px-(--gutter)">
       <div
         role="status"
         className={

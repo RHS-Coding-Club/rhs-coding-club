@@ -41,30 +41,6 @@ function ChallengePage() {
 
   return (
     <>
-      {preview && (
-        <div
-          role="status"
-          className="mx-2.5 mb-2.5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-amber-500/12 px-5 py-3 text-sm text-amber-800 ring-1 ring-amber-500/25 ring-inset dark:text-amber-200"
-        >
-          <span className="inline-flex items-center gap-2 font-medium">
-            <Eye className="size-4" aria-hidden="true" />
-            Preview, not live yet.{' '}
-            <span className="font-normal opacity-80">
-              {state === 'scheduled' && challenge.publishedAt
-                ? `Goes live ${fmtDate(challenge.publishedAt, 'datetime')}.`
-                : 'This is a draft. Only officers can see it.'}
-            </span>
-          </span>
-          <Link
-            to="/admin/challenges/$id"
-            params={{ id: challenge.id }}
-            className="font-medium underline underline-offset-4"
-          >
-            Edit in admin
-          </Link>
-        </div>
-      )}
-
       <PageHero
         size="sm"
         background={<DotGridBackground initialDark={theme === 'dark'} />}
@@ -129,6 +105,30 @@ function ChallengePage() {
           )}
         </dl>
       </PageHero>
+
+      {preview && (
+        <div
+          role="status"
+          className="mx-2.5 mt-2.5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-amber-500/12 px-5 py-3 text-sm text-amber-800 ring-1 ring-amber-500/25 ring-inset dark:text-amber-200"
+        >
+          <span className="inline-flex items-center gap-2 font-medium">
+            <Eye className="size-4" aria-hidden="true" />
+            Preview, not live yet.{' '}
+            <span className="font-normal opacity-80">
+              {state === 'scheduled' && challenge.publishedAt
+                ? `Goes live ${fmtDate(challenge.publishedAt, 'datetime')}.`
+                : 'This is a draft. Only officers can see it.'}
+            </span>
+          </span>
+          <Link
+            to="/admin/challenges/$id"
+            params={{ id: challenge.id }}
+            className="font-medium underline underline-offset-4"
+          >
+            Edit in admin
+          </Link>
+        </div>
+      )}
 
       <div className="mx-auto grid max-w-6xl gap-10 px-(--gutter) py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-14">
         <FadeUp className="min-w-0 lg:col-start-1 lg:row-start-1">

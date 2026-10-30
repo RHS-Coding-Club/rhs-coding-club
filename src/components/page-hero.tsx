@@ -6,9 +6,11 @@ import { cn } from '#/lib/utils'
 import { EASE } from '#/components/motion'
 
 /**
- * The header card every inner page opens with: a rounded, full-bleed panel
- * (same frame as the home hero) over a React Bits background, with the page
- * title, a line of copy, and optional actions or stats.
+ * The header every inner page opens with: an edge-to-edge band whose ground
+ * color runs from the very top of the page, behind the floating site header.
+ * The React Bits background and the copy (title, a line of text, optional
+ * actions or stats) start below the header. It has to be the first thing on
+ * the page.
  *
  * `background` renders client-only behind a scrim (WebGL/canvas backgrounds
  * never run on the server); pass something that reads in BOTH themes.
@@ -49,16 +51,13 @@ export function PageHero({
 
   return (
     <section
-      className={cn(
-        'relative mx-2.5 overflow-hidden rounded-4xl bg-stage',
-        size === 'sm' && 'min-h-[18rem]',
-        size === 'md' && 'min-h-[24rem] sm:min-h-[28rem]',
-        size === 'lg' && 'min-h-[30rem] sm:min-h-[36rem]',
-        className,
-      )}
+      className={cn('relative -mt-(--header-offset) overflow-hidden bg-stage', className)}
     >
       {background && (
-        <div aria-hidden="true" className="absolute inset-0">
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-(--header-offset) bottom-0"
+        >
           <ClientOnly>
             <Suspense>{background}</Suspense>
           </ClientOnly>
@@ -71,11 +70,13 @@ export function PageHero({
       />
       <div
         className={cn(
-          'pointer-events-none relative mx-auto grid h-full max-w-6xl gap-10 px-(--gutter) py-14 sm:py-20',
+          'pointer-events-none relative mx-auto grid h-full max-w-6xl gap-10 px-(--gutter) pt-[calc(var(--header-offset)+3.5rem)] pb-14 sm:pt-[calc(var(--header-offset)+5rem)] sm:pb-20',
           aside && 'lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end',
-          size === 'sm' && 'min-h-[18rem] content-end',
-          size === 'md' && 'min-h-[24rem] content-end sm:min-h-[28rem]',
-          size === 'lg' && 'min-h-[30rem] content-end sm:min-h-[36rem]',
+          size === 'sm' && 'min-h-[calc(18rem+var(--header-offset))] content-end',
+          size === 'md' &&
+            'min-h-[calc(24rem+var(--header-offset))] content-end sm:min-h-[calc(28rem+var(--header-offset))]',
+          size === 'lg' &&
+            'min-h-[calc(30rem+var(--header-offset))] content-end sm:min-h-[calc(36rem+var(--header-offset))]',
         )}
       >
         <div className="max-w-3xl text-[#101826] dark:text-white">
