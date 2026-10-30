@@ -3,6 +3,7 @@ import ClickSpark from '#/components/bits/ClickSpark'
 import { LEVEL_LABEL, resourceDomain } from '#/lib/schemas/resources'
 import type { Level } from '#/lib/schemas/resources'
 import { cn } from '#/lib/utils'
+import { safeHref } from '#/lib/rich-text'
 
 export interface ResourceCardData {
   id: string
@@ -94,7 +95,7 @@ export function ResourceCard({
 
       <h3 className="mt-4 text-xl leading-snug font-semibold tracking-[-0.02em]">
         <a
-          href={r.url}
+          href={safeHref(r.url) ?? undefined}
           target="_blank"
           rel="noopener noreferrer"
           className="focus-visible:ring-ring/50 rounded-md outline-none after:absolute after:inset-0 after:rounded-3xl after:content-[''] focus-visible:ring-3"

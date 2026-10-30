@@ -9,6 +9,7 @@ import { ProjectCover } from './project-cover'
 import { TeamAvatars } from './team-avatars'
 import { TechChip } from './tech-chip'
 import { teamNames } from './filter'
+import { safeHref } from '#/lib/rich-text'
 
 /** A wide spotlight card for an officer-featured project. */
 export function FeaturedProject({
@@ -86,7 +87,11 @@ export function FeaturedProject({
             </RaisedButton>
             {project.demoUrl && (
               <RaisedButton asChild variant="outline">
-                <a href={project.demoUrl} target="_blank" rel="noreferrer">
+                <a
+                  href={safeHref(project.demoUrl) ?? undefined}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <Globe aria-hidden="true" />
                   Live demo
                 </a>
@@ -94,7 +99,11 @@ export function FeaturedProject({
             )}
             {project.repoUrl && (
               <RaisedButton asChild variant="ghost">
-                <a href={project.repoUrl} target="_blank" rel="noreferrer">
+                <a
+                  href={safeHref(project.repoUrl) ?? undefined}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <Github aria-hidden="true" />
                   Code
                 </a>

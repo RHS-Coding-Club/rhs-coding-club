@@ -46,6 +46,7 @@ import { cn } from '#/lib/utils'
 import type { ProjectDecision } from '#/lib/schemas/projects'
 import { featureProject, listProjectReviewQueue, reviewProject } from '#/server/projects'
 import type { QueueProject } from '#/services/projects'
+import { safeHref } from '#/lib/rich-text'
 
 export const Route = createFileRoute('/_admin/admin/projects')({
   loader: () => listProjectReviewQueue(),
@@ -381,7 +382,7 @@ function ReviewPanel({
         <div className="flex flex-wrap gap-2 text-sm">
           {p.repoUrl && (
             <a
-              href={p.repoUrl}
+              href={safeHref(p.repoUrl) ?? undefined}
               target="_blank"
               rel="noreferrer"
               className="text-primary inline-flex items-center gap-1.5 underline-offset-4 hover:underline"
@@ -392,7 +393,7 @@ function ReviewPanel({
           )}
           {p.demoUrl && (
             <a
-              href={p.demoUrl}
+              href={safeHref(p.demoUrl) ?? undefined}
               target="_blank"
               rel="noreferrer"
               className="text-primary inline-flex items-center gap-1.5 underline-offset-4 hover:underline"

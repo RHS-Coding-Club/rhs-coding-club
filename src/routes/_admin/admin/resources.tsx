@@ -42,6 +42,7 @@ import { LEVELS, LEVEL_LABEL, resourceDomain } from '#/lib/schemas/resources'
 import { serverErrorMessage } from '#/lib/schemas/community'
 import { cn } from '#/lib/utils'
 import { approveResource, deleteResource, listResourcesAdmin } from '#/server/resources'
+import { safeHref } from '#/lib/rich-text'
 
 const STATUS = ['all', 'pending', 'approved'] as const
 
@@ -177,7 +178,7 @@ function AdminResources() {
                   <TableCell className="max-w-72">
                     <p className="truncate font-medium">{r.title}</p>
                     <a
-                      href={r.url}
+                      href={safeHref(r.url) ?? undefined}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 font-mono text-xs"

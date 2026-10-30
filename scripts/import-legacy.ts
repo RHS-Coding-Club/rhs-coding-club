@@ -70,6 +70,20 @@ const lg = (id: string) => `lg_${id}`
 const ms = (v: unknown, fallback: number) => (typeof v === 'number' ? v : fallback)
 const json = (v: unknown) => q(JSON.stringify(v))
 const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : null)
+/**
+ * Imported links skip the app's form validation, so hold them to the same
+ * rule: http(s) only. Anything else (javascript:, data:, junk) is dropped.
+ */
+const link = (v: unknown) => {
+  const s = str(v)
+  if (!s) return null
+  try {
+    const u = new URL(s)
+    return u.protocol === 'https:' || u.protocol === 'http:' ? s : null
+  } catch {
+    return null
+  }
+}
 
 function wrangler(argv: string[], capture = false) {
   const r = spawnSync('bunx', ['wrangler', ...argv], {
@@ -109,7 +123,7 @@ function fileKey(url: unknown, purpose: string): string | null {
 
 // ---------- Users ----------
 
-const existing = new Map<string, { id: string; role: Role }>()
+const existing = new Map<string, { id: string; role: Role; verified: boolean }>()
 if (!dryRun) {
   const out = wrangler(
     [
@@ -119,14 +133,21 @@ if (!dryRun) {
       remote ? '--remote' : '--local',
       '--json',
       '--command',
-      "SELECT id, email, role FROM user WHERE id NOT LIKE 'lg_%'",
+      "SELECT id, email, role, email_verified FROM user WHERE id NOT LIKE 'lg_%'",
     ],
     true,
   )
   const rows = (
-    JSON.parse(out) as { results: { id: string; email: string; role: Role }[] }[]
+    JSON.parse(out) as {
+      results: { id: string; email: string; role: Role; email_verified: number }[]
+    }[]
   )[0].results
-  for (const r of rows) existing.set(r.email.toLowerCase(), { id: r.id, role: r.role })
+  for (const r of rows)
+    existing.set(r.email.toLowerCase(), {
+      id: r.id,
+      role: r.role,
+      verified: r.email_verified === 1,
+    })
 }
 
 const profiles = new Map(col('users').map((u) => [u.id, u]))
@@ -177,6 +198,8 @@ const lines: string[] = ['PRAGMA foreign_keys = ON;']
 const roleUpdates: string[] = []
 let newUsers = 0
 let merged = 0
+/** Emails held here by an unverified account; that member's old data is skipped. */
+const conflicts: string[] = []
 
 const githubNames = new Map<string, string>()
 for (const r of [...col('membershipApplications'), ...col('githubMembershipRequests')])
@@ -196,6 +219,13 @@ for (const [email, group] of byEmail) {
     'guest',
   )
   const here = existing.get(email)
+  // Anyone can sign up here with any address, so an unverified account is no
+  // proof of owning the old one: merging would hand a stranger the old
+  // member's role and work. Skip it and report it for an admin to sort out.
+  if (here && !here.verified) {
+    conflicts.push(email)
+    continue
+  }
   const id = here?.id ?? lg(primary.uid)
   for (const p of group) userId.set(p.uid, id)
 
@@ -317,18 +347,22 @@ for (const p of col('projects')) {
     .map((u: string) => fileKey(u, 'project'))
     .filter(Boolean)
   lines.push(
-    `INSERT OR IGNORE INTO project (id, title, description, tech, repo_url, demo_url, image_keys, author_id, status, rejection_reason, featured, year, reviewed_by, reviewed_at, created_at, updated_at) VALUES (${q(lg(p.id))}, ${q(p.title)}, ${q(p.description ?? '')}, ${json(p.tech ?? [])}, ${q(str(p.repoUrl))}, ${q(str(p.demoUrl))}, ${json(images)}, ${q(author)}, ${q(p.approved ? 'approved' : 'pending')}, NULL, ${q(Boolean(p.featured))}, ${Number(p.year) || 'NULL'}, NULL, ${p.approved ? created : 'NULL'}, ${created}, ${ms(p.updatedAt, created)});`,
+    `INSERT OR IGNORE INTO project (id, title, description, tech, repo_url, demo_url, image_keys, author_id, status, rejection_reason, featured, year, reviewed_by, reviewed_at, created_at, updated_at) VALUES (${q(lg(p.id))}, ${q(p.title)}, ${q(p.description ?? '')}, ${json(p.tech ?? [])}, ${q(link(p.repoUrl))}, ${q(link(p.demoUrl))}, ${json(images)}, ${q(author)}, ${q(p.approved ? 'approved' : 'pending')}, NULL, ${q(Boolean(p.featured))}, ${Number(p.year) || 'NULL'}, NULL, ${p.approved ? created : 'NULL'}, ${created}, ${ms(p.updatedAt, created)});`,
     `INSERT OR IGNORE INTO project_member (id, project_id, user_id, created_at) VALUES (${q(lg(`pm_${p.id}`))}, ${q(lg(p.id))}, ${q(author)}, ${created});`,
   )
 }
 
 const resourceIds = new Set<string>()
 for (const r of col('resources')) {
-  if (!str(r.url)) continue
+  const href = link(r.url)
+  if (!href) {
+    skipped.push(`resource ${r.title} (not an http(s) link)`)
+    continue
+  }
   resourceIds.add(r.id)
   const created = ms(r.createdAt, now)
   lines.push(
-    `INSERT OR IGNORE INTO resource (id, title, description, url, tags, level, approved, added_by, created_at, updated_at) VALUES (${q(lg(r.id))}, ${q(r.title)}, ${q(r.description ?? '')}, ${q(r.url)}, ${json(r.tags ?? [])}, ${q(['beginner', 'intermediate', 'advanced'].includes(r.level) ? r.level : 'beginner')}, 1, ${q(who(r.addedBy))}, ${created}, ${ms(r.updatedAt, created)});`,
+    `INSERT OR IGNORE INTO resource (id, title, description, url, tags, level, approved, added_by, created_at, updated_at) VALUES (${q(lg(r.id))}, ${q(r.title)}, ${q(r.description ?? '')}, ${q(href)}, ${json(r.tags ?? [])}, ${q(['beginner', 'intermediate', 'advanced'].includes(r.level) ? r.level : 'beginner')}, 1, ${q(who(r.addedBy))}, ${created}, ${ms(r.updatedAt, created)});`,
   )
 }
 for (const b of col('bookmarks')) {
@@ -341,7 +375,7 @@ for (const b of col('bookmarks')) {
 
 for (const o of col('officers')) {
   lines.push(
-    `INSERT OR IGNORE INTO officer (id, name, title, bio, email, github_url, image_key, sort_order, is_active, created_at, updated_at) VALUES (${q(lg(o.id))}, ${q(o.name)}, ${q(o.role ?? 'Officer')}, ${q(o.bio ?? '')}, ${q(str(o.email))}, ${q(str(o.githubUrl))}, ${q(fileKey(o.imageUrl, 'officer'))}, ${Number(o.order) || 0}, ${q(o.isActive !== false)}, ${ms(o.createdAt, now)}, ${ms(o.updatedAt, now)});`,
+    `INSERT OR IGNORE INTO officer (id, name, title, bio, email, github_url, image_key, sort_order, is_active, created_at, updated_at) VALUES (${q(lg(o.id))}, ${q(o.name)}, ${q(o.role ?? 'Officer')}, ${q(o.bio ?? '')}, ${q(str(o.email))}, ${q(link(o.githubUrl))}, ${q(fileKey(o.imageUrl, 'officer'))}, ${Number(o.order) || 0}, ${q(o.isActive !== false)}, ${ms(o.createdAt, now)}, ${ms(o.updatedAt, now)});`,
   )
 }
 
@@ -500,3 +534,8 @@ console.log(
   summary,
 )
 if (skipped.length) console.log('Skipped:', skipped)
+if (conflicts.length)
+  console.log(
+    'Not merged: these emails belong to unverified accounts here, so their old data was left out. Once each owner verifies (a password reset does it) or an admin removes the account, re-run the import:',
+    conflicts,
+  )

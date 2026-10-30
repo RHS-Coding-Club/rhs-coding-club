@@ -22,6 +22,7 @@ import { teamNames } from '#/components/projects/filter'
 import { fmtDate } from '#/lib/format'
 import { hasRole } from '#/lib/roles'
 import { getProject } from '#/server/projects'
+import { safeHref } from '#/lib/rich-text'
 
 export const Route = createFileRoute('/projects/$id')({
   loader: async ({ params }) => {
@@ -88,7 +89,11 @@ function ProjectPage() {
           <>
             {project.demoUrl && (
               <RaisedButton asChild size="lg">
-                <a href={project.demoUrl} target="_blank" rel="noreferrer">
+                <a
+                  href={safeHref(project.demoUrl) ?? undefined}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <Globe aria-hidden="true" />
                   Live demo
                 </a>
@@ -100,7 +105,11 @@ function ProjectPage() {
                 size="lg"
                 variant={project.demoUrl ? 'outline' : 'primary'}
               >
-                <a href={project.repoUrl} target="_blank" rel="noreferrer">
+                <a
+                  href={safeHref(project.repoUrl) ?? undefined}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <Github aria-hidden="true" />
                   View the code
                 </a>

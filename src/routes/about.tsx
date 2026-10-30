@@ -10,6 +10,7 @@ import { RaisedButton } from '#/components/raised-button'
 import { SplitButton } from '#/components/split-button'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import { useIsDark } from '#/hooks/use-is-dark'
+import { safeHref } from '#/lib/rich-text'
 
 export const Route = createFileRoute('/about')({
   loader: () => getAbout(),
@@ -114,7 +115,7 @@ function AboutPage() {
                     )}
                     {o.githubUrl && (
                       <a
-                        href={o.githubUrl}
+                        href={safeHref(o.githubUrl) ?? undefined}
                         target="_blank"
                         rel="noreferrer"
                         className="text-foreground/80 hover:text-foreground mt-5 inline-flex items-center gap-1.5 font-mono text-xs transition-colors"
