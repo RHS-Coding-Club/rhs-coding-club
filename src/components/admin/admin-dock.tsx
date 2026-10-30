@@ -34,7 +34,7 @@ const GROUPS: NavItem['to'][][] = [
     '/admin/badges',
     '/admin/newsletter',
   ],
-  ['/admin/users', '/admin/officers', '/admin/settings'],
+  ['/admin/users', '/admin/officers', '/admin/settings', '/admin/reset'],
 ]
 
 /** Phones get the busiest pages plus "More", which opens the full list. */

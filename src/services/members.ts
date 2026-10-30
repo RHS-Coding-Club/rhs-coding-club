@@ -16,14 +16,20 @@ import type { Db } from '#/db'
 import { schema } from '#/db'
 import type { EmailTopic, PointSource } from '#/db/schema'
 import { badgeStats, badgesForUsers } from '#/lib/badges'
-import { semesterStart, weekKey } from '#/lib/dates'
+import { weekKey } from '#/lib/dates'
 import { hasRole } from '#/lib/roles'
 import type { Role } from '#/lib/roles'
 import type { EmailPrefsInput, Profile } from '#/lib/schemas/account'
 import { PREF_TOPICS } from '#/lib/schemas/account'
 import { getAdminOverview } from './home'
 import { latestApplication } from './membership'
-import { adjustPoints, pointHistory, pointsFor, rankMembers } from './points'
+import {
+  adjustPoints,
+  pointHistory,
+  pointsFor,
+  pointsWindowStart,
+  rankMembers,
+} from './points'
 import { getSetting } from './settings'
 
 // Members: the leaderboard, public profiles, the dashboard, account settings,
@@ -76,7 +82,7 @@ export async function getLeaderboard(
   opts: { window: LeaderboardWindow; viewerId?: string | null; now?: Date },
 ) {
   const now = opts.now ?? new Date()
-  const since = opts.window === 'semester' ? semesterStart(now) : undefined
+  const since = opts.window === 'semester' ? await pointsWindowStart(db, now) : undefined
   const [ranked, points] = await Promise.all([
     rankMembers(db, { since }),
     getSetting(db, 'points'),
@@ -270,7 +276,7 @@ export async function getMemberProfile(db: Db, userId: string, now = new Date())
   })
   if (!u) return null
 
-  const since = semesterStart(now)
+  const since = await pointsWindowStart(db, now)
   const [allTime, semester, rank, allTimeRank, solved, attended, projects, badges] =
     await Promise.all([
       pointsFor(db, u.id),
@@ -364,7 +370,7 @@ export async function getDashboard(
     return { kind: 'guest' as const, application }
   }
 
-  const since = semesterStart(now)
+  const since = await pointsWindowStart(db, now)
   const weeksFrom = new Date(now.getTime() - (WEEKS - 1) * 7 * 86_400_000)
   const [
     allTime,
@@ -624,7 +630,7 @@ export async function getUserDetail(db: Db, userId: string, now = new Date()) {
   if (!u) return null
   const [allTime, semester, ledger, application, badges] = await Promise.all([
     pointsFor(db, u.id),
-    pointsFor(db, u.id, semesterStart(now)),
+    pointsFor(db, u.id, await pointsWindowStart(db, now)),
     describedHistory(db, u.id, 100),
     latestApplication(db, u.id),
     badgesForUsers(db, [u.id]),

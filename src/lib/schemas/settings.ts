@@ -20,7 +20,14 @@ export const saveSettingSchema = z.discriminatedUnion('key', [
 ])
 export type SaveSettingInput = z.infer<typeof saveSettingSchema>
 
-export const SETTING_GROUPS: { key: SettingKey; label: string; description: string }[] = [
+/** Groups with a tab on the settings page. `season` is run by the reset tool. */
+export type EditableSettingKey = Exclude<SettingKey, 'season'>
+
+export const SETTING_GROUPS: {
+  key: EditableSettingKey
+  label: string
+  description: string
+}[] = [
   {
     key: 'club-info',
     label: 'Club info',

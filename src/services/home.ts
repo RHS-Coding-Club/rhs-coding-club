@@ -13,13 +13,13 @@ import {
 } from 'drizzle-orm'
 import type { Db } from '#/db'
 import { schema } from '#/db'
-import { semesterStart } from '#/lib/dates'
+import { pointsWindowStart } from './points'
 import { getSetting } from './settings'
 
 const MEMBER_ROLES = ['member', 'officer', 'admin'] as const
 
 export async function getHomeData(db: Db, now = new Date()) {
-  const since = semesterStart(now)
+  const since = await pointsWindowStart(db, now)
   const [club, points, social, nextEvent, memberCount, eventCount, projectCount] =
     await Promise.all([
       getSetting(db, 'club-info'),

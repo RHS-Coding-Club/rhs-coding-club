@@ -85,12 +85,22 @@ export const emailSchema = z.object({
     }),
 })
 
+/**
+ * The points season. Leaderboards and dashboards count points from the later
+ * of the semester start and `startedAt`, so "start a new season" zeroes the
+ * board without deleting anyone's history. Set by the admin reset tool.
+ */
+export const seasonSchema = z.object({
+  startedAt: z.number().int().nullable().default(null),
+})
+
 export const SETTINGS = {
   'club-info': clubInfoSchema,
   social: socialSchema,
   points: pointsSchema,
   'github-org': githubOrgSchema,
   email: emailSchema,
+  season: seasonSchema,
 } as const
 
 export type SettingKey = keyof typeof SETTINGS

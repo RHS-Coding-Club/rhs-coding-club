@@ -4,7 +4,7 @@ import { AdminPageHeader } from '#/components/admin/admin-page-header'
 import { SettingsForm } from '#/components/admin/settings/settings-form'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { SETTING_GROUPS } from '#/lib/schemas/settings'
-import type { SettingKey } from '#/lib/settings'
+import type { EditableSettingKey } from '#/lib/schemas/settings'
 import { getSettingsAdmin } from '#/server/settings'
 
 const KEYS = ['club-info', 'social', 'points', 'github-org', 'email'] as const
@@ -24,7 +24,7 @@ function AdminSettings() {
   const { values, meta, canEdit } = Route.useLoaderData()
   const search = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
-  const group: SettingKey = search.group ?? 'club-info'
+  const group: EditableSettingKey = search.group ?? 'club-info'
 
   return (
     <>
@@ -39,7 +39,9 @@ function AdminSettings() {
       />
       <Tabs
         value={group}
-        onValueChange={(v) => void navigate({ search: { group: v as SettingKey } })}
+        onValueChange={(v) =>
+          void navigate({ search: { group: v as EditableSettingKey } })
+        }
       >
         <TabsList className="mb-6 h-auto flex-wrap">
           {SETTING_GROUPS.map((g) => (

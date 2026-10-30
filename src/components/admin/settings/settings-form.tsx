@@ -11,7 +11,7 @@ import { Textarea } from '#/components/ui/textarea'
 import { fmtDate } from '#/lib/format'
 import { saveSettingSchema } from '#/lib/schemas/settings'
 import { serverErrorMessage } from '#/lib/schemas/community'
-import type { SettingKey } from '#/lib/settings'
+import type { EditableSettingKey } from '#/lib/schemas/settings'
 import { cn } from '#/lib/utils'
 import { saveSettings } from '#/server/settings'
 
@@ -27,7 +27,7 @@ interface Field {
 }
 
 /** The fields of each group, in order. Values are validated by the group's Zod schema. */
-const FIELDS: Record<SettingKey, Field[]> = {
+const FIELDS: Record<EditableSettingKey, Field[]> = {
   'club-info': [
     { path: 'clubName', label: 'Club name', kind: 'text' },
     {
@@ -174,7 +174,7 @@ export function SettingsForm({
   canEdit,
   meta,
 }: {
-  group: SettingKey
+  group: EditableSettingKey
   value: Obj
   canEdit: boolean
   meta?: { updatedAt: Date; updatedByName: string | null }

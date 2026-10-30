@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   Library,
   Mail,
+  RotateCcw,
   Settings,
   ShieldCheck,
   UserCheck,
@@ -56,6 +57,7 @@ export const ADMIN_NAV = [
   { to: '/admin/users', label: 'Users', icon: Users, minRole: 'admin' },
   { to: '/admin/officers', label: 'Officers', icon: ShieldCheck, minRole: 'admin' },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
+  { to: '/admin/reset', label: 'Reset data', icon: RotateCcw, minRole: 'admin' },
 ] as const
 
 /** Overview counts that badge a nav item (see `getAdminOverview`). */

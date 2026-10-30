@@ -3,6 +3,8 @@ import type { Db } from '#/db'
 import { schema } from '#/db'
 import type { PointSource } from '#/db/schema'
 import { evaluateBadges } from '#/lib/badges'
+import { semesterStart } from '#/lib/dates'
+import { getSetting } from './settings'
 
 // Points are an append-only ledger (`point_entry`). Nothing stores a total:
 // every score is a SUM over the ledger, optionally since a date.
@@ -70,6 +72,19 @@ export async function adjustPoints(
 }
 
 /** A user's total, all time or since `since`. */
+/**
+ * Where "this semester" starts for leaderboards and dashboards: the semester
+ * start, or the start of a new points season if an admin began one later
+ * (see the reset tool). Earlier points stay in history and all-time totals.
+ */
+export async function pointsWindowStart(db: Db, now = new Date()) {
+  const semester = semesterStart(now)
+  const { startedAt } = await getSetting(db, 'season')
+  return startedAt && startedAt > semester.getTime() && startedAt <= now.getTime()
+    ? new Date(startedAt)
+    : semester
+}
+
 export async function pointsFor(db: Db, userId: string, since?: Date) {
   const rows = await db
     .select({ n: total })

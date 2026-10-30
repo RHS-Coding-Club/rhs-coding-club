@@ -28,6 +28,7 @@ const BLURB: Partial<Record<(typeof ADMIN_NAV)[number]['to'], string>> = {
   '/admin/users': 'Roles and accounts',
   '/admin/officers': 'Who shows on the about page',
   '/admin/settings': 'Points, email, club details',
+  '/admin/reset': 'New school year, sample data, full wipe',
 }
 
 function AdminHome() {

@@ -1,12 +1,12 @@
 import { and, desc, gte, isNotNull, lt, lte, sql } from 'drizzle-orm'
 import type { Db } from '#/db'
 import { schema } from '#/db'
-import { semesterStart, weekKey } from '#/lib/dates'
+import { weekKey } from '#/lib/dates'
 import { fmtDate } from '#/lib/format'
 import { recipientsFor, sendEmails } from './email'
 import type { EmailMessage } from './email'
 import { escapeHtml, prefsFooter, renderEmail, siteUrl } from './email-templates'
-import { rankMembers } from './points'
+import { pointsWindowStart, rankMembers } from './points'
 
 // The Monday digest: this week's challenge, events in the next seven days,
 // posts from the last seven, and the top five this semester. Sent to every
@@ -52,7 +52,7 @@ export async function buildDigest(db: Db, now: Date) {
       columns: { id: true, title: true, slug: true, summary: true },
       limit: 4,
     }),
-    rankMembers(db, { since: semesterStart(now), limit: 5 }),
+    rankMembers(db, { since: await pointsWindowStart(db, now), limit: 5 }),
   ])
   return { challenge: challenge ?? null, events, posts, top }
 }
