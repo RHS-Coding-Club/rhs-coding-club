@@ -75,7 +75,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 }
 
 /** Full-screen auth pages: no site header or footer. */
-const AUTH_PAGES = new Set(['/login', '/signup', '/forgot-password', '/reset-password'])
+const AUTH_PAGES = new Set([
+  '/login',
+  '/signup',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+])
 
 function RootLayout() {
   const { user, theme } = Route.useRouteContext()

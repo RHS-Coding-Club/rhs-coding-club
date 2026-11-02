@@ -68,6 +68,28 @@ describe('sign-up and roles', () => {
     expect(rows).toHaveLength(1)
   })
 
+  it('limits how much mail anyone can trigger for one address', async () => {
+    const auth = getAuth()
+    const log = vi.spyOn(console, 'info').mockImplementation(() => undefined)
+    const u = await signUp('flooded@test.local')
+    const body = { email: u.email, password: 'password123' }
+    // Each failed login with the right password asks for a fresh link.
+    for (let i = 0; i < 5; i++)
+      await auth.api.signInEmail({ body }).catch(() => undefined)
+    for (let i = 0; i < 3; i++) await signUp(u.email)
+    await vi.waitFor(() => {
+      expect(mails(log, 'Confirm your RHS Coding Club email')).toHaveLength(3)
+      expect(
+        mails(log, 'You already have an RHS Coding Club account').filter((c) =>
+          String(c[0]).includes('flooded@test.local'),
+        ),
+      ).toHaveLength(1)
+    })
+    // The link goes to the page with a button, not straight to the GET endpoint.
+    expect(String(mails(log, 'Confirm your')[0]?.[0])).toContain('/verify-email?token=')
+    log.mockRestore()
+  })
+
   it('stops emailing reset links once an account has several outstanding', async () => {
     const auth = getAuth()
     const u = await signUp('forgetful@test.local')

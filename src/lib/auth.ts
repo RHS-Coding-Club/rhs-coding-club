@@ -2,9 +2,10 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { env, waitUntil } from 'cloudflare:workers'
 import { APIError } from 'better-auth/api'
-import { and, count, eq, gt, like } from 'drizzle-orm'
+import { and, count, eq, gt, like, lte } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
 import { sendEmail } from '#/services/email'
+import type { EmailMessage } from '#/services/email'
 import { renderEmail, siteUrl } from '#/services/email-templates'
 import {
   ROLES,
@@ -15,6 +16,63 @@ import {
 
 /** Reset links one account can have outstanding before more stop being emailed. */
 const MAX_LIVE_RESETS = 3
+
+const HOUR = 60 * 60 * 1000
+const DAY = 24 * HOUR
+
+/**
+ * Whether this address has had its allowance of this kind of mail. Anyone can
+ * trigger these for any address, so without it the site's Gmail could be used
+ * to flood a stranger. Counted in `verification`, which holds short-lived rows.
+ */
+async function overLimit(key: string, max: number, windowMs: number) {
+  const db = getDb()
+  const { verification } = schema
+  const identifier = `email-throttle:${key}`
+  const now = new Date()
+  await db
+    .delete(verification)
+    .where(and(eq(verification.identifier, identifier), lte(verification.expiresAt, now)))
+  const sent = await db
+    .select({ n: count() })
+    .from(verification)
+    .where(eq(verification.identifier, identifier))
+    .then((rows) => rows.at(0)?.n ?? 0)
+  if (sent >= max) return true
+  await db.insert(verification).values({
+    id: crypto.randomUUID(),
+    identifier,
+    value: '1',
+    expiresAt: new Date(now.getTime() + windowMs),
+  })
+  return false
+}
+
+/** Sends mail the public can trigger, after the response so timing reveals nothing. */
+function sendThrottled(
+  limit: { kind: string; email: string; max: number; windowMs: number },
+  message: EmailMessage,
+) {
+  const key = `${limit.kind}:${limit.email.toLowerCase()}`
+  waitUntil(
+    overLimit(key, limit.max, limit.windowMs).then((over) =>
+      over ? undefined : sendEmail(getDb(), message, 'public').then(() => undefined),
+    ),
+  )
+}
+
+/**
+ * Better Auth's link confirms on GET, and mail scanners open links. Send people
+ * to a page where a person has to press the button instead.
+ */
+function confirmPageUrl(url: string) {
+  const { searchParams } = new URL(url)
+  const query = new URLSearchParams({
+    token: searchParams.get('token') ?? '',
+    next: searchParams.get('callbackURL') ?? '/join',
+  })
+  return siteUrl(`/verify-email?${query}`)
+}
 
 // Server-only. Built lazily so bindings are read per isolate, never at import
 // time on the client. `role` and `avatarKey` are Better Auth "additional
@@ -64,23 +122,20 @@ function createAuth() {
           preheader: 'You already have an RHS Coding Club account.',
           heading: 'You already have an account',
           paragraphs: [
-            `Hi ${user.name.split(' ')[0] || user.name}, someone tried to sign up with this email, but it already has an RHS Coding Club account, maybe from the old club site.`,
+            'Someone tried to sign up with this email, but it already has an RHS Coding Club account, maybe from the old club site.',
             'Log in, or choose a password if you never set one.',
           ],
           cta: { label: 'Choose a password', href: siteUrl('/forgot-password') },
           footer: "If this wasn't you, ignore this email. Nothing changed.",
         })
-        waitUntil(
-          sendEmail(
-            getDb(),
-            {
-              to: user.email,
-              subject: 'You already have an RHS Coding Club account',
-              html,
-              text,
-            },
-            'public',
-          ),
+        sendThrottled(
+          { kind: 'existing', email: user.email, max: 1, windowMs: DAY },
+          {
+            to: user.email,
+            subject: 'You already have an RHS Coding Club account',
+            html,
+            text,
+          },
         )
       },
       revokeSessionsOnPasswordReset: true,
@@ -108,7 +163,7 @@ function createAuth() {
           preheader: 'Choose a new password for your RHS Coding Club account.',
           heading: 'Reset your password',
           paragraphs: [
-            `Hi ${user.name.split(' ')[0] || user.name}, someone asked to set a new password for the RHS Coding Club account on this email.`,
+            'Someone asked to set a new password for the RHS Coding Club account on this email.',
             'The link works for one hour and only once.',
           ],
           cta: { label: 'Choose a new password', href: url },
@@ -145,18 +200,19 @@ function createAuth() {
           preheader: 'One click and your RHS Coding Club account is ready.',
           heading: 'Confirm your email',
           paragraphs: [
-            `Hi ${user.name.split(' ')[0] || user.name}, confirm this address to finish making your RHS Coding Club account.`,
+            'Confirm this address to finish making your RHS Coding Club account.',
           ],
-          cta: { label: 'Confirm my email', href: url },
+          cta: { label: 'Confirm my email', href: confirmPageUrl(url) },
           footer: "If you didn't sign up, ignore this email. No account gets activated.",
         })
-        waitUntil(
-          sendEmail(getDb(), {
+        sendThrottled(
+          { kind: 'confirm', email: user.email, max: 3, windowMs: HOUR },
+          {
             to: user.email,
             subject: 'Confirm your RHS Coding Club email',
             html,
             text,
-          }),
+          },
         )
       },
     },
