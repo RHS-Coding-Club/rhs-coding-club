@@ -94,6 +94,23 @@ export const seasonSchema = z.object({
   startedAt: z.number().int().nullable().default(null),
 })
 
+export const BACKUP_FREQUENCIES = ['daily', 'weekly', 'monthly'] as const
+export type BackupFrequency = (typeof BACKUP_FREQUENCIES)[number]
+
+/** Automatic backups. Edited on the admin Backups page. */
+export const backupSchema = z.object({
+  enabled: z.boolean().default(true),
+  frequency: z.enum(BACKUP_FREQUENCIES).default('weekly'),
+  retentionDays: z.number().int().min(7).max(365).default(90),
+})
+
+/** What the last backup did, written by the backup job for the admin page. */
+export const backupStatusSchema = z.object({
+  lastSuccessAt: z.number().int().nullable().default(null),
+  lastError: z.string().max(200).nullable().default(null),
+  lastErrorAt: z.number().int().nullable().default(null),
+})
+
 export const SETTINGS = {
   'club-info': clubInfoSchema,
   social: socialSchema,
@@ -101,6 +118,8 @@ export const SETTINGS = {
   'github-org': githubOrgSchema,
   email: emailSchema,
   season: seasonSchema,
+  backup: backupSchema,
+  'backup-status': backupStatusSchema,
 } as const
 
 export type SettingKey = keyof typeof SETTINGS

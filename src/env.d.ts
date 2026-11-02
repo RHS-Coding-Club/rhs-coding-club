@@ -14,6 +14,7 @@ declare namespace Cloudflare {
     GMAIL_USER: string
     GMAIL_APP_PASSWORD: string
     GITHUB_TOKEN: string
+    TURNSTILE_SECRET: string
     TRUSTED_ORIGINS?: string
   }
 }

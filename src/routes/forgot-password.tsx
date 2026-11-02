@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { AtSign, MailCheck } from 'lucide-react'
 import { requestPasswordReset } from '#/lib/auth-client'
 import { AuthLayout } from '#/components/auth/auth-layout'
 import { AuthField } from '#/components/auth/auth-field'
 import { RaisedButton } from '#/components/raised-button'
+import { Turnstile } from '#/components/turnstile'
+import type { TurnstileHandle } from '#/components/turnstile'
+import { TURNSTILE_ACTIONS, TURNSTILE_HEADER } from '#/lib/turnstile'
 import { getClubPulse } from '#/server/public'
 
 export const Route = createFileRoute('/forgot-password')({
@@ -23,19 +26,23 @@ function ForgotPasswordPage() {
   const [sentTo, setSentTo] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  const turnstile = useRef<TurnstileHandle>(null)
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
     setPending(true)
     const email = String(new FormData(e.currentTarget).get('email'))
+    const token = await turnstile.current?.getToken()
     const { error: err } = await requestPasswordReset({
       email,
       redirectTo: '/reset-password',
+      fetchOptions: { headers: { [TURNSTILE_HEADER]: token ?? '' } },
     })
     setPending(false)
     if (err) {
       setError(err.message ?? 'Could not send the email. Try again in a minute.')
+      turnstile.current?.reset()
       return
     }
     setSentTo(email)
@@ -97,6 +104,7 @@ function ForgotPasswordPage() {
           placeholder="you@example.com"
           required
         />
+        <Turnstile ref={turnstile} action={TURNSTILE_ACTIONS.forgotPassword} />
         {error && (
           <p role="alert" className="text-destructive text-sm">
             {error}

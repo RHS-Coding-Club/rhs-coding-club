@@ -4,9 +4,11 @@ import { env } from 'cloudflare:workers'
 import { getDb } from '#/db'
 import { isRateLimited } from '#/lib/rate-limit'
 import { contactSchema, markMessageSchema, messageIdSchema } from '#/lib/schemas/contact'
+import { TURNSTILE_ACTIONS, TURNSTILE_FAILED } from '#/lib/turnstile'
 import { requireOfficer } from '#/server/auth'
 import * as contact from '#/services/contact'
 import { getSetting } from '#/services/settings'
+import { passesTurnstile } from '#/services/turnstile'
 
 // ---------- Public ----------
 
@@ -33,7 +35,10 @@ export const sendContactMessage = createServerFn({ method: 'POST' })
     const ip = getRequestHeaders().get('cf-connecting-ip')
     if (await isRateLimited(env.FORM_LIMIT, ip))
       throw new contact.ContactError('Too many messages. Try again in a minute.')
-    await contact.submitContactMessage(getDb(), data)
+    const { turnstileToken, ...message } = data
+    if (!(await passesTurnstile(TURNSTILE_ACTIONS.contact, turnstileToken, ip)))
+      throw new contact.ContactError(TURNSTILE_FAILED)
+    await contact.submitContactMessage(getDb(), message)
     // Same answer whether or not the honeypot tripped.
     return { ok: true as const }
   })

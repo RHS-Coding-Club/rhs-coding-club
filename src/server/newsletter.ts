@@ -10,11 +10,14 @@ import {
   maskEmail,
   tokenSchema,
 } from '#/lib/schemas/newsletter'
+import { TURNSTILE_ACTIONS, TURNSTILE_FAILED } from '#/lib/turnstile'
 import { requireOfficer } from '#/server/auth'
 import * as newsletter from '#/services/newsletter'
+import { passesTurnstile } from '#/services/turnstile'
 
 export const newsletterSchema = z.object({
   email: z.email('Enter a valid email address.'),
+  turnstileToken: z.string().max(2048).optional(),
 })
 
 /** Public: the footer signup. Duplicates are a silent success. */
@@ -24,6 +27,8 @@ export const subscribeNewsletter = createServerFn({ method: 'POST' })
     const ip = getRequestHeaders().get('cf-connecting-ip')
     if (await isRateLimited(env.FORM_LIMIT, ip))
       throw new newsletter.NewsletterError('Too many attempts. Try again in a minute.')
+    if (!(await passesTurnstile(TURNSTILE_ACTIONS.newsletter, data.turnstileToken, ip)))
+      throw new newsletter.NewsletterError(TURNSTILE_FAILED)
     const result = await newsletter.subscribeEmail(getDb(), data.email)
     return { ok: true as const, created: result.created }
   })

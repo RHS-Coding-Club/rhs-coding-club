@@ -4,7 +4,7 @@ import { cimd } from '@better-auth/cimd'
 import { mcp } from '@better-auth/mcp'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { env, waitUntil } from 'cloudflare:workers'
-import { APIError } from 'better-auth/api'
+import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { and, count, eq, gt, like, lte, sql } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
 import { canonicalMailbox } from '#/lib/email-address'
@@ -20,6 +20,9 @@ import {
   isBootstrapAdmin,
   parseBootstrapAdmins,
 } from '#/lib/roles'
+import { TURNSTILE_ACTIONS, TURNSTILE_FAILED, TURNSTILE_HEADER } from '#/lib/turnstile'
+import type { TurnstileAction } from '#/lib/turnstile'
+import { passesTurnstile } from '#/services/turnstile'
 
 /** Reset links one account can have outstanding before more stop being emailed. */
 const MAX_LIVE_RESETS = 3
@@ -99,6 +102,11 @@ function fetchClientMetadata(input: RequestInfo | URL, init?: RequestInit) {
 // used. That keeps this module importable inside the Workers test pool, which
 // has no Start runtime. If a server function ever needs to call an auth
 // mutation, forward its Set-Cookie header with setResponseHeaders instead.
+const TURNSTILE_PATHS: Partial<Record<string, TurnstileAction>> = {
+  '/sign-up/email': TURNSTILE_ACTIONS.signup,
+  '/request-password-reset': TURNSTILE_ACTIONS.forgotPassword,
+}
+
 function createAuth() {
   const bootstrapAdmins = parseBootstrapAdmins(env.BOOTSTRAP_ADMIN_EMAILS)
 
@@ -232,6 +240,24 @@ function createAuth() {
       },
     },
     socialProviders,
+    // Nothing here calls this, and login resends the link on its own path. Open,
+    // it would mail any unconfirmed account without a Turnstile check.
+    disabledPaths: ['/send-verification-email'],
+    hooks: {
+      // These two send email to whatever address is typed, so bots are kept out
+      // of them. Login isn't gated: it only sends mail after a correct password
+      // on an unconfirmed account, and it has its own rate limit.
+      before: createAuthMiddleware(async (ctx) => {
+        const action = TURNSTILE_PATHS[ctx.path]
+        if (!action) return
+        const passed = await passesTurnstile(
+          action,
+          ctx.headers?.get(TURNSTILE_HEADER),
+          ctx.headers?.get('cf-connecting-ip'),
+        )
+        if (!passed) throw new APIError('FORBIDDEN', { message: TURNSTILE_FAILED })
+      }),
+    },
     plugins: [
       // Only signs MCP access tokens. Without this flag every session read
       // would sign a JWT nothing uses.

@@ -5,6 +5,7 @@ import {
   Bot,
   CalendarDays,
   Code2,
+  DatabaseBackup,
   FileText,
   FolderGit2,
   Github,
@@ -59,6 +60,7 @@ export const ADMIN_NAV = [
   { to: '/admin/users', label: 'Users', icon: Users, minRole: 'admin' },
   { to: '/admin/officers', label: 'Officers', icon: ShieldCheck, minRole: 'admin' },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
+  { to: '/admin/backups', label: 'Backups', icon: DatabaseBackup, minRole: 'admin' },
   { to: '/admin/reset', label: 'Reset data', icon: RotateCcw, minRole: 'admin' },
 ] as const
 

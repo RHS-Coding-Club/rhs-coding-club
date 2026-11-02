@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { AtSign, LockKeyhole, MailCheck, UserRound } from 'lucide-react'
 import { z } from 'zod'
@@ -8,6 +8,9 @@ import { AuthDivider, AuthLayout } from '#/components/auth/auth-layout'
 import { AuthField, FinePrint } from '#/components/auth/auth-field'
 import { SocialButtons } from '#/components/auth/social-buttons'
 import { RaisedButton } from '#/components/raised-button'
+import { Turnstile } from '#/components/turnstile'
+import type { TurnstileHandle } from '#/components/turnstile'
+import { TURNSTILE_ACTIONS, TURNSTILE_HEADER } from '#/lib/turnstile'
 import { getClubPulse } from '#/server/public'
 
 const searchSchema = z.object({ redirect: z.string().optional() })
@@ -30,6 +33,7 @@ function SignupPage() {
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   const [sentTo, setSentTo] = useState<string | null>(null)
+  const turnstile = useRef<TurnstileHandle>(null)
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -37,15 +41,18 @@ function SignupPage() {
     setPending(true)
     const form = new FormData(e.currentTarget)
     const email = String(form.get('email'))
+    const token = await turnstile.current?.getToken()
     const { error: err } = await signUp.email({
       name: String(form.get('name')),
       email,
       password: String(form.get('password')),
       callbackURL: next,
+      fetchOptions: { headers: { [TURNSTILE_HEADER]: token ?? '' } },
     })
     setPending(false)
     if (err) {
       setError(err.message ?? 'Could not create your account.')
+      turnstile.current?.reset()
       return
     }
     setSentTo(email)
@@ -127,6 +134,7 @@ function SignupPage() {
           required
           minLength={8}
         />
+        <Turnstile ref={turnstile} action={TURNSTILE_ACTIONS.signup} />
         {error && (
           <p role="alert" className="text-destructive text-sm">
             {error}

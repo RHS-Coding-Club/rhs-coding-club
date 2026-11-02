@@ -54,11 +54,16 @@
     },
   ],
 
-  "r2_buckets": [{ "binding": "FILES", "bucket_name": "rhs-coding-club-files" }],
+  "r2_buckets": [
+    { "binding": "FILES", "bucket_name": "rhs-coding-club-files" },
+    // Private. Nothing serves this bucket; admins download through a server function.
+    { "binding": "BACKUPS", "bucket_name": "rhs-coding-club-backups" },
+  ],
 
   // Background jobs (src/services/cron.ts): hourly announcements, reminders,
-  // and GitHub invite sync; the weekly digest on Monday mornings.
-  "triggers": { "crons": ["0 * * * *", "0 16 * * 1"] },
+  // and GitHub invite sync; the weekly digest on Monday mornings; a daily check
+  // for whether a backup is due.
+  "triggers": { "crons": ["0 * * * *", "0 16 * * 1", "30 6 * * *"] },
 
   // Required by `wrangler preview`, which Workers Builds runs on PR branches.
   // Empty on purpose: previews inherit nothing from above, so they can't reach

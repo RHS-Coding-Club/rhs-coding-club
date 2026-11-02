@@ -61,6 +61,7 @@ Google and GitHub login need OAuth apps whose callback URLs are `{APP_URL}/api/a
 | `bun run db:migrate`       | Apply migrations to local D1                          |
 | `bun run db:migrate:prod`  | Apply migrations to the production D1                 |
 | `bun run db:seed`          | Seed local D1                                         |
+| `bun run db:restore`       | Load a backup into an empty D1 database               |
 | `bun run test:unit`        | Pure-function tests in Node                           |
 | `bun run test:integration` | Server code against a real D1 inside workerd          |
 | `bun run test:e2e`         | Playwright smoke tests against the dev server         |
@@ -101,13 +102,32 @@ Officers and admins can run the admin panel from an AI app that speaks the 2026-
 claude mcp add --transport http rhs https://rhs.riponhighcodingclub.workers.dev/mcp
 ```
 
-The app opens the site to sign in, and the officer approves it. Its tools match the admin panel and the officer's role. Deleting things, changing roles or settings, adjusting points, accepting members, GitHub invites, and emailing the club return a link instead of acting, and a person has to approve them on the site. The reset tool stays website-only.
+The app opens the site to sign in, and the officer approves it. Its tools match the admin panel and the officer's role. Deleting things, changing roles or settings, adjusting points, accepting members, GitHub invites, and emailing the club return a link instead of acting, and a person has to approve them on the site. The reset tool and backups stay website-only.
 
 `/admin/mcp` shows connected apps, waiting approvals, and recent activity. Calls are limited to 60 a minute per user.
 
 ## Security
 
 `src/server.ts` adds security headers to every response (`src/lib/security-headers.ts`) and rate limits per IP: 10 a minute on sign-in, sign-up, and reset routes, and 5 a minute on the contact and newsletter forms. The limits are Workers rate limiting bindings in `wrangler.jsonc`, which is free, and only apply on Cloudflare, not in local dev.
+
+Sign-up, forgot password, contact, and the newsletter form also check Cloudflare Turnstile on the server, because those forms send email and spend the Gmail daily limit. It's free. Forms fail closed: if `TURNSTILE_SECRET` is missing in production or Cloudflare can't be reached, they refuse the request. Login isn't gated, so Google, GitHub, and password sign-in keep working if Turnstile is down.
+
+## Backups
+
+Admins configure automatic backups at `/admin/backups`: how often (daily, weekly, or every 30 days) and how long to keep them (7 to 365 days). The default is weekly, kept for 90 days. The page estimates storage from the size of the latest real backup, against R2's free 10 GB, which uploaded files share.
+
+Backups live in the private `rhs-coding-club-backups` bucket, and a daily cron job checks whether one is due. Old ones are only deleted right after a new backup succeeds, and the newest three are always kept, so a failing job can't age out the last good copies.
+
+They leave out passwords, sessions, and uploaded images. After a full restore, people sign in with Google or GitHub on the same email, or set a new password through **Forgot password**. Uploaded images need their own copy.
+
+To restore, never over live data:
+
+1. `bunx wrangler d1 create rhs-coding-club-restore`
+2. `bunx wrangler d1 migrations apply rhs-coding-club-restore --remote` (with a temporary `d1_databases` entry for it)
+3. Download a backup from `/admin/backups`, then `bun run db:restore <file> --database rhs-coding-club-restore --remote`
+4. Check the data, then point `database_id` in `wrangler.jsonc` at the new database and deploy
+
+For a mistake in the last few days, D1 Time Travel is faster: `bunx wrangler d1 time-travel`.
 
 ## Email
 
@@ -128,6 +148,7 @@ Set these on the `rhs` Worker as secrets (`bunx wrangler secret put NAME`, or th
 | `GITHUB_CLIENT_SECRET`   | GitHub sign-in                                     |
 | `GMAIL_APP_PASSWORD`     | Sending email                                      |
 | `GITHUB_TOKEN`           | Org invites. Needs `admin:org` and `read:user`     |
+| `TURNSTILE_SECRET`       | Bot checks on forms. Forms refuse without it       |
 | `BOOTSTRAP_ADMIN_EMAILS` | Optional. Only for setting up a brand new database |
 
 Public configuration (`APP_URL`, the OAuth client IDs, the Gmail address) lives in `wrangler.jsonc`.
@@ -140,7 +161,7 @@ To deploy:
 
 Free tier limits to watch: Workers requests and CPU time, D1 reads and writes, R2 storage (billed to the card past the free 10 GB), and Gmail's daily recipients. Cloudflare's own dashboard shows current usage.
 
-The admin reset tool at `/admin/reset` handles the new school year, and offers a data backup first. That backup leaves out login data and uploaded files. To restore the database itself, use D1 Time Travel (`bunx wrangler d1 time-travel`).
+The admin reset tool at `/admin/reset` handles the new school year, and offers a data backup first.
 
 ## Contributing
 
