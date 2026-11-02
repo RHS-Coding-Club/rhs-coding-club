@@ -30,7 +30,7 @@ describe('sendEmails', () => {
 
   it('sends over one Gmail connection as the club account', async () => {
     const { sent, connect } = fakeMailer()
-    const r = await sendEmails(db, many(3), now)
+    const r = await sendEmails(db, many(3), { now })
     expect(r).toEqual({ sent: 3, logged: 0, failed: 0 })
     expect(connect).toHaveBeenCalledTimes(1)
     expect(connect.mock.calls[0]?.[0]).toMatchObject({
@@ -45,22 +45,57 @@ describe('sendEmails', () => {
     ])
   })
 
-  it('stops a broadcast at 400 a day but keeps room for one-off emails', async () => {
+  it('spends the day from least to most important, keeping room for resets', async () => {
     const { sent } = fakeMailer()
-    expect(await sendEmails(db, many(450), now)).toMatchObject({ sent: 400, failed: 50 })
-    expect(await sendEmails(db, many(5), now)).toMatchObject({ sent: 0, failed: 5 })
-    // A password reset still goes out.
-    expect(await sendEmails(db, [mail('reset@test.local')], now)).toMatchObject({
-      sent: 1,
+    // A contact form flood can't get past its own tier.
+    expect(await sendEmails(db, many(250), { tier: 'public', now })).toMatchObject({
+      sent: 200,
+      failed: 50,
     })
-    expect(sent).toHaveLength(401)
+    expect(await sendEmails(db, many(250), { now })).toMatchObject({
+      sent: 200,
+      failed: 50,
+    })
+    expect(await sendEmails(db, many(5), { now })).toMatchObject({ sent: 0, failed: 5 })
+    expect(
+      await sendEmails(db, [mail('decision@test.local')], { tier: 'personal', now }),
+    ).toMatchObject({ sent: 1 })
+    expect(
+      await sendEmails(db, [mail('reset@test.local')], { tier: 'reset', now }),
+    ).toMatchObject({ sent: 1 })
+    expect(sent).toHaveLength(402)
     // The allowance starts over the next day.
-    expect(await sendEmails(db, many(5), nextDay)).toMatchObject({ sent: 5, failed: 0 })
+    expect(await sendEmails(db, many(5), { now: nextDay })).toMatchObject({
+      sent: 5,
+      failed: 0,
+    })
+  })
+
+  it('strips line breaks from every header value', async () => {
+    const { sent } = fakeMailer()
+    await sendEmails(
+      db,
+      [
+        {
+          ...mail('a@test.local\r\nBcc: x@evil.test'),
+          subject: 'Hi\r\nBcc: x@evil.test',
+          headers: { 'List-Unsubscribe': '<u>\nBcc: x@evil.test' },
+        },
+      ],
+      { now },
+    )
+    expect(sent[0]?.subject).toBe('Hi Bcc: x@evil.test')
+    expect(sent[0]?.to).not.toMatch(/[\r\n]/)
+    expect(sent[0]?.headers?.['List-Unsubscribe']).not.toMatch(/[\r\n]/)
   })
 
   it('counts a failed connection instead of throwing', async () => {
     fakeMailer()
     vi.spyOn(WorkerMailer, 'connect').mockRejectedValue(new Error('refused'))
-    expect(await sendEmails(db, many(2), now)).toEqual({ sent: 0, logged: 0, failed: 2 })
+    expect(await sendEmails(db, many(2), { now })).toEqual({
+      sent: 0,
+      logged: 0,
+      failed: 2,
+    })
   })
 })

@@ -74,11 +74,15 @@ export async function submitContactMessage(
       footer:
         'Sent from the contact form on the club website. Reply to them directly at the address above.',
     })
-    await sendEmail(db, {
-      to: contactEmail,
-      subject: `[Contact] ${input.subject}`,
-      ...content,
-    })
+    await sendEmail(
+      db,
+      {
+        to: contactEmail,
+        subject: `[Contact] ${input.subject}`,
+        ...content,
+      },
+      'public',
+    )
   }
   return { stored: true as const, id: row.id }
 }

@@ -27,11 +27,16 @@ export interface SendResult {
   failed: number
 }
 
-/** Gmail allows about 500 recipients a day; broadcasts stop short of it. */
-const DAILY_LIMIT = 500
-const BROADCAST_LIMIT = 400
-/** A send to one person (a reset, a decision) may use the reserve. */
-const isBroadcast = (messages: EmailMessage[]) => messages.length > 1
+/**
+ * How far into Gmail's roughly 500 recipients a day each kind of mail may go.
+ * All share one count, so what the public can trigger stops first and
+ * password resets always have room left.
+ */
+const TIER_LIMIT = { public: 200, broadcast: 400, personal: 450, reset: 500 } as const
+export type EmailTier = keyof typeof TIER_LIMIT
+
+/** Header values come from forms; a line break would start a new header. */
+const oneLine = (value: string) => value.replace(/[\r\n]+/g, ' ').trim()
 
 const QUOTA_KEY = 'cron:email-quota'
 
@@ -68,7 +73,7 @@ async function grant(db: Db, wanted: number, limit: number, now: Date) {
 export async function sendEmails(
   db: Db,
   messages: EmailMessage[],
-  now = new Date(),
+  { tier = 'broadcast', now = new Date() }: { tier?: EmailTier; now?: Date } = {},
 ): Promise<SendResult> {
   const result: SendResult = { sent: 0, logged: 0, failed: 0 }
   if (messages.length === 0) return result
@@ -83,8 +88,7 @@ export async function sendEmails(
     return result
   }
 
-  const limit = isBroadcast(messages) ? BROADCAST_LIMIT : DAILY_LIMIT
-  const allowed = await grant(db, messages.length, limit, now)
+  const allowed = await grant(db, messages.length, TIER_LIMIT[tier], now)
   if (allowed < messages.length) {
     result.failed += messages.length - allowed
     console.error(
@@ -94,7 +98,7 @@ export async function sendEmails(
   if (allowed === 0) return result
 
   const { senderName, replyTo } = await getSetting(db, 'email')
-  const from = { name: senderName || 'RHS Coding Club', email: cfg.username }
+  const from = { name: oneLine(senderName) || 'RHS Coding Club', email: cfg.username }
 
   let mailer: WorkerMailer | null = null
   try {
@@ -109,12 +113,16 @@ export async function sendEmails(
       try {
         await mailer.send({
           from,
-          to: m.to,
-          subject: m.subject,
+          to: oneLine(m.to),
+          subject: oneLine(m.subject),
           html: m.html,
           text: m.text,
-          headers: m.headers,
-          ...(replyTo ? { reply: replyTo } : {}),
+          headers:
+            m.headers &&
+            Object.fromEntries(
+              Object.entries(m.headers).map(([k, v]) => [oneLine(k), oneLine(v)]),
+            ),
+          ...(replyTo ? { reply: oneLine(replyTo) } : {}),
         })
         result.sent++
       } catch (err) {
@@ -131,8 +139,8 @@ export async function sendEmails(
   return result
 }
 
-export function sendEmail(db: Db, message: EmailMessage) {
-  return sendEmails(db, [message])
+export function sendEmail(db: Db, message: EmailMessage, tier: EmailTier = 'personal') {
+  return sendEmails(db, [message], { tier })
 }
 
 /**

@@ -2,11 +2,19 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { env, waitUntil } from 'cloudflare:workers'
 import { APIError } from 'better-auth/api'
-import { count, eq } from 'drizzle-orm'
+import { and, count, eq, gt, like } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
 import { sendEmail } from '#/services/email'
 import { renderEmail } from '#/services/email-templates'
-import { ROLES, initialRoleFor, parseBootstrapAdmins } from '#/lib/roles'
+import {
+  ROLES,
+  initialRoleFor,
+  isBootstrapAdmin,
+  parseBootstrapAdmins,
+} from '#/lib/roles'
+
+/** Reset links one account can have outstanding before more stop being emailed. */
+const MAX_LIVE_RESETS = 3
 
 // Server-only. Built lazily so bindings are read per isolate, never at import
 // time on the client. `role` and `avatarKey` are Better Auth "additional
@@ -54,6 +62,21 @@ function createAuth() {
       // Not awaited, so response time doesn't reveal whether an email exists;
       // waitUntil keeps the Worker alive until the send finishes.
       sendResetPassword: async ({ user, url }) => {
+        // Anyone can ask for a reset for any address; don't let them flood one
+        // inbox or spend the club's daily allowance. Tokens still live count.
+        const live = await getDb()
+          .select({ n: count() })
+          .from(schema.verification)
+          .where(
+            and(
+              eq(schema.verification.value, user.id),
+              like(schema.verification.identifier, 'reset-password:%'),
+              gt(schema.verification.expiresAt, new Date()),
+            ),
+          )
+          .then((rows) => rows.at(0)?.n ?? 0)
+        if (live > MAX_LIVE_RESETS) return
+
         const { html, text } = renderEmail({
           preheader: 'Choose a new password for your RHS Coding Club account.',
           heading: 'Reset your password',
@@ -66,12 +89,16 @@ function createAuth() {
             "If you didn't ask for this, ignore this email. Your password won't change.",
         })
         waitUntil(
-          sendEmail(getDb(), {
-            to: user.email,
-            subject: 'Reset your RHS Coding Club password',
-            html,
-            text,
-          }),
+          sendEmail(
+            getDb(),
+            {
+              to: user.email,
+              subject: 'Reset your RHS Coding Club password',
+              html,
+              text,
+            },
+            'reset',
+          ),
         )
       },
       onPasswordReset: async ({ user }) => {
@@ -124,12 +151,20 @@ function createAuth() {
     databaseHooks: {
       user: {
         create: {
-          before: async (u) => ({
-            data: {
-              ...u,
-              role: initialRoleFor(u.email, bootstrapAdmins, u.emailVerified),
-            },
-          }),
+          before: async (u) => {
+            // Otherwise a stranger could sit on a listed address, and the real
+            // admin's provider sign-in couldn't link to an unverified account.
+            if (!u.emailVerified && isBootstrapAdmin(u.email, bootstrapAdmins))
+              throw new APIError('FORBIDDEN', {
+                message: 'Sign in with Google or GitHub to use this email.',
+              })
+            return {
+              data: {
+                ...u,
+                role: initialRoleFor(u.email, bootstrapAdmins, u.emailVerified),
+              },
+            }
+          },
         },
       },
     },

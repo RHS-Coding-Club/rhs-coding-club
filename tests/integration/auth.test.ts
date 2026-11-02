@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { eq } from 'drizzle-orm'
 import { getAuth } from '#/lib/auth'
 import { getDb, schema } from '#/db'
@@ -21,12 +21,21 @@ describe('sign-up and roles', () => {
     expect(row?.email).toBe('newbie@test.local')
   })
 
-  it('does not grant admin for a bootstrap email from a password sign-up', async () => {
-    const created = await signUp('admin@test.local', 'Fake Ada')
-    const row = await getDb().query.user.findFirst({
-      where: eq(schema.user.id, created.id),
-    })
-    expect(row?.role).toBe('guest')
+  it('refuses a password sign-up on a bootstrap email', async () => {
+    await expect(signUp('admin@test.local', 'Fake Ada')).rejects.toThrow(
+      'Sign in with Google or GitHub',
+    )
+  })
+
+  it('stops emailing reset links once an account has several outstanding', async () => {
+    const auth = getAuth()
+    const u = await signUp('forgetful@test.local')
+    const send = vi.spyOn(console, 'info').mockImplementation(() => undefined)
+    for (let i = 0; i < 6; i++)
+      await auth.api.requestPasswordReset({ body: { email: u.email } })
+    const mails = send.mock.calls.filter((c) => String(c[0]).startsWith('[email:dev]'))
+    send.mockRestore()
+    expect(mails).toHaveLength(3)
   })
 
   it('grants admin to a bootstrap email a provider verified, and exposes it on the session', async () => {
@@ -53,6 +62,6 @@ describe('sign-up and roles', () => {
   })
 
   it('rejects duplicate emails', async () => {
-    await expect(signUp('admin@test.local')).rejects.toThrow()
+    await expect(signUp('ada@admin.test')).rejects.toThrow()
   })
 })
