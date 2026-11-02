@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest something new or a better way of doing something.
+title: 'feat: '
+labels: ['type: feature', 'status: needs triage']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe what's hard or missing today, before any particular solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: How might it work?
+    validations:
+      required: true
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Who is it for?
+      multiple: true
+      options:
+        - Visitors
+        - Members
+        - Officers
+        - Admins
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Other ideas you considered
+  - type: checkboxes
+    id: free-tier
+    attributes:
+      label: Budget
+      description: The club has no budget, so everything has to stay on free tiers.
+      options:
+        - label: As far as I know, this doesn't need a paid service.
