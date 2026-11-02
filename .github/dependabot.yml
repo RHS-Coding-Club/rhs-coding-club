@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # bun.lock needs the "bun" ecosystem; "npm" can't update it. Updates are
+  # grouped so a week of bumps is one or two PRs. Merging one deploys the site.
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+      major:
+        update-types: [major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ['*']

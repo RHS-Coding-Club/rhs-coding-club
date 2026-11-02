@@ -4,7 +4,7 @@
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-If you believe you have found a security vulnerability in the RHS Coding Club website, please report it to us immediately via the website's contact us page or our club's Discord channel.
+If you believe you have found a security vulnerability in the RHS Coding Club website, please [report it privately on GitHub](https://github.com/RHS-Coding-Club/rhs-coding-club/security/advisories/new). You can also reach us through the website's contact page or the club's Discord.
 
 **Links:** [Contact Us Page](https://rhs.riponhighcodingclub.workers.dev/contact), [Discord](https://discord.com/invite/UQR79bn6ZZ)
 

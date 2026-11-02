@@ -22,7 +22,7 @@
     "db:seed": "bun scripts/seed.ts",
     "db:seed:prod": "bun scripts/seed.ts --remote",
     "db:studio": "drizzle-kit studio",
-    "auth:schema": "better-auth generate --config src/lib/auth.ts --output src/db/schema/auth.generated.ts",
+    "auth:schema": "bunx @better-auth/cli@latest generate --config src/lib/auth.ts --output src/db/schema/auth.generated.ts",
     "test": "bun run test:unit && bun run test:integration",
     "test:unit": "vitest run --config vitest.config.ts",
     "test:integration": "vitest run --config vitest.workers.config.ts",
@@ -75,7 +75,6 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@better-auth/cli": "^1.4.21",
     "@cloudflare/vite-plugin": "^1.67.0",
     "@cloudflare/vitest-plugin": "^1.4.12",
     "@modelcontextprotocol/client": "^2.4.0",
@@ -87,7 +86,7 @@
     "@types/node": "^22.20.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.2",
+    "@vitejs/plugin-react": "^6.2.0",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9.39.5",
     "prettier": "^3.9.10",
@@ -100,7 +99,14 @@
     "wrangler": "^4.156.1"
   },
   "overrides": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "fast-uri": "^3.1.9",
+    "ip-address": "^10.7.5",
     "seroval": "^1.7.5",
-    "seroval-plugins": "^1.7.5"
+    "seroval-plugins": "^1.7.5",
+    "source-map-js": "^1.2.2",
+    "systeminformation": "^5.33.16",
+    "undici": "^7.30.1",
+    "zod": "^4.6.7"
   }
 }

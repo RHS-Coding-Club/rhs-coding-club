@@ -17,6 +17,17 @@ export function markdownToDoc(markdown: string): RichNode {
   return { type: 'doc', content: content.length ? content : [{ type: 'paragraph' }] }
 }
 
+/** Repeats until stable, because removing a tag can join the text around it into a new one. */
+function stripTags(html: string): string {
+  let current = html
+  let previous: string
+  do {
+    previous = current
+    current = current.replace(/<[^>]+>/g, '')
+  } while (current !== previous)
+  return current
+}
+
 function blocks(tokens: Token[]): RichNode[] {
   const out: RichNode[] = []
   for (const t of tokens) {
@@ -83,7 +94,7 @@ function blocks(tokens: Token[]): RichNode[] {
         break
       }
       case 'html': {
-        const text = (t as Tokens.HTML).text.replace(/<[^>]+>/g, '').trim()
+        const text = stripTags((t as Tokens.HTML).text).trim()
         if (text) out.push({ type: 'paragraph', content: [{ type: 'text', text }] })
         break
       }
@@ -165,7 +176,7 @@ function inline(tokens: Token[] | undefined, marks: RichMark[] = []): RichNode[]
         break
       }
       case 'html':
-        text((t as Tokens.HTML).text.replace(/<[^>]+>/g, ''))
+        text(stripTags((t as Tokens.HTML).text))
         break
       default:
         if ('text' in t && typeof t.text === 'string') text(decode(t.text))
