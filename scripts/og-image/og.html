@@ -1,11 +1,14 @@
 <!doctype html>
-<!-- Source of public/og.png. Rendered by render.ts: bun run og:render -->
+<!--
+  Source of public/og.jpg. Rendered by render.ts: bun run og:render
+  hero-bg.jpg is a 1200x630 screenshot of the home page's AsciiBackground in dark mode.
+-->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@600&display=swap"
     />
     <style>
       * {
@@ -17,55 +20,46 @@
         width: 1200px;
         height: 630px;
         overflow: hidden;
-        padding: 64px 72px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        background: #0b0f15;
-        color: #fff;
-        font-family: 'Geist', sans-serif;
+        background: #121924 url(hero-bg.jpg) center / cover;
       }
-      #mark {
+      #lockup {
+        position: absolute;
+        left: 60px;
+        right: 60px;
+        bottom: 56px;
         display: flex;
         align-items: center;
-        gap: 18px;
-        font-size: 26px;
-        font-weight: 500;
-        letter-spacing: -0.01em;
-        color: #8b98a8;
+        justify-content: space-between;
       }
-      #mark img {
-        width: 72px;
-        height: 72px;
-      }
+      /* The headline highlight from the home page hero. */
       h1 {
-        font-size: 128px;
-        line-height: 1.02;
+        font-family: 'Geist', sans-serif;
+        font-size: 116px;
         font-weight: 600;
+        line-height: 1.08;
         letter-spacing: -0.045em;
+        white-space: nowrap;
+        color: #fff;
       }
-      svg {
-        position: absolute;
-        right: 72px;
-        top: 64px;
+      h1 span {
+        display: inline-block;
+        margin-left: 0.04em;
+        padding: 0 0.14em 0.06em;
+        border-radius: 0.16em;
+        background: #5fb2ee;
+        color: #0b0f15;
+      }
+      img {
+        width: 124px;
+        height: 124px;
       }
     </style>
   </head>
   <body>
-    <div id="mark">
+    <div id="lockup">
+      <h1>RHS <span>Coding Club</span></h1>
       <img src="../../public/logo.png" alt="" />
-      <span>Ripon High School</span>
     </div>
-    <svg width="148" height="72" viewBox="0 0 148 72" fill="none" aria-hidden="true">
-      <path
-        d="M34 12 8 36l26 24M114 12l26 24-26 24M88 6 60 66"
-        stroke="#5fb2ee"
-        stroke-width="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-    <h1>RHS<br />Coding Club</h1>
     <script>
       document.fonts.ready.then(() => {
         document.body.dataset.ready = 'true'

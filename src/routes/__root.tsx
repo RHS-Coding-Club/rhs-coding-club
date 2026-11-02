@@ -29,7 +29,7 @@ const FONTS =
 const DESCRIPTION =
   'The most active club at RHS. Coding challenges, community service, hackathons, and projects.'
 // Link previews need an absolute URL, and this also runs in the browser, where env isn't readable.
-const OG_IMAGE = 'https://rhs.riponhighcodingclub.workers.dev/og.png'
+const OG_IMAGE = 'https://rhs.riponhighcodingclub.workers.dev/og.jpg'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async () => {
