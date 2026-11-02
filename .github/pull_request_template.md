@@ -32,8 +32,8 @@ If your changes affect the UI, add before/after screenshots or GIFs.
 Steps for a reviewer to test this PR locally:
 
 1. `git checkout your-branch-name`
-2. `npm install` (if needed)
-3. `npm run dev`
+2. `bun install` (if needed)
+3. `bun run dev`
 4. Visit: `http://localhost:3000/...`
 5. Verify that...
 
