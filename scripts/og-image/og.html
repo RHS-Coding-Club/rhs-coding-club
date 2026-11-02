@@ -1,0 +1,100 @@
+<!doctype html>
+<!-- Source of public/og.png. Rendered by render.ts: bun run og:render -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@600&display=swap"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #4a9bea;
+      }
+      /* Soft colour field in the club's blues. The deep blobs sit behind the name so white stays readable. */
+      #field {
+        position: absolute;
+        inset: -120px;
+        filter: blur(70px);
+      }
+      #field i {
+        position: absolute;
+        border-radius: 50%;
+      }
+      #lockup {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+      }
+      img {
+        width: 104px;
+        height: 104px;
+      }
+      h1 {
+        padding-bottom: 6px;
+        font-family: 'Geist', sans-serif;
+        font-size: 98px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: -0.045em;
+        white-space: nowrap;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="field">
+      <i
+        style="left: -80px; top: -150px; width: 700px; height: 420px; background: #bfe3ff"
+      ></i>
+      <i
+        style="left: 620px; top: -190px; width: 620px; height: 380px; background: #38bdf8"
+      ></i>
+      <i
+        style="left: 1080px; top: -90px; width: 460px; height: 400px; background: #f6f8ff"
+      ></i>
+      <i
+        style="left: -180px; top: 610px; width: 700px; height: 360px; background: #f6f8ff"
+      ></i>
+      <i
+        style="left: 340px; top: 730px; width: 620px; height: 240px; background: #a5d8ff"
+      ></i>
+      <i
+        style="left: 960px; top: 520px; width: 560px; height: 440px; background: #38bdf8"
+      ></i>
+      <i
+        style="
+          left: 40px;
+          top: 240px;
+          width: 1360px;
+          height: 370px;
+          background: #1e3fd8;
+          transform: rotate(-5deg);
+        "
+      ></i>
+      <i
+        style="left: 620px; top: 300px; width: 520px; height: 240px; background: #2a1fd0"
+      ></i>
+    </div>
+    <div id="lockup">
+      <img src="../../public/logo.png" alt="" />
+      <h1>RHS Coding Club</h1>
+    </div>
+    <script>
+      document.fonts.ready.then(() => {
+        document.body.dataset.ready = 'true'
+      })
+    </script>
+  </body>
+</html>
