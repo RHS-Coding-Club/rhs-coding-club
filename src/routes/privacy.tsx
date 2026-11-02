@@ -164,8 +164,9 @@ const SECTIONS: LegalSection[] = [
     body: (
       <p>
         Turn notification emails on or off in <Link to="/account">Account settings</Link>.
-        Every newsletter has an unsubscribe link at the bottom that takes you off the list
-        without needing an account.
+        Emails you need for your account, like confirming your address or resetting your
+        password, always go out. Every newsletter has an unsubscribe link at the bottom
+        that takes you off the list without needing an account.
       </p>
     ),
   },

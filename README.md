@@ -2,7 +2,9 @@
 
 The website for the Ripon High School Coding Club: weekly challenges, events and RSVPs, member projects, a blog, learning resources, and a points and badges system.
 
-Built with TanStack Start and deployed to Cloudflare Workers. Data lives in D1 (SQLite), files in R2, auth is Better Auth, email goes through the club's Gmail account.
+Live at **https://rhs.riponhighcodingclub.workers.dev**.
+
+Built with TanStack Start and deployed to Cloudflare Workers. Data lives in D1 (SQLite), files in R2, auth is Better Auth, email goes through the club's Gmail account. The club has no budget, so everything runs on free tiers and there is no paid domain.
 
 ## Stack
 
@@ -31,7 +33,7 @@ bun run db:seed                  # test users + sample content
 bun run dev                      # http://localhost:3000
 ```
 
-Seeded logins (all with password `password123`):
+Seeded logins, which only work locally (all with password `password123`):
 
 | Email                | Role    |
 | -------------------- | ------- |
@@ -40,7 +42,7 @@ Seeded logins (all with password `password123`):
 | `member@test.local`  | member  |
 | `guest@test.local`   | guest   |
 
-Google and GitHub login need OAuth apps whose callback URLs are `{APP_URL}/api/auth/callback/google` and `{APP_URL}/api/auth/callback/github`. Leave the client IDs blank in `.dev.vars` and those buttons simply won't work locally.
+Google and GitHub login need OAuth apps whose callback URLs are `{APP_URL}/api/auth/callback/google` and `{APP_URL}/api/auth/callback/github`. Without credentials in `.dev.vars` those buttons won't work locally. Everything else does: with no `GMAIL_APP_PASSWORD`, emails print to the dev server console, including the links to confirm an account or reset a password.
 
 ## Scripts
 
@@ -66,28 +68,59 @@ Google and GitHub login need OAuth apps whose callback URLs are `{APP_URL}/api/a
 src/
   routes/          file-based routes; _authed and _admin are pathless guards
   server/          server functions and auth middleware
+  services/        business logic; takes the database as an argument
   db/schema/       Drizzle tables (auth.ts = Better Auth, club.ts = everything else)
   db/migrations/   generated SQL, applied by Wrangler
   lib/             pure helpers, auth config, zod schemas
-  components/      ui/ (Shadcn) and feature components
-scripts/seed.ts    local seed
+  components/      ui/ (Shadcn), bits/ (vendored React Bits), feature components
+scripts/           local seed and the one-time import from the old Firebase site
 tests/             unit/, integration/, e2e/
 ```
 
+## Accounts and sign-in
+
+People sign in with Google, GitHub, or an email and password. A password sign-up has to confirm its email before it can log in. Signing up with an address that already has an account gets the same response as a new sign-up, and the owner gets an email telling them to log in or set a password, so the form can't be used to find out who has an account.
+
+Members imported from the old site have no password. They set one through **Forgot password**, or sign in with a Google or GitHub account that uses the same email.
+
 ## Authorization
 
-Roles are `guest < member < officer < admin`. New sign-ups are guests until an officer approves their membership application. Emails listed in `BOOTSTRAP_ADMIN_EMAILS` become admin on first sign-in.
+Roles are `guest < member < officer < admin`. New sign-ups are guests until an officer approves their membership application. Emails listed in `BOOTSTRAP_ADMIN_EMAILS` become admin the first time they sign in with Google or GitHub. Password sign-up is refused for those addresses, because it doesn't prove ownership until the email is confirmed.
 
 Every protected server function uses `requireUser`, `requireMember`, `requireOfficer`, or `requireAdmin` from `src/server/auth.ts`. Route layouts redirect too, but the server-function middleware is the actual security boundary.
 
-## Deploying
+## Email
 
-1. `bunx wrangler login`
-2. `bunx wrangler d1 create rhs-coding-club` and put the returned `database_id` in `wrangler.jsonc`
-3. `bunx wrangler r2 bucket create rhs-coding-club-files`
-4. `bunx wrangler secret put NAME` for each secret in `.dev.vars.example`
-5. `bun run db:migrate:prod`
-6. `bun run deploy`
+`src/services/email.ts` sends through the club's Gmail account over SMTP using an app password. Gmail allows about 500 recipients a day, so each kind of mail gets a limit (`TIER_LIMIT`): public-triggered mail stops first and password resets always have room left. Bulk sends beyond a limit are dropped and logged, not queued.
+
+Changing the Gmail password cancels the app password, and email stops until a new one is generated and set as `GMAIL_APP_PASSWORD`.
+
+## Running the site
+
+Everything belongs to the club account `riponhighcodingclub@gmail.com`, so it can be handed to next year's officers by passing on that login. That account owns the Cloudflare account, the OAuth apps, and the mailbox the site sends from. The card on the Cloudflare account is only there because R2 requires one.
+
+Set these on the `rhs` Worker as secrets (`bunx wrangler secret put NAME`, or the dashboard):
+
+| Secret                   | Needed for                                         |
+| ------------------------ | -------------------------------------------------- |
+| `BETTER_AUTH_SECRET`     | Signing sessions. `openssl rand -base64 32`        |
+| `GOOGLE_CLIENT_SECRET`   | Google sign-in                                     |
+| `GITHUB_CLIENT_SECRET`   | GitHub sign-in                                     |
+| `GMAIL_APP_PASSWORD`     | Sending email                                      |
+| `GITHUB_TOKEN`           | Org invites. Needs `admin:org` and `read:user`     |
+| `BOOTSTRAP_ADMIN_EMAILS` | Optional. Only for setting up a brand new database |
+
+Public configuration (`APP_URL`, the OAuth client IDs, the Gmail address) lives in `wrangler.jsonc`.
+
+To deploy:
+
+1. `bunx wrangler login` as the club account
+2. `bun run db:migrate:prod` if the change includes a migration
+3. `bun run deploy`
+
+Free tier limits to watch: Workers requests and CPU time, D1 reads and writes, R2 storage (billed to the card past the free 10 GB), and Gmail's daily recipients. Cloudflare's own dashboard shows current usage.
+
+The admin reset tool at `/admin/reset` handles the new school year, and offers a data backup first. That backup leaves out login data and uploaded files. To restore the database itself, use D1 Time Travel (`bunx wrangler d1 time-travel`).
 
 ## Contributing
 

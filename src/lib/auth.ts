@@ -5,7 +5,7 @@ import { APIError } from 'better-auth/api'
 import { and, count, eq, gt, like } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
 import { sendEmail } from '#/services/email'
-import { renderEmail } from '#/services/email-templates'
+import { renderEmail, siteUrl } from '#/services/email-templates'
 import {
   ROLES,
   initialRoleFor,
@@ -56,6 +56,33 @@ function createAuth() {
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 8,
+      // No session until the address is confirmed. Sign-up also stops saying
+      // whether an email is registered, so an existing owner hears it by email.
+      requireEmailVerification: true,
+      onExistingUserSignUp: async ({ user }) => {
+        const { html, text } = renderEmail({
+          preheader: 'You already have an RHS Coding Club account.',
+          heading: 'You already have an account',
+          paragraphs: [
+            `Hi ${user.name.split(' ')[0] || user.name}, someone tried to sign up with this email, but it already has an RHS Coding Club account, maybe from the old club site.`,
+            'Log in, or choose a password if you never set one.',
+          ],
+          cta: { label: 'Choose a password', href: siteUrl('/forgot-password') },
+          footer: "If this wasn't you, ignore this email. Nothing changed.",
+        })
+        waitUntil(
+          sendEmail(
+            getDb(),
+            {
+              to: user.email,
+              subject: 'You already have an RHS Coding Club account',
+              html,
+              text,
+            },
+            'public',
+          ),
+        )
+      },
       revokeSessionsOnPasswordReset: true,
       // Also how members imported from the old site claim their account: the
       // reset creates their first password, and the email proves they own it.
@@ -108,6 +135,31 @@ function createAuth() {
           .where(eq(schema.user.id, user.id))
       },
     },
+    emailVerification: {
+      sendOnSignUp: true,
+      // A correct password on an unconfirmed account sends a fresh link.
+      sendOnSignIn: true,
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: async ({ user, url }) => {
+        const { html, text } = renderEmail({
+          preheader: 'One click and your RHS Coding Club account is ready.',
+          heading: 'Confirm your email',
+          paragraphs: [
+            `Hi ${user.name.split(' ')[0] || user.name}, confirm this address to finish making your RHS Coding Club account.`,
+          ],
+          cta: { label: 'Confirm my email', href: url },
+          footer: "If you didn't sign up, ignore this email. No account gets activated.",
+        })
+        waitUntil(
+          sendEmail(getDb(), {
+            to: user.email,
+            subject: 'Confirm your RHS Coding Club email',
+            html,
+            text,
+          }),
+        )
+      },
+    },
     socialProviders,
     account: {
       accountLinking: { enabled: true, trustedProviders: ['google', 'github'] },
@@ -156,8 +208,7 @@ function createAuth() {
             // admin's provider sign-in couldn't link to an unverified account.
             if (!u.emailVerified && isBootstrapAdmin(u.email, bootstrapAdmins))
               throw new APIError('FORBIDDEN', {
-                message:
-                  'Could not create that account. Try signing in with Google or GitHub.',
+                message: 'Could not create that account.',
               })
             return {
               data: {

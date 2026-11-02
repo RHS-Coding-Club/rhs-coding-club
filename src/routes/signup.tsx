@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link, createFileRoute, redirect, useRouter } from '@tanstack/react-router'
-import { AtSign, LockKeyhole, UserRound } from 'lucide-react'
+import { Link, createFileRoute, redirect } from '@tanstack/react-router'
+import { AtSign, LockKeyhole, MailCheck, UserRound } from 'lucide-react'
 import { z } from 'zod'
 import { signUp } from '#/lib/auth-client'
 import { safeRedirect } from '#/lib/format'
@@ -23,35 +23,70 @@ export const Route = createFileRoute('/signup')({
 })
 
 function SignupPage() {
-  const router = useRouter()
   const pulse = Route.useLoaderData()
   const { redirect: requested } = Route.useSearch()
   // New accounts start as guests, so the membership application is the next step.
   const next = safeRedirect(requested, '/join')
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
-  // Members brought over from the old site already have an account.
-  const [exists, setExists] = useState(false)
+  const [sentTo, setSentTo] = useState<string | null>(null)
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
-    setExists(false)
     setPending(true)
     const form = new FormData(e.currentTarget)
+    const email = String(form.get('email'))
     const { error: err } = await signUp.email({
       name: String(form.get('name')),
-      email: String(form.get('email')),
+      email,
       password: String(form.get('password')),
+      callbackURL: next,
     })
+    setPending(false)
     if (err) {
-      setPending(false)
-      setExists(err.code?.startsWith('USER_ALREADY_EXISTS') ?? false)
       setError(err.message ?? 'Could not create your account.')
       return
     }
-    await router.invalidate()
-    await router.navigate({ to: next })
+    setSentTo(email)
+  }
+
+  if (sentTo) {
+    return (
+      <AuthLayout
+        title="Check your email"
+        subtitle={`We sent a link to ${sentTo}. Open it to finish making your account.`}
+        pulse={pulse}
+      >
+        <div className="bg-brand-sky/10 ring-brand-sky/25 flex items-start gap-3 rounded-2xl p-4 text-sm ring-1">
+          <MailCheck
+            className="text-brand-sky mt-0.5 size-5 shrink-0"
+            aria-hidden="true"
+          />
+          <p>
+            Nothing after a few minutes? Check spam, or{' '}
+            <button
+              type="button"
+              onClick={() => setSentTo(null)}
+              className="font-medium underline underline-offset-4"
+            >
+              try a different email
+            </button>
+            .
+          </p>
+        </div>
+        <p className="text-muted-foreground text-sm">
+          Already confirmed?{' '}
+          <Link
+            to="/login"
+            search={{ redirect: requested }}
+            className="text-foreground font-medium underline-offset-4 hover:underline"
+          >
+            Log in
+          </Link>
+        </p>
+      </AuthLayout>
+    )
   }
 
   return (
@@ -94,24 +129,7 @@ function SignupPage() {
         />
         {error && (
           <p role="alert" className="text-destructive text-sm">
-            {exists ? (
-              <>
-                You already have an account, maybe from the old club site.{' '}
-                <Link
-                  to="/forgot-password"
-                  className="font-medium underline underline-offset-4"
-                >
-                  Set a password
-                </Link>{' '}
-                or{' '}
-                <Link to="/login" className="font-medium underline underline-offset-4">
-                  log in
-                </Link>
-                .
-              </>
-            ) : (
-              error
-            )}
+            {error}
           </p>
         )}
         <RaisedButton

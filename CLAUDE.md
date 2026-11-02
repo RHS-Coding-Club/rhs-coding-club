@@ -4,7 +4,9 @@ Guidance for Claude Code when working in this repository.
 
 ## What this is
 
-The RHS Coding Club website, rewritten from scratch (September 2026) on TanStack Start and Cloudflare. The previous Next.js + Firebase app lives only in git history before the `rewrite/tanstack-cloudflare` branch. Do not reintroduce Firebase, Next.js, Brevo, or Vercel.
+The RHS Coding Club website, rewritten from scratch (September 2026) on TanStack Start and Cloudflare. The previous Next.js + Firebase app lives only in git history before the `rewrite/tanstack-cloudflare` branch. Do not reintroduce Firebase, Next.js, or Vercel.
+
+The club has no budget and no paid domain, so everything must stay on free tiers. It's live at https://rhs.riponhighcodingclub.workers.dev on the club's own Cloudflare account (`riponhighcodingclub@gmail.com`), and `wrangler.jsonc` pins that account.
 
 ## Commands
 
@@ -12,6 +14,7 @@ The RHS Coding Club website, rewritten from scratch (September 2026) on TanStack
 - `bun run type-check`, `bun run lint`, `bun run format` — run all three before committing
 - `bun run db:generate` after changing `src/db/schema/**`, then `bun run db:migrate` locally
 - `bun run db:seed` — test users (`*@test.local`, password `password123`) and sample content
+- `bun run deploy` — production; `bun run db:migrate:prod` first if there's a migration
 - `bun run test:unit` / `test:integration` / `test:e2e`
 - `bun run cf:types` after editing `wrangler.jsonc` or `.dev.vars.example`
 
@@ -30,9 +33,13 @@ The RHS Coding Club website, rewritten from scratch (September 2026) on TanStack
 11. **Email** goes through `src/services/email.ts` (the club Gmail over SMTP with `worker-mailer`; logs to the console until `GMAIL_USER` and `GMAIL_APP_PASSWORD` are set; about 500 recipients a day, split into tiers in `TIER_LIMIT` so resets keep room) with the layout in `email-templates.ts`. Respect `recipientsFor`/`recipientById` so opt-outs and club-wide toggles apply.
 12. **Background jobs** run from the cron triggers in `wrangler.jsonc` via `src/server.ts` -> `src/services/cron.ts`. Every job must be idempotent (claim before sending).
 
+## Auth
+
+Google, GitHub, and email/password. Password sign-ups must confirm their email before logging in, and sign-up answers the same whether or not the address has an account. Better Auth won't link a provider to an unverified account, which blocks anyone who pre-registers someone else's email, so leave `requireLocalEmailVerified` at its default.
+
 ## Roles
 
-`guest < member < officer < admin`. Guests are signed-in users awaiting membership approval. Officers manage content, reviews, events, and badges. Only admins change roles, edit officers, or write settings. `BOOTSTRAP_ADMIN_EMAILS` grants admin on first sign-in.
+`guest < member < officer < admin`. Guests are signed-in users awaiting membership approval. Officers manage content, reviews, events, and badges. Only admins change roles, edit officers, or write settings. `BOOTSTRAP_ADMIN_EMAILS` grants admin on the first provider-verified sign-in and refuses password sign-up for those addresses.
 
 ## Conventions
 

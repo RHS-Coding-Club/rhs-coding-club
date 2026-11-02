@@ -41,7 +41,11 @@ function LoginPage() {
     })
     if (err) {
       setPending(false)
-      setError(err.message ?? 'Could not sign in. Check your email and password.')
+      setError(
+        err.code === 'EMAIL_NOT_VERIFIED'
+          ? 'Confirm your email first. We just sent you a new link.'
+          : (err.message ?? 'Could not sign in. Check your email and password.'),
+      )
       return
     }
     await router.invalidate()
