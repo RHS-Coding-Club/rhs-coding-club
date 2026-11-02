@@ -59,4 +59,10 @@
   // Background jobs (src/services/cron.ts): hourly announcements, reminders,
   // and GitHub invite sync; the weekly digest on Monday mornings.
   "triggers": { "crons": ["0 * * * *", "0 16 * * 1"] },
+
+  // Required by `wrangler preview`, which Workers Builds runs on PR branches.
+  // Empty on purpose: previews inherit nothing from above, so they can't reach
+  // production data or secrets. They also have no database, so pages that need
+  // one fail on a preview URL. Treat the build as a check, not a test site.
+  "previews": {},
 }
