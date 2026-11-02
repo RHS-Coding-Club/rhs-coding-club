@@ -270,9 +270,18 @@ export async function approvePendingAction(db: Db, user: McpUser, id: string) {
     return fail('You are no longer allowed to do this.')
   const parsed = tool.input.safeParse(args)
   if (!parsed.success) return fail(errorMessage(parsed.error))
+  const ctx = { db, user }
   try {
-    await tool.run({ db, user }, parsed.data as never)
+    // What gets approved is what the page showed. If the draft, the title, or the
+    // person's role has moved on since, the approval doesn't cover it any more.
+    const now = tool.preview ? await tool.preview(ctx, parsed.data as never) : tool.title
+    if (now !== row.summary)
+      return await fail(
+        'This changed after the app asked. Nothing ran. Ask the app to request it again.',
+      )
+    await tool.run(ctx, parsed.data as never)
   } catch (error) {
+    if (error instanceof ApprovalError) throw error
     return fail(errorMessage(error))
   }
   await audit(caller, row.tool, args, 'approved', row.summary)

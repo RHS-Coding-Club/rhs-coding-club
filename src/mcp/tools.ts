@@ -3,8 +3,8 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { schema } from '#/db'
 import type { Db } from '#/db'
-import { markdownToDoc } from '#/lib/markdown'
-import { richTextField } from '#/lib/rich-text'
+import { docToMarkdown, markdownToDoc } from '#/lib/markdown'
+import { parseRichText, richTextField } from '#/lib/rich-text'
 import { badgeIdSchema, badgeSchema, badgeUserSchema } from '#/lib/schemas/badges'
 import { postIdSchema, savePostSchema } from '#/lib/schemas/blog'
 import {
@@ -98,12 +98,15 @@ const markdown = (opts: { required?: boolean; message?: string }) =>
 const WALL_TIME =
   "Times are the club's local wall clock, formatted like 2026-10-29T15:30, with no timezone."
 
-async function userName(db: Db, id: string) {
+/** Leads with the email: anyone can pick their own display name. */
+async function account(db: Db, id: string) {
   const row = await db.query.user.findFirst({
     where: eq(schema.user.id, id),
-    columns: { name: true, role: true },
+    columns: { name: true, email: true, role: true },
   })
-  return row ? `${row.name} (now ${row.role})` : `unknown user ${id}`
+  return row
+    ? `the account ${row.email} (named "${row.name}", now ${row.role})`
+    : `unknown user ${id}`
 }
 
 async function titleOf(
@@ -130,6 +133,25 @@ async function announceIfLive(db: Db, result: { wentLive: boolean }) {
 
 const UPLOAD_PURPOSES = ['event', 'badge', 'officer', 'post'] as const
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+
+/** Reads a download, stopping at the limit: the content-length header can lie or be absent. */
+async function readCapped(res: Response, type: string) {
+  const reader = res.body?.getReader()
+  if (!reader) throw new UploadError('That URL returned nothing.')
+  const chunks: BlobPart[] = []
+  let total = 0
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    total += value.byteLength
+    if (total > MAX_IMAGE_BYTES) {
+      await reader.cancel()
+      throw new UploadError('Images must be 5 MB or smaller.')
+    }
+    chunks.push(new Uint8Array(value))
+  }
+  return new File(chunks, 'image', { type })
+}
 
 export const TOOLS: McpTool[] = [
   // ---------- Overview ----------
@@ -247,9 +269,9 @@ export const TOOLS: McpTool[] = [
       titleOf('Publish and email members about the challenge', data.id, async () => {
         const row = await db.query.challenge.findFirst({
           where: eq(schema.challenge.id, data.id),
-          columns: { title: true },
+          columns: { title: true, description: true },
         })
-        return row?.title
+        return row && `${row.title}: ${row.description}`
       }),
     run: async ({ db }, data) =>
       announceIfLive(db, await challenges.setChallengePublished(db, data.id, data.mode)),
@@ -486,9 +508,19 @@ export const TOOLS: McpTool[] = [
     name: 'review_application',
     title: 'Review a membership application',
     description:
-      'Approving makes the applicant a member. Rejecting needs a note saying why. They are emailed either way.',
+      'Approving makes the applicant a member, so it needs approval on the website. Rejecting needs a note saying why, and runs right away. They are emailed either way.',
     effect: 'write',
+    confirm: (data) => data.decision === 'approve',
     input: reviewApplicationSchema,
+    preview: async ({ db }, data) => {
+      const row = await db.query.membershipApplication.findFirst({
+        where: eq(schema.membershipApplication.id, data.id),
+        columns: { userId: true },
+      })
+      return row
+        ? `Make ${await account(db, row.userId)} a member and email them`
+        : `Approve an application with unknown id ${data.id}`
+    },
     run: ({ db, user }, data) =>
       membership.reviewApplication(db, {
         id: data.id,
@@ -518,9 +550,20 @@ export const TOOLS: McpTool[] = [
   tool({
     name: 'approve_github_request',
     title: 'Approve a GitHub org request',
-    description: 'Approves the request and sends the org invite through GitHub.',
+    description:
+      'Approves the request and sends the org invite through GitHub. Needs approval on the website.',
     effect: 'write',
+    confirm: true,
     input: requestIdSchema,
+    preview: async ({ db }, data) => {
+      const row = await db.query.githubMembershipRequest.findFirst({
+        where: eq(schema.githubMembershipRequest.id, data.id),
+        columns: { githubUsername: true, userId: true },
+      })
+      return row
+        ? `Invite the GitHub user ${row.githubUsername} to the organization, for ${await account(db, row.userId)}`
+        : `Approve a GitHub request with unknown id ${data.id}`
+    },
     run: ({ db, user }, data) =>
       github.approveGithubRequest(db, { id: data.id, reviewerId: user.id }),
   }),
@@ -737,19 +780,15 @@ export const TOOLS: McpTool[] = [
     effect: 'destructive',
     confirm: true,
     input: issueIdSchema,
+    // The whole issue, so approving covers exactly these words.
     preview: async ({ db }, data) => {
-      const { active } = await newsletter.subscriberCounts(db)
-      return titleOf(
-        `Email ${active} subscriber${active === 1 ? '' : 's'} the newsletter`,
-        data.id,
-        async () => {
-          const row = await db.query.newsletterIssue.findFirst({
-            where: eq(schema.newsletterIssue.id, data.id),
-            columns: { subject: true },
-          })
-          return row?.subject
-        },
-      )
+      const row = await db.query.newsletterIssue.findFirst({
+        where: eq(schema.newsletterIssue.id, data.id),
+        columns: { subject: true, content: true },
+      })
+      return row
+        ? `Email every active subscriber the newsletter "${row.subject}":\n\n${docToMarkdown(parseRichText(row.content))}`
+        : `Send a newsletter with unknown id ${data.id}`
     },
     run: ({ db }, data) => newsletter.sendIssue(db, data.id),
   }),
@@ -811,14 +850,8 @@ export const TOOLS: McpTool[] = [
         signal: AbortSignal.timeout(10_000),
       })
       if (!res.ok) throw new UploadError(`That URL returned ${res.status}.`)
-      if (Number(res.headers.get('content-length') ?? 0) > MAX_IMAGE_BYTES)
-        throw new UploadError('Images must be 5 MB or smaller.')
       const type = (res.headers.get('content-type') ?? '').split(';')[0]?.trim() ?? ''
-      const key = await putImage(
-        env.FILES,
-        data.purpose,
-        new File([await res.arrayBuffer()], 'image', { type }),
-      )
+      const key = await putImage(env.FILES, data.purpose, await readCapped(res, type))
       return { key, path: `/files/${key}` }
     },
   }),
@@ -881,7 +914,7 @@ export const TOOLS: McpTool[] = [
     confirm: true,
     input: changeRoleSchema,
     preview: async ({ db }, data) =>
-      `Change ${await userName(db, data.userId)} to ${data.role}`,
+      `Change ${await account(db, data.userId)} to ${data.role}`,
     run: ({ db, user }, data) =>
       members.changeRole(db, { actorId: user.id, userId: data.userId, role: data.role }),
   }),
@@ -895,7 +928,7 @@ export const TOOLS: McpTool[] = [
     confirm: true,
     input: adjustPointsSchema,
     preview: async ({ db }, data) =>
-      `${data.delta > 0 ? 'Add' : 'Remove'} ${Math.abs(data.delta)} points ${data.delta > 0 ? 'to' : 'from'} ${await userName(db, data.userId)}, with the note "${data.note}"`,
+      `${data.delta > 0 ? 'Add' : 'Remove'} ${Math.abs(data.delta)} points ${data.delta > 0 ? 'to' : 'from'} ${await account(db, data.userId)}, with the note "${data.note}"`,
     run: ({ db, user }, data) =>
       members.adjustMemberPoints(db, { ...data, createdBy: user.id }),
   }),

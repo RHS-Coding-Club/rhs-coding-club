@@ -747,6 +747,46 @@ describe('running tools', () => {
     expect(pending.filter((p) => p.userId === officer.user.id)).toEqual([])
   })
 
+  it('stops an image download at the limit, whatever the headers say', async () => {
+    const chunk = new Uint8Array(1024 * 1024)
+    vi.mocked(globalThis.fetch).mockImplementationOnce(() => {
+      let sent = 0
+      return Promise.resolve(
+        new Response(
+          new ReadableStream({
+            pull(controller) {
+              sent += 1
+              if (sent > 50) throw new Error('kept reading past the limit')
+              controller.enqueue(chunk)
+            },
+          }),
+          { headers: { 'content-type': 'image/png' } },
+        ),
+      )
+    })
+    const result = await call(officerToken, 'upload_image', {
+      url: 'https://images.example/huge.png',
+      purpose: 'event',
+    })
+    expect(result.isError).toBe(true)
+    expect(result.content[0]?.text).toContain('5 MB')
+  })
+
+  it('stores an image under the limit', async () => {
+    vi.mocked(globalThis.fetch).mockImplementationOnce(() =>
+      Promise.resolve(
+        new Response(new Uint8Array(1024), { headers: { 'content-type': 'image/png' } }),
+      ),
+    )
+    const result = await call(officerToken, 'upload_image', {
+      url: 'https://images.example/small.png',
+      purpose: 'event',
+    })
+    expect(result.isError).toBeFalsy()
+    const { key } = json(result) as { key: string }
+    expect(await env.FILES.head(key)).not.toBeNull()
+  })
+
   it('logs who did what, through which app', async () => {
     const rows = await db
       .select()
@@ -785,7 +825,9 @@ describe('actions that need approval', () => {
     const page = await getPendingAction(db, admin.user, id)
     expect(page?.status).toBe('pending')
     // Written by the server from the database, naming the real person.
-    expect(page?.summary).toBe('Change Test promote (now member) to officer')
+    expect(page?.summary).toBe(
+      'Change the account promote@mcp.test (named "Test promote", now member) to officer',
+    )
 
     await approvePendingAction(db, admin.user, id)
     expect(await roleOf(target.user.id)).toBe('officer')
@@ -864,7 +906,9 @@ describe('actions that need approval', () => {
       })
     expect((await issue())?.sentAt).toBeNull()
     const page = await getPendingAction(db, officer.user, id)
-    expect(page?.summary).toMatch(/Email \d+ subscribers? the newsletter "MCP issue"/)
+    expect(page?.summary).toBe(
+      'Email every active subscriber the newsletter "MCP issue":\n\nHello everyone.',
+    )
     await approvePendingAction(db, officer.user, id)
     expect((await issue())?.sentAt).toBeTruthy()
   })
@@ -929,6 +973,98 @@ describe('actions that need approval', () => {
     approveIdOf(
       await call(officerToken, 'save_challenge', { ...base, publishMode: 'now' }),
     )
+  })
+
+  it('refuses to send a newsletter edited after the request', async () => {
+    const saved = (await call(officerToken, 'save_newsletter_issue', {
+      subject: 'Innocent issue',
+      content: 'The real words.',
+    }).then(json)) as { id: string }
+    const id = approveIdOf(await call(officerToken, 'send_newsletter', { id: saved.id }))
+
+    const edited = await call(officerToken, 'save_newsletter_issue', {
+      id: saved.id,
+      subject: 'Innocent issue',
+      content: 'Words nobody approved.',
+    })
+    expect(edited.isError).toBeFalsy()
+
+    await expect(approvePendingAction(db, officer.user, id)).rejects.toThrow(
+      /changed after/,
+    )
+    const issue = await db.query.newsletterIssue.findFirst({
+      where: eq(schema.newsletterIssue.id, saved.id),
+    })
+    expect(issue?.sentAt).toBeNull()
+    expect((await getPendingAction(db, officer.user, id))?.status).toBe('failed')
+  })
+
+  it('refuses a role change when the person changed after the request', async () => {
+    const target = await createUser('moved', 'member')
+    const id = approveIdOf(
+      await call(adminToken, 'set_user_role', { userId: target.user.id, role: 'admin' }),
+    )
+    await db
+      .update(schema.user)
+      .set({ name: 'Someone else' })
+      .where(eq(schema.user.id, target.user.id))
+    await expect(approvePendingAction(db, admin.user, id)).rejects.toThrow(
+      /changed after/,
+    )
+    expect(await roleOf(target.user.id)).toBe('member')
+  })
+
+  it('needs approval to accept a member, but not to reject one', async () => {
+    const target = await createUser('applicant', 'guest')
+    const insert = (appId: string) =>
+      db.insert(schema.membershipApplication).values({
+        id: appId,
+        userId: target.user.id,
+        grade: '9',
+        experience: 'none',
+        goals: 'Learn to code',
+        whyJoin: 'It looks fun',
+        availability: 'Lunch meetings',
+      })
+    await insert('app-approve')
+    const id = approveIdOf(
+      await call(officerToken, 'review_application', {
+        id: 'app-approve',
+        decision: 'approve',
+        note: '',
+      }),
+    )
+    expect(await roleOf(target.user.id)).toBe('guest')
+    expect((await getPendingAction(db, officer.user, id))?.summary).toContain(
+      'applicant@mcp.test',
+    )
+    await rejectPendingAction(db, officer.user, id)
+
+    const rejected = await call(officerToken, 'review_application', {
+      id: 'app-approve',
+      decision: 'reject',
+      note: 'Please tell us a little more.',
+    })
+    expect(rejected.isError).toBeFalsy()
+    expect(json(rejected).status).not.toBe('awaiting_approval')
+  })
+
+  it('needs approval to send a GitHub invite', async () => {
+    await db.insert(schema.githubMembershipRequest).values({
+      id: 'gh-1',
+      userId: member.user.id,
+      githubUsername: 'octocat',
+    })
+    const id = approveIdOf(
+      await call(officerToken, 'approve_github_request', { id: 'gh-1' }),
+    )
+    const page = await getPendingAction(db, officer.user, id)
+    expect(page?.summary).toContain('octocat')
+    expect(page?.summary).toContain('member@mcp.test')
+    const row = await db.query.githubMembershipRequest.findFirst({
+      where: eq(schema.githubMembershipRequest.id, 'gh-1'),
+    })
+    expect(row?.status).toBe('pending')
   })
 
   it('validates approved arguments again', async () => {

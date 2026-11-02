@@ -61,7 +61,7 @@ function AdminMcp() {
             <ul className="divide-border border-border divide-y rounded-xl border">
               {pending.map((p) => (
                 <li key={p.id} className="flex items-center justify-between gap-4 p-4">
-                  <p className="min-w-0 text-sm">{p.summary}</p>
+                  <p className="line-clamp-2 min-w-0 text-sm">{p.summary}</p>
                   <RaisedButton asChild size="sm">
                     <Link to="/admin/mcp/$id" params={{ id: p.id }}>
                       Review

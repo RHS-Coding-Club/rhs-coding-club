@@ -60,7 +60,7 @@ function ApproveMcpAction() {
         description="Check it yourself before you approve. The app may have read something written to trick it."
       />
       <div className="grid max-w-2xl gap-6">
-        <p className="text-xl">{action.summary}</p>
+        <p className="text-xl break-words whitespace-pre-wrap">{action.summary}</p>
 
         <details className="text-sm">
           <summary className="text-muted-foreground cursor-pointer">

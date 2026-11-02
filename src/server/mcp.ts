@@ -3,6 +3,7 @@ import { and, desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { getDb, schema } from '#/db'
 import { mcpResource } from '#/lib/mcp-config'
+import { redirectKind } from '#/lib/redirect-kind'
 import { hasRole } from '#/lib/roles'
 import { requireOfficer, requireUser } from '#/server/auth'
 
@@ -20,9 +21,6 @@ const hostOf = (url: string | undefined) => {
   }
 }
 
-const isLocal = (host: string | null) =>
-  host !== null && /^(localhost|127\.0\.0\.1|\[::1\])(:|$)/.test(host)
-
 /** What the consent page shows: who is asking, and where the sign-in goes back to. */
 export const getConsentInfo = createServerFn({ method: 'GET' })
   .middleware([requireUser])
@@ -37,13 +35,12 @@ export const getConsentInfo = createServerFn({ method: 'GET' })
       where: eq(schema.oauthClient.clientId, data.clientId),
       columns: { name: true, uri: true },
     })
-    const redirectHost = hostOf(data.redirectUri)
     return {
       name: client?.name ?? 'An unknown app',
       // A metadata-document client's id is the URL of the site vouching for it.
       publisher: hostOf(data.clientId) ?? hostOf(client?.uri ?? undefined),
-      redirectHost,
-      redirectIsLocal: isLocal(redirectHost),
+      redirectUri: data.redirectUri ?? null,
+      redirect: redirectKind(data.redirectUri),
       allowed: hasRole(context.user.role, 'officer'),
     }
   })
