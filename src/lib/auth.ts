@@ -1,16 +1,22 @@
 import { betterAuth } from 'better-auth'
+import { jwt } from 'better-auth/plugins'
+import { cimd } from '@better-auth/cimd'
+import { mcp } from '@better-auth/mcp'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { env, waitUntil } from 'cloudflare:workers'
 import { APIError } from 'better-auth/api'
 import { and, count, eq, gt, like, lte, sql } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
 import { canonicalMailbox } from '#/lib/email-address'
+import { MCP_SCOPE, mcpResource } from '#/lib/mcp-config'
 import { sendEmail } from '#/services/email'
 import type { EmailMessage } from '#/services/email'
 import { renderEmail, siteUrl } from '#/services/email-templates'
 import {
   ROLES,
+  hasRole,
   initialRoleFor,
+  isRole,
   isBootstrapAdmin,
   parseBootstrapAdmins,
 } from '#/lib/roles'
@@ -67,6 +73,20 @@ function confirmPageUrl(url: string) {
     next: searchParams.get('callbackURL') ?? '/join',
   })
   return siteUrl(`/verify-email?${query}`)
+}
+
+/**
+ * Fetches a Client ID Metadata Document, the JSON an MCP client hosts to say who
+ * it is. The URL comes from whoever starts a sign-in, so redirects are refused.
+ * Workers can't reach private addresses, which covers the rest of what the CIMD
+ * plugin asks of this function.
+ */
+function fetchClientMetadata(input: RequestInfo | URL, init?: RequestInit) {
+  return fetch(input, {
+    ...init,
+    redirect: 'manual',
+    signal: init?.signal ?? AbortSignal.timeout(5000),
+  })
 }
 
 // Server-only. Built lazily so bindings are read per isolate, never at import
@@ -212,6 +232,42 @@ function createAuth() {
       },
     },
     socialProviders,
+    plugins: [
+      // Only signs MCP access tokens. Without this flag every session read
+      // would sign a JWT nothing uses.
+      jwt({ disableSettingJwtHeader: true }),
+      mcp({
+        loginPage: '/login',
+        consentPage: '/consent',
+        resource: mcpResource(),
+        scopes: ['openid', 'offline_access', MCP_SCOPE],
+        // Short, because a token can't be revoked before it expires. Clients
+        // refresh silently, and refreshing checks the role again below.
+        accessTokenExpiresIn: 15 * 60,
+        // Apps identify themselves with a metadata document. Nobody manages
+        // clients through the API, where any signed-in guest could make one.
+        clientPrivileges: () => false,
+        // Anyone can start a sign-in, but only officers ever get a token. The
+        // MCP endpoint checks the role again on every request.
+        customAccessTokenClaims: async ({ user }) => {
+          const row = user?.id
+            ? await getDb().query.user.findFirst({
+                where: eq(schema.user.id, user.id),
+                columns: { role: true },
+              })
+            : undefined
+          if (!hasRole(isRole(row?.role) ? row.role : null, 'officer'))
+            throw new APIError('FORBIDDEN', {
+              message: 'Only officers and admins can use the MCP server.',
+            })
+          return {}
+        },
+      }),
+      cimd({
+        fetchClientMetadataResource: fetchClientMetadata,
+        metadataProfile: 'mcp-2026-07-28',
+      }),
+    ],
     account: {
       accountLinking: { enabled: true, trustedProviders: ['google', 'github'] },
     },

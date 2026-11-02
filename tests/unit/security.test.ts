@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { canonicalMailbox } from '#/lib/email-address'
-import { isAuthWrite } from '#/lib/rate-limit'
+import { isAuthWrite, isOAuthRoute } from '#/lib/rate-limit'
 import { CONTENT_SECURITY_POLICY, withSecurityHeaders } from '#/lib/security-headers'
 
 describe('canonicalMailbox', () => {
@@ -26,6 +26,15 @@ describe('isAuthWrite', () => {
     expect(isAuthWrite('GET', '/api/auth/get-session')).toBe(false)
     expect(isAuthWrite('GET', '/api/auth/callback/github')).toBe(false)
     expect(isAuthWrite('POST', '/api/auth/sign-out')).toBe(false)
+  })
+})
+
+describe('isOAuthRoute', () => {
+  it('covers MCP sign-in, apart from the limit on site logins', () => {
+    expect(isOAuthRoute('/api/auth/oauth2/token')).toBe(true)
+    expect(isOAuthRoute('/api/auth/oauth2/authorize')).toBe(true)
+    expect(isAuthWrite('POST', '/api/auth/oauth2/token')).toBe(false)
+    expect(isOAuthRoute('/api/auth/sign-in/email')).toBe(false)
   })
 })
 

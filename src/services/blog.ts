@@ -189,6 +189,13 @@ export type SavePostResult =
   | { ok: true; id: string; slug: string; publishedAt: Date | null }
   | { ok: false; errors: PostFieldErrors }
 
+export class PostError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'PostError'
+  }
+}
+
 /**
  * Creates or updates a post. `publish` decides the published state: keep it,
  * publish now (an already-published post keeps its original date), or move
@@ -216,7 +223,7 @@ export async function savePost(
         columns: { id: true, publishedAt: true },
       })
     : null
-  if (input.id && !existing) throw new Error('That post no longer exists.')
+  if (input.id && !existing) throw new PostError('That post no longer exists.')
 
   const current = existing?.publishedAt ?? null
   const publishedAt =
@@ -256,7 +263,7 @@ export async function setPostPublished(db: Db, id: string, published: boolean) {
     where: eq(schema.post.id, id),
     columns: { id: true, publishedAt: true },
   })
-  if (!post) throw new Error('That post no longer exists.')
+  if (!post) throw new PostError('That post no longer exists.')
   const publishedAt = published ? (post.publishedAt ?? new Date()) : null
   await db.update(schema.post).set({ publishedAt }).where(eq(schema.post.id, id))
   return { publishedAt }

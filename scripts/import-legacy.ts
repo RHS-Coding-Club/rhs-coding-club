@@ -24,7 +24,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { q } from './seed/util'
-import { markdownToDoc } from './legacy/markdown'
+import { markdownToDoc } from '../src/lib/markdown'
 import { clubInfoSchema, socialSchema } from '../src/lib/settings'
 
 const DB = 'rhs-coding-club'

@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import {
   Award,
   BookOpen,
+  Bot,
   CalendarDays,
   Code2,
   FileText,
@@ -54,6 +55,7 @@ export const ADMIN_NAV = [
   },
   { to: '/admin/newsletter', label: 'Newsletter', icon: Mail },
   { to: '/admin/messages', label: 'Messages', icon: Inbox, queue: 'unreadMessages' },
+  { to: '/admin/mcp', label: 'AI access', icon: Bot },
   { to: '/admin/users', label: 'Users', icon: Users, minRole: 'admin' },
   { to: '/admin/officers', label: 'Officers', icon: ShieldCheck, minRole: 'admin' },
   { to: '/admin/settings', label: 'Settings', icon: Settings },

@@ -1,7 +1,10 @@
 import handler from '@tanstack/react-start/server-entry'
-import { isAuthWrite, isRateLimited } from '#/lib/rate-limit'
+import { isAuthWrite, isOAuthRoute, isRateLimited } from '#/lib/rate-limit'
 import { withSecurityHeaders } from '#/lib/security-headers'
 import { runScheduled } from '#/services/cron'
+
+const isMcpPath = (pathname: string) =>
+  pathname === '/mcp' || pathname.startsWith('/.well-known/')
 
 // Worker entry: TanStack Start serves every request; the cron triggers in
 // wrangler.jsonc call `scheduled`, which runs the matching background jobs.
@@ -11,9 +14,14 @@ export default {
     const secure = (response: Response) =>
       withSecurityHeaders(response, !import.meta.env.DEV)
     const { pathname } = new URL(request.url)
+    const limiter = isAuthWrite(request.method, pathname)
+      ? env.AUTH_LIMIT
+      : isOAuthRoute(pathname)
+        ? env.OAUTH_LIMIT
+        : null
     if (
-      isAuthWrite(request.method, pathname) &&
-      (await isRateLimited(env.AUTH_LIMIT, request.headers.get('cf-connecting-ip')))
+      limiter &&
+      (await isRateLimited(limiter, request.headers.get('cf-connecting-ip')))
     ) {
       return secure(
         Response.json(
@@ -21,6 +29,11 @@ export default {
           { status: 429, headers: { 'retry-after': '60' } },
         ),
       )
+    }
+    if (isMcpPath(pathname)) {
+      const { handleMcpRequest } = await import('#/mcp/http')
+      const response = await handleMcpRequest(request)
+      if (response) return secure(response)
     }
     return secure(await handler.fetch(request))
   },

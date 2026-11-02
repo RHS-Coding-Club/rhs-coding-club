@@ -10,7 +10,9 @@ import { SocialButtons } from '#/components/auth/social-buttons'
 import { RaisedButton } from '#/components/raised-button'
 import { getClubPulse } from '#/server/public'
 
-const searchSchema = z.object({ redirect: z.string().optional() })
+// Loose because an MCP app's sign-in arrives here with a signed query that has to
+// stay in the URL: the auth client sends it along when the user logs in.
+const searchSchema = z.looseObject({ redirect: z.string().optional() })
 
 export const Route = createFileRoute('/login')({
   validateSearch: searchSchema,
@@ -35,7 +37,7 @@ function LoginPage() {
     setError(null)
     setPending(true)
     const form = new FormData(e.currentTarget)
-    const { error: err } = await signIn.email({
+    const { data, error: err } = await signIn.email({
       email: String(form.get('email')),
       password: String(form.get('password')),
     })
@@ -48,6 +50,8 @@ function LoginPage() {
       )
       return
     }
+    // Continuing an MCP app's sign-in: the auth client is already navigating.
+    if (data.redirect) return
     await router.invalidate()
     await router.navigate({ to: next })
   }
