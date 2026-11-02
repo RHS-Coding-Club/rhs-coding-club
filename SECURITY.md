@@ -6,7 +6,7 @@
 
 If you believe you have found a security vulnerability in the RHS Coding Club website, please report it to us immediately via the website's contact us page or our club's Discord channel.
 
-**Links:** [Contact Us Page](https://www.rhscoding.club/contact), [Discord](https://discord.com/invite/UQR79bn6ZZ)
+**Links:** [Contact Us Page](https://rhs.riponhighcodingclub.workers.dev/contact), [Discord](https://discord.com/invite/UQR79bn6ZZ)
 
 Please include the following details in your report:
 

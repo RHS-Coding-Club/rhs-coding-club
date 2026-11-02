@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "rhs-coding-club",
+  "name": "rhs",
+  "account_id": "1983615f2ba0e1faf04dd17e6626905c",
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
@@ -10,15 +11,18 @@
   // .dev.vars locally and `wrangler secret put` in production. Local dev
   // overrides APP_URL from .dev.vars.
   "vars": {
-    "APP_URL": "https://rhs-coding-club.jmaan1337.workers.dev",
+    "APP_URL": "https://rhs.riponhighcodingclub.workers.dev",
     "GITHUB_ORG": "RHS-Coding-Club",
+    "GITHUB_CLIENT_ID": "Ov23lia4t3tmuH69lU05",
+    "GOOGLE_CLIENT_ID": "984837526432-nmjg5r6p1344oi6ustjrjrglnk7dgjve.apps.googleusercontent.com",
+    "GMAIL_USER": "riponhighcodingclub@gmail.com",
   },
 
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "rhs-coding-club",
-      "database_id": "260ab3fb-b486-40d2-8581-1f3d202a38a2",
+      "database_id": "55e2c11a-5adf-4bef-ad9f-75577dd60b45",
       "migrations_dir": "src/db/migrations",
     },
   ],
