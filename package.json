@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "deploy": "bun run build && wrangler deploy",
     "cf:types": "wrangler types",
+    "og:render": "bun scripts/og-image/render.ts",
     "type-check": "tsc --noEmit",
     "lint": "eslint",
     "lint:fix": "eslint --fix",

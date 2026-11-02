@@ -26,6 +26,11 @@ export interface RouterContext {
 const FONTS =
   'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap'
 
+const DESCRIPTION =
+  'The most active club at RHS. Coding challenges, community service, hackathons, and projects.'
+// Link previews need an absolute URL, and this also runs in the browser, where env isn't readable.
+const OG_IMAGE = 'https://rhs.riponhighcodingclub.workers.dev/og.png'
+
 export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async () => {
     const [user, theme] = await Promise.all([getSessionUser(), getTheme()])
@@ -36,12 +41,16 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { title: 'RHS Coding Club' },
-      {
-        name: 'description',
-        content:
-          'The most active club at RHS. Coding challenges, community service, hackathons, and projects.',
-      },
+      { name: 'description', content: DESCRIPTION },
       { name: 'theme-color', content: '#0b0f15' },
+      // Defaults for link previews; a page's own og: tags replace these one by one, so
+      // nothing here may describe this particular image (cover images override it).
+      { property: 'og:site_name', content: 'RHS Coding Club' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:title', content: 'RHS Coding Club' },
+      { property: 'og:description', content: DESCRIPTION },
+      { property: 'og:image', content: OG_IMAGE },
+      { name: 'twitter:card', content: 'summary_large_image' },
     ],
     links: [
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
