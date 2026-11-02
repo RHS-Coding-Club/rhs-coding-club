@@ -23,7 +23,7 @@ describe('sign-up and roles', () => {
 
   it('refuses a password sign-up on a bootstrap email', async () => {
     await expect(signUp('admin@test.local', 'Fake Ada')).rejects.toThrow(
-      'Sign in with Google or GitHub',
+      'Could not create that account',
     )
   })
 

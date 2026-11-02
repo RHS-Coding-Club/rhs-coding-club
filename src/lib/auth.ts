@@ -156,7 +156,8 @@ function createAuth() {
             // admin's provider sign-in couldn't link to an unverified account.
             if (!u.emailVerified && isBootstrapAdmin(u.email, bootstrapAdmins))
               throw new APIError('FORBIDDEN', {
-                message: 'Sign in with Google or GitHub to use this email.',
+                message:
+                  'Could not create that account. Try signing in with Google or GitHub.',
               })
             return {
               data: {
