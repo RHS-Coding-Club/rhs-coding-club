@@ -6,11 +6,10 @@ import { cn } from '#/lib/utils'
 import { EASE } from '#/components/motion'
 
 /**
- * The header every inner page opens with: an edge-to-edge band whose ground
- * color runs from the very top of the page, behind the floating site header.
- * The React Bits background and the copy (title, a line of text, optional
- * actions or stats) start below the header. It has to be the first thing on
- * the page.
+ * The header every inner page opens with: an edge-to-edge band whose React Bits
+ * background runs from the very top of the page, behind the floating site
+ * header. The copy (title, a line of text, optional actions or stats) starts
+ * below the header. It has to be the first thing on the page.
  *
  * `background` renders client-only behind a scrim (WebGL/canvas backgrounds
  * never run on the server); pass something that reads in BOTH themes.
@@ -54,10 +53,7 @@ export function PageHero({
       className={cn('relative -mt-(--header-offset) overflow-hidden bg-stage', className)}
     >
       {background && (
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-(--header-offset) bottom-0"
-        >
+        <div aria-hidden="true" className="absolute inset-0">
           <ClientOnly>
             <Suspense>{background}</Suspense>
           </ClientOnly>
