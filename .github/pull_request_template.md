@@ -39,7 +39,7 @@ Steps for a reviewer to test this PR locally:
 
 ## Environment / Config Changes
 
-Does this PR require new environment variables, Firebase rules, or config changes?
+Does this PR require new secrets, migrations, or changes to `wrangler.jsonc`?
 
 - [ ] Yes
 - [ ] No
@@ -48,6 +48,5 @@ If **yes**, list them here:
 
 ```env
 # Example
-NEXT_PUBLIC_SOMETHING=
-FIREBASE_SOMETHING=
+SOME_SECRET=
 ```
