@@ -2,7 +2,7 @@
 // here is secret: a Turnstile site key is public by design.
 
 /** Null turns the widget off, which is the default in local dev and tests. */
-const PRODUCTION_SITE_KEY = '__TURNSTILE_SITE_KEY__'
+const PRODUCTION_SITE_KEY = '0x4AAAAAAFxAlSpwkDWmU3pz'
 
 export const TURNSTILE_SITE_KEY: string | null =
   (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined) ||

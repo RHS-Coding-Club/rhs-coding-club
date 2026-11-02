@@ -189,6 +189,11 @@ describe('Turnstile on the routes that send email', () => {
     expect((await post('/request-password-reset', body, 'good')).status).toBe(200)
   })
 
+  it('turns off the public resend route', async () => {
+    const res = await post('/send-verification-email', { email: 'x@test.local' })
+    expect(res.status).toBe(404)
+  })
+
   it('leaves login alone', async () => {
     const fetcher = withTurnstile(answer('login'))
     const res = await post('/sign-in/email', {

@@ -29,8 +29,7 @@ const FREQUENCY_LABEL: Record<BackupFrequency, string> = {
 
 type Overview = Awaited<ReturnType<typeof getBackups>>
 
-const when = (value: Date | number) =>
-  `${fmtDate(value)} · ${fmtDate(value, 'time')}`
+const when = (value: Date | number) => `${fmtDate(value)} · ${fmtDate(value, 'time')}`
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (

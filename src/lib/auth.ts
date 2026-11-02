@@ -240,9 +240,13 @@ function createAuth() {
       },
     },
     socialProviders,
+    // Nothing here calls this, and login resends the link on its own path. Open,
+    // it would mail any unconfirmed account without a Turnstile check.
+    disabledPaths: ['/send-verification-email'],
     hooks: {
       // These two send email to whatever address is typed, so bots are kept out
-      // of them. Login isn't gated: it sends nothing and has its own rate limit.
+      // of them. Login isn't gated: it only sends mail after a correct password
+      // on an unconfirmed account, and it has its own rate limit.
       before: createAuthMiddleware(async (ctx) => {
         const action = TURNSTILE_PATHS[ctx.path]
         if (!action) return
