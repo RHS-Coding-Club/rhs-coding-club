@@ -21,6 +21,7 @@
     "db:migrate:prod": "wrangler d1 migrations apply rhs-coding-club --remote",
     "db:seed": "bun scripts/seed.ts",
     "db:seed:prod": "bun scripts/seed.ts --remote",
+    "db:restore": "bun scripts/restore-backup.ts",
     "db:studio": "drizzle-kit studio",
     "auth:schema": "bunx @better-auth/cli@latest generate --config src/lib/auth.ts --output src/db/schema/auth.generated.ts",
     "test": "bun run test:unit && bun run test:integration",

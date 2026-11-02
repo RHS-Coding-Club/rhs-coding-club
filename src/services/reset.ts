@@ -1,6 +1,7 @@
 import { and, count, countDistinct, eq, gte, isNotNull, ne, sql } from 'drizzle-orm'
 import type { SQL } from 'drizzle-orm'
 import type { BatchItem } from 'drizzle-orm/batch'
+import { BACKUP_TABLES } from '#/db/backup-tables'
 import type { AnySQLiteColumn, SQLiteTable } from 'drizzle-orm/sqlite-core'
 import type { Db } from '#/db'
 import { schema } from '#/db'
@@ -341,35 +342,12 @@ export async function runReset(
 }
 
 /**
- * Everything except login secrets (accounts, sessions, verification
- * tokens), as a JSON string, for the backup the reset tool offers first.
+ * Everything except login secrets (accounts, sessions, verification tokens),
+ * as a JSON string, for the reset tool's download and the automatic backups.
  */
 export async function exportBackup(db: Db, now = new Date()) {
-  const tables = {
-    user: t.user,
-    setting: t.setting,
-    membership_application: t.membershipApplication,
-    officer: t.officer,
-    challenge: t.challenge,
-    submission: t.submission,
-    point_entry: t.pointEntry,
-    event: t.event,
-    rsvp: t.rsvp,
-    attendance: t.attendance,
-    project: t.project,
-    project_member: t.projectMember,
-    post: t.post,
-    resource: t.resource,
-    resource_bookmark: t.resourceBookmark,
-    badge: t.badge,
-    user_badge: t.userBadge,
-    github_membership_request: t.githubMembershipRequest,
-    newsletter_subscriber: t.newsletterSubscriber,
-    newsletter_issue: t.newsletterIssue,
-    contact_message: t.contactMessage,
-  }
   const entries = await Promise.all(
-    Object.entries(tables).map(
+    Object.entries(BACKUP_TABLES).map(
       async ([name, table]) => [name, await db.select().from(table)] as const,
     ),
   )

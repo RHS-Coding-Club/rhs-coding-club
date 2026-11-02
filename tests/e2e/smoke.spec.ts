@@ -131,3 +131,38 @@ test('guest is asked to apply before submitting a challenge', async ({ page }) =
   await page.goto('/challenges/c_seed_1')
   await expect(page.getByRole('link', { name: /apply/i }).first()).toBeVisible()
 })
+
+test('an admin backs up, sees the estimate, and downloads the file', async ({ page }) => {
+  await logIn(page, 'admin@test.local')
+  await page.goto('/admin/backups', { waitUntil: 'networkidle' })
+  await expect(page.getByRole('heading', { name: 'Backups', level: 1 })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Back up now' }).click()
+  await expect(page.getByText('Backup finished.')).toBeVisible({ timeout: 15_000 })
+  await expect(page.getByText(/Based on the latest backup/)).toBeVisible()
+
+  // The estimate follows the form before anything is saved.
+  const copies = page
+    .getByText('Backups kept at once')
+    .locator('..')
+    .getByRole('definition')
+  await page.getByLabel('Delete after (days)').fill('70')
+  await expect(copies).toHaveText('11')
+  await page.getByLabel('Delete after (days)').fill('3')
+  await expect(page.getByText('Enter a whole number from 7 to 365.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Save settings' })).toBeDisabled()
+  await page.getByLabel('Delete after (days)').fill('90')
+  await expect(copies).toHaveText('13')
+
+  const downloading = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Download' }).first().click()
+  const download = await downloading
+  expect(download.suggestedFilename()).toMatch(/^rhs-coding-club-.*\.json\.gz$/)
+  await download.saveAs('test-results/latest-backup.json.gz')
+})
+
+test('officers can not reach backups', async ({ page }) => {
+  await logIn(page, 'officer@test.local')
+  await page.goto('/admin/backups')
+  await expect(page).toHaveURL(/\/admin\/?$/)
+})

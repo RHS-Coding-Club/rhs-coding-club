@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useServerFn } from '@tanstack/react-start'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { CheckCircle2, Send } from 'lucide-react'
@@ -8,6 +8,9 @@ import type { FieldErrors } from '#/lib/schemas/community'
 import { sendContactMessage } from '#/server/contact'
 import { EASE } from '#/components/motion'
 import { RaisedButton } from '#/components/raised-button'
+import { Turnstile } from '#/components/turnstile'
+import type { TurnstileHandle } from '#/components/turnstile'
+import { TURNSTILE_ACTIONS } from '#/lib/turnstile'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
 import { Textarea } from '#/components/ui/textarea'
@@ -24,6 +27,7 @@ export function ContactForm({
   defaults?: { name?: string; email?: string }
 }) {
   const send = useServerFn(sendContactMessage)
+  const turnstile = useRef<TurnstileHandle>(null)
   const reduced = useReducedMotion()
   const [errors, setErrors] = useState<FieldErrors>({})
   const [pending, setPending] = useState(false)
@@ -51,7 +55,8 @@ export function ContactForm({
     setErrors({})
     setPending(true)
     try {
-      await send({ data: parsed.data })
+      const turnstileToken = await turnstile.current?.getToken()
+      await send({ data: { ...parsed.data, turnstileToken } })
       setSentTo(parsed.data.email)
       form.reset()
       setLength(0)
@@ -59,6 +64,7 @@ export function ContactForm({
       setErrors({
         _: serverErrorMessage(err, 'Could not send that. Try again in a moment.'),
       })
+      turnstile.current?.reset()
     } finally {
       setPending(false)
     }
@@ -199,6 +205,7 @@ export function ContactForm({
               />
             </div>
 
+            <Turnstile ref={turnstile} action={TURNSTILE_ACTIONS.contact} />
             {errors._ && (
               <p role="alert" className="text-destructive text-sm">
                 {errors._}

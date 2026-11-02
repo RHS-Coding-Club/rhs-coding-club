@@ -10,6 +10,11 @@ TRUSTED_ORIGINS=http://localhost:3100
 # Better Auth. Generate with: openssl rand -base64 32
 BETTER_AUTH_SECRET=
 
+# Cloudflare Turnstile. Empty locally: the forms skip the check, and a production
+# build with no secret refuses them. To try the real widget, also set
+# VITE_TURNSTILE_SITE_KEY in .env.
+TURNSTILE_SECRET=
+
 # Comma-separated emails that become admin the first time they sign in.
 BOOTSTRAP_ADMIN_EMAILS=
 

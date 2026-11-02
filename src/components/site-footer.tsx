@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { ArrowRight, Mail } from 'lucide-react'
 import { subscribeNewsletter, newsletterSchema } from '#/server/newsletter'
+import { Turnstile } from '#/components/turnstile'
+import type { TurnstileHandle } from '#/components/turnstile'
+import { TURNSTILE_ACTIONS } from '#/lib/turnstile'
 import type { Theme } from '#/server/theme'
 import { Logo } from '#/components/logo'
 import { FadeUp } from '#/components/motion'
@@ -124,6 +127,7 @@ type Status =
 function NewsletterCard({ theme }: { theme: Theme }) {
   const subscribe = useServerFn(subscribeNewsletter)
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
+  const turnstile = useRef<TurnstileHandle>(null)
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -137,10 +141,13 @@ function NewsletterCard({ theme }: { theme: Theme }) {
     }
     setStatus({ kind: 'pending' })
     try {
-      await subscribe({ data: parsed.data })
+      const turnstileToken = await turnstile.current?.getToken()
+      await subscribe({ data: { ...parsed.data, turnstileToken } })
       setStatus({ kind: 'ok' })
       form.reset()
+      turnstile.current?.reset()
     } catch {
+      turnstile.current?.reset()
       setStatus({
         kind: 'error',
         message: 'Something went wrong. Try again in a moment.',
@@ -184,6 +191,7 @@ function NewsletterCard({ theme }: { theme: Theme }) {
               autoComplete="email"
               required
               placeholder="Enter your email"
+              onFocus={() => turnstile.current?.start()}
               className="placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-sm outline-none"
             />
             <button
@@ -195,6 +203,12 @@ function NewsletterCard({ theme }: { theme: Theme }) {
               <ArrowRight className="size-4" aria-hidden="true" />
             </button>
           </div>
+          <Turnstile
+            ref={turnstile}
+            action={TURNSTILE_ACTIONS.newsletter}
+            lazy
+            className="mt-3 flex justify-center empty:hidden"
+          />
           <p className="mt-3 min-h-5 text-sm" role="status" aria-live="polite">
             {status.kind === 'ok' && (
               <span className="text-white">

@@ -19,7 +19,7 @@ export async function setSetting<TKey extends SettingKey>(
   db: Db,
   key: TKey,
   value: SettingValue<TKey>,
-  updatedBy: string,
+  updatedBy: string | null,
 ): Promise<SettingValue<TKey>> {
   const clean = resolveSetting(key, value)
   await db

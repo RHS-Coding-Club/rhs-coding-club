@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { env } from 'cloudflare:test'
 import type { MockInstance } from 'vitest'
 import { eq } from 'drizzle-orm'
 import { getAuth } from '#/lib/auth'
@@ -123,5 +124,78 @@ describe('sign-up and roles', () => {
     const cookie = signIn.headers.get('set-cookie') ?? ''
     const session = await auth.api.getSession({ headers: new Headers({ cookie }) })
     expect((session?.user as { role?: string } | undefined)?.role).toBe('admin')
+  })
+})
+
+describe('Turnstile on the routes that send email', () => {
+  const post = (path: string, body: unknown, token?: string) =>
+    getAuth().handler(
+      new Request(`${env.APP_URL}/api/auth${path}`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          origin: env.APP_URL,
+          ...(token ? { 'x-turnstile-token': token } : {}),
+        },
+        body: JSON.stringify(body),
+      }),
+    )
+  const signup = (email: string) => ({ email, name: 'Bot', password: 'password123' })
+  const answer = (action: string) => ({
+    success: true,
+    action,
+    hostname: new URL(env.APP_URL).hostname,
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    Reflect.deleteProperty(env, 'TURNSTILE_SECRET')
+  })
+
+  function withTurnstile(body: unknown) {
+    Object.assign(env, { TURNSTILE_SECRET: 'test-secret' })
+    const fetcher = vi.fn(() => Promise.resolve(Response.json(body)))
+    vi.stubGlobal('fetch', fetcher)
+    return fetcher
+  }
+
+  it('refuses sign-up with no token and creates nothing', async () => {
+    const fetcher = withTurnstile(answer('signup'))
+    const res = await post('/sign-up/email', signup('bot1@test.local'))
+    expect(res.status).toBe(403)
+    expect(fetcher).not.toHaveBeenCalled()
+    const row = await getDb().query.user.findFirst({
+      where: eq(schema.user.email, 'bot1@test.local'),
+    })
+    expect(row).toBeUndefined()
+  })
+
+  it('accepts sign-up with a good token', async () => {
+    withTurnstile(answer('signup'))
+    const res = await post('/sign-up/email', signup('human@test.local'), 'good')
+    expect(res.status).toBe(200)
+  })
+
+  it('refuses a token made for another form', async () => {
+    withTurnstile(answer('contact'))
+    const res = await post('/sign-up/email', signup('bot2@test.local'), 'wrong-form')
+    expect(res.status).toBe(403)
+  })
+
+  it('guards password reset requests', async () => {
+    withTurnstile(answer('forgot_password'))
+    const body = { email: 'x@test.local', redirectTo: '/reset-password' }
+    expect((await post('/request-password-reset', body)).status).toBe(403)
+    expect((await post('/request-password-reset', body, 'good')).status).toBe(200)
+  })
+
+  it('leaves login alone', async () => {
+    const fetcher = withTurnstile(answer('login'))
+    const res = await post('/sign-in/email', {
+      email: 'nobody@test.local',
+      password: 'wrong-password',
+    })
+    expect(res.status).toBe(401)
+    expect(fetcher).not.toHaveBeenCalled()
   })
 })

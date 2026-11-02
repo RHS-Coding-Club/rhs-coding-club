@@ -521,6 +521,10 @@ const COVERAGE: Record<string, string | null> = {
   getResetCounts: null, // the reset tool stays on the website on purpose
   downloadBackup: null,
   resetData: null,
+  getBackups: null, // backups stay on the website, like the reset tool's download
+  saveBackupSettings: null,
+  runBackupNow: null,
+  downloadStoredBackup: null,
   listResourcesAdmin: 'list_resources',
   saveResource: 'save_resource',
   approveResource: 'set_resource_approved',

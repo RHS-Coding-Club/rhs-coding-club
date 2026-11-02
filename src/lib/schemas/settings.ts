@@ -20,8 +20,14 @@ export const saveSettingSchema = z.discriminatedUnion('key', [
 ])
 export type SaveSettingInput = z.infer<typeof saveSettingSchema>
 
-/** Groups with a tab on the settings page. `season` is run by the reset tool. */
-export type EditableSettingKey = Exclude<SettingKey, 'season'>
+/**
+ * Groups with a tab on the settings page. The reset tool runs `season`, and the
+ * Backups page runs the backup groups.
+ */
+export type EditableSettingKey = Exclude<
+  SettingKey,
+  'season' | 'backup' | 'backup-status'
+>
 
 export const SETTING_GROUPS: {
   key: EditableSettingKey

@@ -27,6 +27,8 @@ export const contactSchema = z.object({
    * every field fill this one too. Any value means the message is dropped.
    */
   website: z.string().max(500).optional(),
+  /** From the Turnstile widget. The server function checks it. */
+  turnstileToken: z.string().max(2048).optional(),
 })
 export type ContactInput = z.infer<typeof contactSchema>
 

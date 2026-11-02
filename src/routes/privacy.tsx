@@ -138,7 +138,9 @@ const SECTIONS: LegalSection[] = [
           <li>
             <strong>Cloudflare</strong> hosts the site. Your data lives in a Cloudflare D1
             database, and uploaded images (avatars, project screenshots) in Cloudflare R2
-            storage.
+            storage. Backups of the database are kept in private R2 storage and deleted on
+            a schedule. Cloudflare Turnstile checks that forms are filled in by people,
+            not bots, and it sees basic browser and connection details when it runs.
           </li>
           <li>
             <strong>Google</strong> delivers our emails through the club&apos;s Gmail
