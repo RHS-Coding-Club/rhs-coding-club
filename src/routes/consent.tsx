@@ -82,22 +82,27 @@ function ConsentPage() {
             <dd className="font-mono break-all">{info.publisher}</dd>
           </div>
         )}
-        {info.redirectHost && (
+        {info.redirectUri && (
           <div>
             <dt className="text-muted-foreground">Sends you back to</dt>
-            <dd className="font-mono break-all">{info.redirectHost}</dd>
+            <dd className="font-mono break-all">{info.redirectUri}</dd>
           </div>
         )}
       </dl>
-      {info.redirectIsLocal && (
+      {info.redirect !== 'https' && (
         <p className="text-muted-foreground mb-6 text-sm">
-          This goes back to a program on your own computer. The name above can&apos;t be
-          verified, so only continue if you just started this from an app you trust.
+          {info.redirect === 'local'
+            ? 'This goes back to a program on your own computer.'
+            : "This doesn't go back to a website, so nothing proves who receives it."}{' '}
+          The name above can&apos;t be verified, so only continue if you just started this
+          from an app you trust.
         </p>
       )}
       <p className="text-muted-foreground mb-6 text-sm">
-        It can read club data and make changes. Deleting things, changing roles, sending
-        email to the club, and changing settings still need your approval here.
+        It can read club data and make changes. Deleting things, changing roles or
+        settings, adjusting points, accepting members, GitHub invites, and emailing the
+        club still need your approval here. Other reviews, like passing a submission or
+        approving a project, run right away.
       </p>
       {error && (
         <p role="alert" className="text-destructive mb-4 text-sm">

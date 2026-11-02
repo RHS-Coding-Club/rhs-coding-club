@@ -97,7 +97,7 @@ Officers and admins can run the admin panel from an AI app that speaks the 2026-
 claude mcp add --transport http rhs https://rhs.riponhighcodingclub.workers.dev/mcp
 ```
 
-The app opens the site to sign in, and the officer approves it. Its tools match the admin panel and the officer's role. Deleting things, changing roles or settings, adjusting points, and emailing the club return a link instead of acting, and a person has to approve them on the site. The reset tool stays website-only.
+The app opens the site to sign in, and the officer approves it. Its tools match the admin panel and the officer's role. Deleting things, changing roles or settings, adjusting points, accepting members, GitHub invites, and emailing the club return a link instead of acting, and a person has to approve them on the site. The reset tool stays website-only.
 
 `/admin/mcp` shows connected apps, waiting approvals, and recent activity. Calls are limited to 60 a minute per user.
 

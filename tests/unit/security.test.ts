@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { canonicalMailbox } from '#/lib/email-address'
 import { isAuthWrite, isOAuthRoute } from '#/lib/rate-limit'
+import { redirectKind } from '#/lib/redirect-kind'
 import { CONTENT_SECURITY_POLICY, withSecurityHeaders } from '#/lib/security-headers'
 
 describe('canonicalMailbox', () => {
@@ -35,6 +36,23 @@ describe('isOAuthRoute', () => {
     expect(isOAuthRoute('/api/auth/oauth2/authorize')).toBe(true)
     expect(isAuthWrite('POST', '/api/auth/oauth2/token')).toBe(false)
     expect(isOAuthRoute('/api/auth/sign-in/email')).toBe(false)
+  })
+})
+
+describe('redirectKind', () => {
+  it('only trusts https', () => {
+    expect(redirectKind('https://claude.ai/api/mcp/auth_callback')).toBe('https')
+    expect(redirectKind('http://localhost:3334/callback')).toBe('local')
+    expect(redirectKind('http://127.0.0.1:3334/callback')).toBe('local')
+    expect(redirectKind('http://[::1]:3334/callback')).toBe('local')
+  })
+
+  it('warns about everything else, including addresses dressed as local', () => {
+    expect(redirectKind('cursor://anysphere.cursor/oauth')).toBe('other')
+    expect(redirectKind('my-app:/callback')).toBe('other')
+    expect(redirectKind('http://evil.example/callback')).toBe('other')
+    expect(redirectKind('http://localhost.evil.example/callback')).toBe('other')
+    expect(redirectKind(undefined)).toBe('other')
   })
 })
 
