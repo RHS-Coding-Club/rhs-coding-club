@@ -1,0 +1,67 @@
+name: Bug report
+description: Something on the site is broken or behaves wrongly.
+title: 'bug: '
+labels: ['type: bug', 'status: needs triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This repository is public. Please leave out students' names, email addresses, and other personal details, including in screenshots.
+
+        Found a security problem? [Report it privately](https://github.com/RHS-Coding-Club/rhs-coding-club/security/advisories/new) instead of opening an issue.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What went wrong, and what did you expect to happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to /challenges
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area of the site
+      options:
+        - Public pages
+        - Sign-in and accounts
+        - Challenges, points, and badges
+        - Events and attendance
+        - Projects
+        - Blog and newsletter
+        - Admin panel
+        - MCP server
+        - Email
+        - Something else
+    validations:
+      required: true
+  - type: dropdown
+    id: role
+    attributes:
+      label: Signed in as
+      options:
+        - Not signed in
+        - Guest
+        - Member
+        - Officer
+        - Admin
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      placeholder: Chrome on a school Chromebook
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or error messages
+      description: Drag images here, or paste any error text.

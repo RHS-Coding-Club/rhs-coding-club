@@ -64,7 +64,7 @@ Google, GitHub, and email/password. Password sign-ups must confirm their email b
 - Shadcn components in `src/components/ui` are generated; don't hand-edit them beyond styling tokens. Add with `bunx shadcn add <name>`.
 - Tailwind only; brand tokens live in `src/styles.css`. Dark is the default theme. Display type is `font-display` (Instrument Serif), body is DM Sans, code and numeric labels are `font-mono`.
 - Tests: pure logic in `tests/unit`, anything touching D1 or Better Auth in `tests/integration` (runs inside workerd with a fresh migrated database per file), browser flows in `tests/e2e`.
-- Commits follow Conventional Commits.
+- Commits follow Conventional Commits. `main` is protected and squash-merge only, so PR titles must follow them too (CI checks this); `feat` and `fix` feed the release-please changelog.
 
 ## Gotchas
 

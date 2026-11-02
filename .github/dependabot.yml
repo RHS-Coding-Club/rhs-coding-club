@@ -6,16 +6,24 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: chore(deps)
+    labels: [dependencies]
     groups:
       minor-and-patch:
         update-types: [minor, patch]
       major:
         update-types: [major]
 
+  # Workflows pin actions to commit SHAs; this keeps the SHAs and their version
+  # comments current.
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    commit-message:
+      prefix: ci(deps)
+    labels: [dependencies, 'area: ci']
     groups:
       actions:
         patterns: ['*']

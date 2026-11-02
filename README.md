@@ -1,5 +1,9 @@
 # RHS Coding Club
 
+[![CI](https://github.com/RHS-Coding-Club/rhs-coding-club/actions/workflows/ci.yml/badge.svg)](https://github.com/RHS-Coding-Club/rhs-coding-club/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/RHS-Coding-Club/rhs-coding-club/badge)](https://scorecard.dev/viewer/?uri=github.com/RHS-Coding-Club/rhs-coding-club)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 The website for the Ripon High School Coding Club: weekly challenges, events and RSVPs, member projects, a blog, learning resources, and a points and badges system.
 
 Live at **https://rhs.riponhighcodingclub.workers.dev**.

@@ -40,6 +40,14 @@ Commits follow [Conventional Commits](https://www.conventionalcommits.org): `fea
 
 Open a pull request against `main`, fill out the template, and link any related issue. CI runs the same checks.
 
+`main` is protected: every change goes through a pull request and the required checks must pass. Pull requests are squash-merged, so the PR title becomes the commit message and has to follow Conventional Commits too. Merging to `main` deploys the site, so run `bun run db:migrate:prod` first if your change includes a migration.
+
+## Releases
+
+[release-please](https://github.com/googleapis/release-please) keeps an open release PR that bumps the version and updates `CHANGELOG.md` from `feat` and `fix` commits. Merging that PR tags the version and publishes a GitHub Release. It doesn't change how the site deploys.
+
+GitHub doesn't run checks on PRs opened by a workflow, so close and reopen the release PR to start them before merging.
+
 ## How the code is organized
 
 [`CLAUDE.md`](./CLAUDE.md) has the full architecture rules. The ones that come up most:
@@ -57,7 +65,7 @@ Tests go in `tests/unit` for pure logic, `tests/integration` for anything touchi
 
 ## Reporting issues
 
-Open a GitHub issue with the steps to reproduce a bug, or what a feature is for and how it might work. Report security problems the way [SECURITY.md](./SECURITY.md) describes, not in a public issue.
+[Open an issue](https://github.com/RHS-Coding-Club/rhs-coding-club/issues/new/choose) using one of the forms. Report security problems the way [SECURITY.md](./SECURITY.md) describes, not in a public issue.
 
 ## Roles
 
