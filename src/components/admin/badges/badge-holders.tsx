@@ -69,7 +69,7 @@ export function BadgeHolders({
           : `Took ${badgeName} from ${name}.`,
       )
       await qc.invalidateQueries({ queryKey: ['badge-holders', badgeId] })
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverErrorMessage(err))
     } finally {

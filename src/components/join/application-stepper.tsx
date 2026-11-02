@@ -90,7 +90,7 @@ export function ApplicationStepper({
     try {
       await applyForMembership({ data: values })
       toast.success('Application sent. An officer will review it soon.')
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       setFormError(serverMessage(err))
     } finally {

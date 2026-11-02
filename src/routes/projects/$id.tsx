@@ -235,7 +235,7 @@ function ProjectPage() {
             <p className="text-lg font-semibold tracking-tight">
               Built at RHS Coding Club
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-[#e6edf5]/75">
+            <p className="mt-2 text-sm leading-relaxed text-[#e6edf5]/80">
               Members build projects at lunch in Mr. Derrick&apos;s classroom and over the
               H2O hackathon weekend. Every approved project earns each teammate points.
             </p>

@@ -163,7 +163,7 @@ function IssueHistory({ issues }: { issues: Data['issues'] }) {
     try {
       await remove({ data: { id } })
       toast.success('Draft deleted.')
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverErrorMessage(err))
     }

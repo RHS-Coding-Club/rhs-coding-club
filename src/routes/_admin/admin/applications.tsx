@@ -108,7 +108,12 @@ function AdminApplications() {
       >
         <TabsList>
           {STATUSES.map((s) => (
-            <TabsTrigger key={s} value={s} className="capitalize">
+            <TabsTrigger
+              aria-controls={undefined}
+              key={s}
+              value={s}
+              className="capitalize"
+            >
               {s}
             </TabsTrigger>
           ))}
@@ -253,7 +258,7 @@ function ApplicationBody({ detail }: { detail: ApplicationDetail }) {
       )
       setRejecting(false)
       await queryClient.invalidateQueries({ queryKey: ['admin-application', a.id] })
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverMessage(err))
     } finally {

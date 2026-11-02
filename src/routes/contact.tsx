@@ -75,10 +75,10 @@ function ContactPage() {
             <h2 className="text-2xl font-semibold tracking-[-0.025em]">
               Or find us at lunch
             </h2>
-            <dl className="mt-5 flex flex-col gap-5">
+            <div className="mt-5 flex flex-col gap-5">
               <Fact icon={CalendarDays} term="When" value={club.meetingSchedule} />
               <Fact icon={MapPin} term="Where" value={club.meetingLocation} />
-            </dl>
+            </div>
           </div>
 
           {socials.length > 0 && (
@@ -146,8 +146,8 @@ function Fact({
     <div className="flex gap-3">
       <Icon className="text-brand-sky mt-0.5 size-5 shrink-0" aria-hidden="true" />
       <div>
-        <dt className="text-muted-foreground text-sm">{term}</dt>
-        <dd className="mt-0.5 text-lg font-medium">{value}</dd>
+        <p className="text-muted-foreground text-sm">{term}</p>
+        <p className="mt-0.5 text-lg font-medium">{value}</p>
       </div>
     </div>
   )

@@ -43,6 +43,7 @@ export interface RichTextEditorProps {
   imagePurpose?: UploadPurpose
   id?: string
   'aria-invalid'?: boolean
+  'aria-label'?: string
   className?: string
 }
 
@@ -76,6 +77,8 @@ export function RichTextEditor({
       attributes: {
         class: 'rich-text min-h-64 px-5 py-4 outline-none',
         ...(id ? { id } : {}),
+        // A contenteditable div can't use <label htmlFor>.
+        'aria-label': aria['aria-label'] ?? 'Rich text',
         ...(aria['aria-invalid'] ? { 'aria-invalid': 'true' } : {}),
       },
     },

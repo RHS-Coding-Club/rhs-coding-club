@@ -279,7 +279,7 @@ function UserBody({
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['admin-user', user.id] })
-    await router.invalidate()
+    await router.invalidate({ sync: true })
   }
 
   async function saveRole() {
@@ -401,7 +401,7 @@ function UserBody({
             <Link
               to="/admin/applications"
               search={{ status: 'all', id: detail.application.id }}
-              className="text-primary underline-offset-4 hover:underline"
+              className="text-primary underline underline-offset-4"
             >
               Open
             </Link>

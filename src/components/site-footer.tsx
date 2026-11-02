@@ -76,7 +76,7 @@ export function SiteFooter({ theme }: { theme: Theme }) {
           >
             {COLUMNS.map((col) => (
               <div key={col.title}>
-                <p className="font-mono text-[11px] tracking-[0.14em] text-[#e6edf5]/60 uppercase">
+                <p className="font-mono text-[11px] tracking-[0.14em] text-[#e6edf5]/80 uppercase">
                   {col.title}
                 </p>
                 <ul className="mt-4 space-y-2.5 text-sm">
@@ -107,7 +107,7 @@ export function SiteFooter({ theme }: { theme: Theme }) {
           </nav>
         </div>
 
-        <p className="mt-20 text-center text-sm text-[#e6edf5]/70">
+        <p className="mt-20 text-center text-sm text-[#e6edf5]/80">
           © 2026 RHS Coding Club
         </p>
       </div>

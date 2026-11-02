@@ -81,7 +81,7 @@ function AdminResources() {
     try {
       await fn()
       toast.success(done)
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverErrorMessage(err))
     } finally {
@@ -113,7 +113,7 @@ function AdminResources() {
           }
         >
           <TabsList>
-            <TabsTrigger value="pending">
+            <TabsTrigger aria-controls={undefined} value="pending">
               Pending
               {pendingCount > 0 && (
                 <span className="bg-primary text-primary-foreground tabular ml-1.5 rounded-full px-1.5 font-mono text-[10px]">
@@ -121,8 +121,12 @@ function AdminResources() {
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="approved">Approved</TabsTrigger>
-            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger aria-controls={undefined} value="approved">
+              Approved
+            </TabsTrigger>
+            <TabsTrigger aria-controls={undefined} value="all">
+              All
+            </TabsTrigger>
           </TabsList>
         </Tabs>
         <Select

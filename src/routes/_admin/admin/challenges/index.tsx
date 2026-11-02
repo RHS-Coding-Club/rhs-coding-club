@@ -66,7 +66,7 @@ function AdminChallenges() {
               : 'It is live.'
             : 'Members can no longer see it.',
       })
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not update it.')
     } finally {

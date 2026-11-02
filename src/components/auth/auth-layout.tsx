@@ -91,7 +91,7 @@ function ClubPanel({ pulse }: { pulse: ClubPulse }) {
               A new problem every week, lunch meetings in Mr. Derrick&apos;s room, and the
               H2O hackathon. Come build with us.
             </p>
-            <footer className="mt-5 flex flex-col gap-1 font-mono text-sm text-[#e6edf5]/70">
+            <footer className="mt-5 flex flex-col gap-1 font-mono text-sm text-[#e6edf5]/80">
               {lines.map((l) => (
                 <span key={l} className="truncate">
                   ~ {l}

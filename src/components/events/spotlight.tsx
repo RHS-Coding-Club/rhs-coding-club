@@ -132,7 +132,7 @@ export function NextEventSpotlight({
             />
             {live ? (
               <div className="relative">
-                <p className="text-sm text-[#e6edf5]/70">
+                <p className="text-sm text-[#e6edf5]/80">
                   It started at {fmtDate(event.startsAt, 'time')}
                 </p>
                 <p className="mt-3 text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
@@ -146,7 +146,7 @@ export function NextEventSpotlight({
               </div>
             ) : (
               <div className="relative">
-                <p className="mb-5 text-sm text-[#e6edf5]/70">Starts in</p>
+                <p className="mb-5 text-sm text-[#e6edf5]/80">Starts in</p>
                 <Countdown
                   target={event.startsAt}
                   serverNow={serverNow}

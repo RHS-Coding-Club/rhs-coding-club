@@ -89,6 +89,10 @@ Roles are `guest < member < officer < admin`. New sign-ups are guests until an o
 
 Every protected server function uses `requireUser`, `requireMember`, `requireOfficer`, or `requireAdmin` from `src/server/auth.ts`. Route layouts redirect too, but the server-function middleware is the actual security boundary.
 
+## Security
+
+`src/server.ts` adds security headers to every response (`src/lib/security-headers.ts`) and rate limits per IP: 10 a minute on sign-in, sign-up, and reset routes, and 5 a minute on the contact and newsletter forms. The limits are Workers rate limiting bindings in `wrangler.jsonc`, which is free, and only apply on Cloudflare, not in local dev.
+
 ## Email
 
 `src/services/email.ts` sends through the club's Gmail account over SMTP using an app password. Gmail allows about 500 recipients a day, so each kind of mail gets a limit (`TIER_LIMIT`): public-triggered mail stops first and password resets always have room left. Bulk sends beyond a limit are dropped and logged, not queued.

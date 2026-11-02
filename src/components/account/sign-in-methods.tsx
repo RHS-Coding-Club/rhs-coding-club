@@ -62,7 +62,7 @@ export function SignInMethods({
       return
     }
     toast.success('Unlinked.')
-    await router.invalidate()
+    await router.invalidate({ sync: true })
   }
 
   return (

@@ -46,7 +46,7 @@ export function SuggestResourceDialog({
       await suggest({ data: parsed.data })
       setOpen(false)
       toast.success('Thanks! An officer will review it soon.')
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       setErrors({ _: serverErrorMessage(err) })
     } finally {

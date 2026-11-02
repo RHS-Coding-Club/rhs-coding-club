@@ -143,7 +143,7 @@ export function ChallengeForm({
               ? 'Scheduled. Members get an email when it goes live.'
               : 'Saved as a draft.',
       })
-      await router.invalidate()
+      await router.invalidate({ sync: true })
       await router.navigate({ to: '/admin/challenges' })
     } catch (err) {
       setFormError(err instanceof Error && err.message ? err.message : 'Could not save.')

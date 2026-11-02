@@ -28,9 +28,9 @@ export function blankEvent(now = new Date()): EventFormValues {
   return {
     title: '',
     description: '',
-    startsAt: `${day}T12:30`,
-    endsAt: `${day}T13:15`,
-    location: "Mr. Derrick's classroom",
+    startsAt: `${day}T12:20`,
+    endsAt: `${day}T12:40`,
+    location: "Mr. Derrick's classroom (C3)",
     tags: ['meeting'],
     coverKey: null,
   }

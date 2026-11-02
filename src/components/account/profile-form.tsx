@@ -75,7 +75,7 @@ export function ProfileForm({ initial }: { initial: ProfileValues }) {
       setGithub(parsed.data.githubUsername ?? '')
       setSkills(parsed.data.skills)
       toast.success('Profile saved.')
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       setFormError(serverMessage(err))
     } finally {

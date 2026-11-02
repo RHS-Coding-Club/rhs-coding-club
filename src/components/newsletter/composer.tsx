@@ -87,7 +87,7 @@ export function NewsletterComposer({
       if (kind === 'save') {
         if (await persist()) {
           toast.success('Draft saved.')
-          await router.invalidate()
+          await router.invalidate({ sync: true })
         }
       } else if (kind === 'test') {
         const data = validate()
@@ -106,7 +106,7 @@ export function NewsletterComposer({
           `Sent to ${r.recipients} subscriber${r.recipients === 1 ? '' : 's'}.`,
         )
         void navigate({ to: '/admin/newsletter', search: { tab: 'history' } })
-        await router.invalidate()
+        await router.invalidate({ sync: true })
       }
     } catch (err) {
       toast.error(serverErrorMessage(err))

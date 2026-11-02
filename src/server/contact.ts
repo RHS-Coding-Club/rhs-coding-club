@@ -1,5 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getRequestHeaders } from '@tanstack/react-start/server'
+import { env } from 'cloudflare:workers'
 import { getDb } from '#/db'
+import { isRateLimited } from '#/lib/rate-limit'
 import { contactSchema, markMessageSchema, messageIdSchema } from '#/lib/schemas/contact'
 import { requireOfficer } from '#/server/auth'
 import * as contact from '#/services/contact'
@@ -27,6 +30,9 @@ export const getContactInfo = createServerFn({ method: 'GET' }).handler(async ()
 export const sendContactMessage = createServerFn({ method: 'POST' })
   .validator(contactSchema)
   .handler(async ({ data }) => {
+    const ip = getRequestHeaders().get('cf-connecting-ip')
+    if (await isRateLimited(env.FORM_LIMIT, ip))
+      throw new contact.ContactError('Too many messages. Try again in a minute.')
     await contact.submitContactMessage(getDb(), data)
     // Same answer whether or not the honeypot tripped.
     return { ok: true as const }

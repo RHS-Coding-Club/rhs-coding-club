@@ -98,7 +98,7 @@ function AdminProjects() {
       toast.success(
         featured ? `${p.title} is featured.` : `${p.title} is no longer featured.`,
       )
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not update the project.')
     } finally {
@@ -118,7 +118,12 @@ function AdminProjects() {
         <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
           <TabsList>
             {(['pending', 'rejected', 'approved', 'all'] as const).map((f) => (
-              <TabsTrigger key={f} value={f} className="capitalize">
+              <TabsTrigger
+                aria-controls={undefined}
+                key={f}
+                value={f}
+                className="capitalize"
+              >
                 {f}
                 <span className="text-muted-foreground ml-1.5 font-mono text-xs">
                   {counts[f]}
@@ -241,7 +246,7 @@ function AdminProjects() {
               busy={busy}
               onFeature={(v) => void toggleFeatured(open, v)}
               onDone={async () => {
-                await router.invalidate()
+                await router.invalidate({ sync: true })
               }}
               setBusy={setBusy}
             />

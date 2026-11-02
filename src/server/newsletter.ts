@@ -1,6 +1,9 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getRequestHeaders } from '@tanstack/react-start/server'
+import { env } from 'cloudflare:workers'
 import { z } from 'zod'
 import { getDb } from '#/db'
+import { isRateLimited } from '#/lib/rate-limit'
 import {
   issueIdSchema,
   issueSchema,
@@ -18,6 +21,9 @@ export const newsletterSchema = z.object({
 export const subscribeNewsletter = createServerFn({ method: 'POST' })
   .validator(newsletterSchema)
   .handler(async ({ data }) => {
+    const ip = getRequestHeaders().get('cf-connecting-ip')
+    if (await isRateLimited(env.FORM_LIMIT, ip))
+      throw new newsletter.NewsletterError('Too many attempts. Try again in a minute.')
     const result = await newsletter.subscribeEmail(getDb(), data.email)
     return { ok: true as const, created: result.created }
   })

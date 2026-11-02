@@ -131,6 +131,8 @@ export function ChallengeArchive({
           </EmptyState>
         ) : (
           <AnimatedList
+            asList
+            label="Past challenges"
             key={`${difficulty}-${solved}`}
             items={items}
             theme={dark ? 'dark' : 'light'}

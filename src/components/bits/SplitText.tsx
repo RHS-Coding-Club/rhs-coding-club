@@ -488,6 +488,9 @@ const SplitText = ({
     <Tag
       key={text}
       ref={ref}
+      // Local: GSAP labels the split text at runtime, which needs a role to be valid.
+      role="img"
+      aria-label={text}
       className={`split-parent inline-block whitespace-normal ${clip ? 'overflow-hidden' : 'overflow-visible'} ${trigger === 'click' ? 'cursor-pointer' : ''} ${className}`}
       style={{
         textAlign,

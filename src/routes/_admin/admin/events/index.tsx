@@ -89,7 +89,7 @@ function AdminEvents() {
       await deleteEvent({ data: { eventId: toDelete.id } })
       toast.success(`Deleted "${toDelete.title}".`)
       setToDelete(null)
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(errorMessage(err, 'Could not delete the event.'))
     } finally {

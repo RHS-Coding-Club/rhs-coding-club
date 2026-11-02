@@ -347,7 +347,7 @@ function LeadPost({ post }: { post: PostListItem }) {
       />
       <div className="relative mx-auto grid max-w-6xl gap-10 px-(--gutter) py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-end">
         <div>
-          <p className="font-mono text-sm text-[#e6edf5]/65">
+          <p className="font-mono text-sm text-[#e6edf5]/80">
             Latest · {fmtDate(post.publishedAt)}
           </p>
           <h2 className="mt-5 max-w-4xl text-[clamp(2.25rem,5vw,4.25rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-balance">
@@ -372,7 +372,7 @@ function LeadPost({ post }: { post: PostListItem }) {
             author={post.author}
             minutes={post.minutes}
             size="sm"
-            className="[&_p]:text-[#e6edf5]/70 [&_p>span]:text-[#e6edf5] [&_[data-slot=avatar-fallback]]:bg-white/15 [&_[data-slot=avatar-fallback]]:text-white"
+            className="[&_p]:text-[#e6edf5]/80 [&_p>span]:text-[#e6edf5] [&_[data-slot=avatar-fallback]]:bg-white/15 [&_[data-slot=avatar-fallback]]:text-white"
           />
           <span className="inline-flex items-center gap-1.5 font-medium">
             Read it

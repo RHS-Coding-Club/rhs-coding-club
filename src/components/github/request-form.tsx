@@ -44,7 +44,7 @@ export function GithubRequestForm({
     try {
       await request({ data: parsed.data })
       toast.success('Request sent. An officer will review it soon.')
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       setErrors({ githubUsername: serverErrorMessage(err) })
     } finally {

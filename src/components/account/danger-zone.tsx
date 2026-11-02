@@ -47,7 +47,7 @@ export function DangerZone({ hasPassword }: { hasPassword: boolean }) {
     }
     setOpen(false)
     toast.success('Your account was deleted.')
-    await router.invalidate()
+    await router.invalidate({ sync: true })
     await router.navigate({ to: '/' })
   }
 

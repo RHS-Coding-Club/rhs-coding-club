@@ -197,7 +197,8 @@ const BranchedMenu: React.FC<BranchedMenuProps> = ({
           '--bm-indent': `${indent}px`,
           '--bm-line-w': lineWidth,
           '--bm-draw': `${drawDuration}ms`,
-          '--bm-muted': `color-mix(in srgb, ${color} 55%, transparent)`,
+          // Local: 55% missed AA contrast on the light theme.
+          '--bm-muted': `color-mix(in srgb, ${color} 70%, transparent)`,
           '--bm-fold': `${foldDuration}ms`,
         } as CSSProperties
       }

@@ -33,17 +33,17 @@ function AboutPage() {
           <p className="text-muted-foreground mt-7 max-w-2xl text-xl leading-relaxed">
             {club.description}
           </p>
-          <dl className="mt-12 flex flex-wrap gap-x-14 gap-y-6">
+          <div className="mt-12 flex flex-wrap gap-x-14 gap-y-6">
             <Fact icon={CalendarDays} term="When we meet" value={club.meetingSchedule} />
             <Fact icon={MapPin} term="Where" value={club.meetingLocation} />
-          </dl>
+          </div>
         </FadeUp>
       </section>
 
       <section className="mx-2.5">
         <div className="bg-brand-navy rounded-4xl px-(--gutter) py-20 text-[#e6edf5] sm:py-28">
           <FadeUp className="mx-auto max-w-4xl">
-            <p className="text-sm text-[#e6edf5]/60">Our mission</p>
+            <p className="text-sm text-[#e6edf5]/80">Our mission</p>
             <p className="mt-5 text-3xl leading-snug font-medium tracking-[-0.02em] text-balance sm:text-4xl sm:leading-snug">
               {club.missionStatement}
             </p>
@@ -166,8 +166,8 @@ function Fact({
     <div className="flex gap-3">
       <Icon className="text-brand-sky mt-0.5 size-5 shrink-0" aria-hidden="true" />
       <div>
-        <dt className="text-muted-foreground text-sm">{term}</dt>
-        <dd className="mt-1 text-lg font-medium">{value}</dd>
+        <p className="text-muted-foreground text-sm">{term}</p>
+        <p className="mt-1 text-lg font-medium">{value}</p>
       </div>
     </div>
   )

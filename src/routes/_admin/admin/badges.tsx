@@ -64,7 +64,7 @@ function AdminBadges() {
       await remove({ data: { id } })
       toast.success('Badge deleted.')
       setOpen(undefined)
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverErrorMessage(err))
     }

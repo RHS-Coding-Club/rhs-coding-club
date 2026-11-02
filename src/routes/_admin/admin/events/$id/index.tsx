@@ -155,7 +155,7 @@ function CheckInControls({ sheet }: { sheet: AttendanceSheet }) {
     setToggling(true)
     try {
       await setCheckIn({ data: { eventId: event.id, open } })
-      await router.invalidate()
+      await router.invalidate({ sync: true })
       toast.success(open ? 'Check-in is open.' : 'Check-in is closed.')
     } catch (err) {
       toast.error(errorMessage(err))
@@ -167,7 +167,7 @@ function CheckInControls({ sheet }: { sheet: AttendanceSheet }) {
     setRegenerating(true)
     try {
       const { code } = await regenerateCheckInCode({ data: { eventId: event.id } })
-      await router.invalidate()
+      await router.invalidate({ sync: true })
       toast.success(`New code: ${code}. The old QR code no longer works.`)
     } catch (err) {
       toast.error(errorMessage(err))
@@ -353,7 +353,7 @@ function MarkMember({ eventId }: { eventId: string }) {
     try {
       await markAttendance({ data: { eventId, userId: m.id, present } })
       setResults((rs) => rs.map((r) => (r.id === m.id ? { ...r, present } : r)))
-      await router.invalidate()
+      await router.invalidate({ sync: true })
       toast.success(present ? `${m.name} marked present.` : `${m.name} marked absent.`)
     } catch (err) {
       toast.error(errorMessage(err))
@@ -442,7 +442,7 @@ function Roster({ sheet }: { sheet: AttendanceSheet }) {
     setBusy(userId)
     try {
       await markAttendance({ data: { eventId: sheet.event.id, userId, present } })
-      await router.invalidate()
+      await router.invalidate({ sync: true })
       toast.success(
         present
           ? `${name} marked present. +${sheet.points} points.`

@@ -61,7 +61,7 @@ export function AdminResourceDialog({
       await save({ data: parsed.data })
       toast.success(resource?.id ? 'Resource updated.' : 'Resource added.')
       onClose()
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       setErrors({ _: serverErrorMessage(err) })
     } finally {

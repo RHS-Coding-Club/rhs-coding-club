@@ -82,7 +82,7 @@ function AdminOfficers() {
     setBusy(`${o.id}-${direction}`)
     try {
       await reorderOfficer({ data: { id: o.id, direction } })
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverMessage(err))
     } finally {
@@ -108,7 +108,7 @@ function AdminOfficers() {
       toast.success(
         isActive ? `${o.name} is shown on About.` : `${o.name} is hidden from About.`,
       )
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverMessage(err))
     } finally {
@@ -123,7 +123,7 @@ function AdminOfficers() {
       await removeOfficer({ data: { id: deleting.id } })
       toast.success(`Removed ${deleting.name}.`)
       setDeleting(null)
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverMessage(err))
     } finally {
@@ -256,7 +256,7 @@ function AdminOfficers() {
               initial={editing}
               onDone={async () => {
                 setEditing(null)
-                await router.invalidate()
+                await router.invalidate({ sync: true })
               }}
               onCancel={() => setEditing(null)}
             />

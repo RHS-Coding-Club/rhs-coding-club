@@ -55,7 +55,7 @@ export function Countdown({
             key={u.label}
             className="flex flex-col items-center rounded-2xl bg-white/8 px-1 py-3 ring-1 ring-white/10 sm:py-4"
           >
-            <dt className="order-2 mt-1 font-mono text-[11px] tracking-[0.12em] uppercase opacity-70">
+            <dt className="order-2 mt-1 font-mono text-[11px] tracking-[0.12em] text-white uppercase">
               {u.label}
             </dt>
             <dd className="order-1">

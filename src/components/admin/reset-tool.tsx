@@ -117,7 +117,7 @@ export function ResetTool({
     try {
       const res = await run({ data: { actions: chosen, confirm: 'RESET' } })
       setResult(res)
-      await router.invalidate()
+      await router.invalidate({ sync: true })
       toast.success('Reset complete.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'The reset did not run.')

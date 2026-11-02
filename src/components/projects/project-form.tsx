@@ -118,7 +118,7 @@ export function ProjectForm({
             : 'Saved and sent back for review.'
           : 'Submitted. An officer will review it soon.',
       )
-      await router.invalidate()
+      await router.invalidate({ sync: true })
       await router.navigate({ to: '/projects/$id', params: { id } })
     } catch (err) {
       setErrors({

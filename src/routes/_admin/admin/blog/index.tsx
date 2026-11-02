@@ -75,7 +75,7 @@ function AdminBlog() {
       toast.success(
         published ? `Published “${p.title}”.` : `“${p.title}” is a draft again.`,
       )
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not update the post.')
     } finally {
@@ -90,7 +90,7 @@ function AdminBlog() {
       await deletePost({ data: { id: deleting.id } })
       toast.success('Post deleted.')
       setDeleting(null)
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not delete the post.')
     } finally {
@@ -116,19 +116,19 @@ function AdminBlog() {
 
       <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)} className="mb-4">
         <TabsList>
-          <TabsTrigger value="all">
+          <TabsTrigger aria-controls={undefined} value="all">
             All{' '}
             <span className="text-muted-foreground ml-1.5 font-mono text-xs">
               {posts.length}
             </span>
           </TabsTrigger>
-          <TabsTrigger value="drafts">
+          <TabsTrigger aria-controls={undefined} value="drafts">
             Drafts{' '}
             <span className="text-muted-foreground ml-1.5 font-mono text-xs">
               {drafts}
             </span>
           </TabsTrigger>
-          <TabsTrigger value="published">
+          <TabsTrigger aria-controls={undefined} value="published">
             Published{' '}
             <span className="text-muted-foreground ml-1.5 font-mono text-xs">
               {posts.length - drafts}

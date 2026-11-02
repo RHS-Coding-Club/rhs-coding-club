@@ -53,6 +53,7 @@ export function BadgeShelf({ badges, dark }: { badges: ShelfBadge[]; dark: boole
               ) : (
                 <div
                   tabIndex={0}
+                  role="img"
                   aria-label={`${b.name}, ${RARITY[b.rarity].label} badge`}
                   className="bg-card ring-border/70 focus-visible:ring-ring h-full rounded-3xl ring-1 outline-none focus-visible:ring-2"
                 >

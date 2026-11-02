@@ -42,7 +42,7 @@ export function SkillsInput({
           <button
             type="button"
             onClick={() => onChange(value.filter((v) => v !== s))}
-            className="text-muted-foreground hover:text-foreground hover:bg-background/60 rounded-md p-0.5"
+            className="text-muted-foreground hover:text-foreground hover:bg-background/60 rounded-md p-[5px]"
             aria-label={`Remove ${s}`}
           >
             <X className="size-3.5" />

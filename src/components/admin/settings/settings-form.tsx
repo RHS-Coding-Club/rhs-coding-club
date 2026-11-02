@@ -204,7 +204,7 @@ export function SettingsForm({
     try {
       await save({ data: parsed.data })
       toast.success('Settings saved.')
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverErrorMessage(err))
     } finally {

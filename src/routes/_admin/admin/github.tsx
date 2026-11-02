@@ -96,7 +96,7 @@ function AdminGithub() {
       if (result.manual) toast.success('Approved. Send the invite on GitHub.')
       else if (result.error) toast.error(result.error)
       else toast.success(STATUS_LABEL[result.status])
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverErrorMessage(err))
     } finally {
@@ -162,7 +162,7 @@ function AdminGithub() {
               ['all', 'All'],
             ] as const
           ).map(([value, label]) => (
-            <TabsTrigger key={value} value={value}>
+            <TabsTrigger aria-controls={undefined} key={value} value={value}>
               {label}
               {value === 'pending' && count('pending') > 0 && (
                 <span className="bg-primary text-primary-foreground tabular ml-1.5 rounded-full px-1.5 font-mono text-[10px]">
@@ -334,7 +334,7 @@ function DenyDialog({
       await deny({ data: parsed.data })
       toast.success('Request denied.')
       onClose()
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       setError(serverErrorMessage(err))
     } finally {

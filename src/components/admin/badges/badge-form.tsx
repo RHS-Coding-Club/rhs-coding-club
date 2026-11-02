@@ -81,7 +81,7 @@ export function BadgeForm({
           ? `Saved. Awarded to ${r.awarded} member${r.awarded === 1 ? '' : 's'} who already qualify.`
           : 'Badge saved.',
       )
-      await router.invalidate()
+      await router.invalidate({ sync: true })
       onSaved(r.id)
     } catch (err) {
       setErrors({ _: serverErrorMessage(err) })

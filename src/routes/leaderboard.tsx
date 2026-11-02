@@ -169,7 +169,7 @@ function ViewerNote({
     text = (
       <>
         Want your name up here?{' '}
-        <Link to="/join" className="text-primary underline-offset-4 hover:underline">
+        <Link to="/join" className="text-foreground underline underline-offset-4">
           Join the club
         </Link>
         .
@@ -179,7 +179,7 @@ function ViewerNote({
     text = (
       <>
         Guests don’t appear on the board yet.{' '}
-        <Link to="/join" className="text-primary underline-offset-4 hover:underline">
+        <Link to="/join" className="text-foreground underline underline-offset-4">
           Apply to join
         </Link>{' '}
         and your points start counting.
@@ -189,10 +189,7 @@ function ViewerNote({
     text = (
       <>
         You haven’t scored {range === 'semester' ? 'this semester' : 'yet'}. Start with{' '}
-        <Link
-          to="/challenges"
-          className="text-primary underline-offset-4 hover:underline"
-        >
+        <Link to="/challenges" className="text-foreground underline underline-offset-4">
           this week’s challenge
         </Link>
         .

@@ -44,6 +44,10 @@ type State = 'in' | 'above' | 'below'
 
 interface AnimatedListProps {
   items?: AnimatedListItem[]
+  /** Local: names the list for screen readers. */
+  label?: string
+  /** Local: a plain list, for rows that hold links (an option can't). */
+  asList?: boolean
   onItemSelect?: (item: AnimatedListItem, index: number) => void
   renderItem?: (item: AnimatedListItem, index: number, isSelected: boolean) => ReactNode
   initialSelectedIndex?: number
@@ -242,6 +246,8 @@ const RING_CLASS =
   'absolute inset-0 rounded-[var(--al-radius)] [background:var(--al-ring-fill)] [box-shadow:inset_0_0_0_1px_var(--al-ring)]'
 
 const AnimatedList = ({
+  label,
+  asList = false,
   items = DEFAULT_ITEMS,
   onItemSelect,
   renderItem,
@@ -669,10 +675,13 @@ const AnimatedList = ({
       <div
         ref={viewportRef}
         className={`${VIEWPORT_CLASS} ${displayScrollbar ? SCROLLBAR_CLASS : BARE_CLASS}`}
-        role="listbox"
+        role={asList ? 'list' : 'listbox'}
+        aria-label={label}
         tabIndex={0}
         aria-activedescendant={
-          selected >= 0 && selected < items.length ? `${baseId}-${selected}` : undefined
+          !asList && selected >= 0 && selected < items.length
+            ? `${baseId}-${selected}`
+            : undefined
         }
         style={{
           maxHeight: size(maxHeight),
@@ -693,8 +702,8 @@ const AnimatedList = ({
                 }}
                 id={`${baseId}-${index}`}
                 className={`${ITEM_CLASS} ${itemClassName}`.trim()}
-                role="option"
-                aria-selected={isSelected}
+                role={asList ? 'listitem' : 'option'}
+                aria-selected={asList ? undefined : isSelected}
                 data-index={index}
                 data-selected={isSelected ? '' : undefined}
                 onPointerEnter={selectOnHover ? () => hover(index) : undefined}

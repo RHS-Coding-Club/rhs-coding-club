@@ -132,7 +132,7 @@ export function PostEditor({ initial }: { initial: PostEditorInitial }) {
           replace: true,
         })
       } else {
-        await router.invalidate()
+        await router.invalidate({ sync: true })
       }
     } catch (err) {
       setErrors({ form: err instanceof Error ? err.message : 'Could not save the post.' })

@@ -31,6 +31,7 @@ export function BadgePips({
             <TooltipTrigger asChild>
               <span
                 tabIndex={0}
+                role="img"
                 aria-label={`${b.name}, ${RARITY[b.rarity].label.toLowerCase()} badge`}
                 className={cn(
                   'focus-visible:ring-ring block size-2.5 rounded-full ring-2 ring-[var(--card)] outline-none focus-visible:ring-2',

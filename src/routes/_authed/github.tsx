@@ -192,7 +192,7 @@ function StatusCard({ request: r, data }: { request: RequestData; data: PageData
 
       {(invited || inOrg) && (
         <div className="bg-brand-navy rounded-2xl p-6 text-[#e6edf5]">
-          <p className="text-sm text-[#e6edf5]/70">From the officers</p>
+          <p className="text-sm text-[#e6edf5]/80">From the officers</p>
           <p className="mt-2 text-lg leading-relaxed">{data.welcomeMessage}</p>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {invited ? (
@@ -215,7 +215,7 @@ function StatusCard({ request: r, data }: { request: RequestData; data: PageData
               </RaisedButton>
             )}
             {invited && expires && (
-              <span className="text-sm text-[#e6edf5]/70">
+              <span className="text-sm text-[#e6edf5]/80">
                 GitHub invites expire {fmtDate(expires, 'date')}.
               </span>
             )}

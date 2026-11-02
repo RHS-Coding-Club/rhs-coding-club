@@ -321,7 +321,7 @@ function SubmitForm({
         description: 'An officer will review it soon.',
       })
       onDone()
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       setFormError(
         err instanceof Error && err.message

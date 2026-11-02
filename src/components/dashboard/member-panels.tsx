@@ -240,11 +240,11 @@ export function ChallengePanel({
             This week&apos;s challenge
           </h2>
           <ArrowUpRight
-            className="size-5 text-[#e6edf5]/70 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            className="size-5 text-[#e6edf5]/80 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
             aria-hidden="true"
           />
         </div>
-        <p className="relative mt-6 font-mono text-sm text-[#e6edf5]/65">
+        <p className="relative mt-6 font-mono text-sm text-[#e6edf5]/80">
           Week {challenge.weekNo} ·{' '}
           <span className="capitalize">{challenge.difficulty}</span> · {challenge.points}{' '}
           pts
@@ -252,7 +252,7 @@ export function ChallengePanel({
         <p className="relative mt-2 text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.05] font-semibold tracking-[-0.04em] text-balance">
           {challenge.title}
         </p>
-        <p className="relative mt-3 line-clamp-2 text-[15px] leading-relaxed text-[#e6edf5]/75">
+        <p className="relative mt-3 line-clamp-2 text-[15px] leading-relaxed text-[#e6edf5]/80">
           {challenge.description}
         </p>
         <div className="relative mt-auto flex flex-wrap items-center justify-between gap-3 pt-8">
@@ -262,7 +262,7 @@ export function ChallengePanel({
               {state.label}
             </span>
           ) : (
-            <span className="text-sm text-[#e6edf5]/70">Not submitted yet</span>
+            <span className="text-sm text-[#e6edf5]/80">Not submitted yet</span>
           )}
           <span className="inline-flex items-center gap-1.5 font-medium">
             {challenge.submission ? 'View it' : 'Solve it'}

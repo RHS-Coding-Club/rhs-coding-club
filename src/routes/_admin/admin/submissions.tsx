@@ -132,7 +132,7 @@ function AdminSubmissions() {
 
   async function afterReview(id: string) {
     await Promise.all([
-      router.invalidate(),
+      router.invalidate({ sync: true }),
       queryClient.invalidateQueries({ queryKey: ['admin-submission', id] }),
     ])
     // Move on to the next submission still waiting, if any.
@@ -181,10 +181,18 @@ function AdminSubmissions() {
           }
         >
           <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="pass">Passed</TabsTrigger>
-            <TabsTrigger value="fail">Needs work</TabsTrigger>
+            <TabsTrigger aria-controls={undefined} value="all">
+              All
+            </TabsTrigger>
+            <TabsTrigger aria-controls={undefined} value="pending">
+              Pending
+            </TabsTrigger>
+            <TabsTrigger aria-controls={undefined} value="pass">
+              Passed
+            </TabsTrigger>
+            <TabsTrigger aria-controls={undefined} value="fail">
+              Needs work
+            </TabsTrigger>
           </TabsList>
         </Tabs>
         <Select

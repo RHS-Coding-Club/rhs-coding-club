@@ -76,8 +76,10 @@ function AdminMessages() {
               }
             >
               <TabsList>
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="unread">
+                <TabsTrigger aria-controls={undefined} value="all">
+                  All
+                </TabsTrigger>
+                <TabsTrigger aria-controls={undefined} value="unread">
                   Unread
                   {unread > 0 && (
                     <span className="bg-primary text-primary-foreground tabular ml-1.5 rounded-full px-1.5 font-mono text-[10px]">
@@ -187,7 +189,7 @@ function MessageView({ message: m, onBack }: { message: Message; onBack: () => v
         toast.success('Marked unread.')
         onBack()
       }
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverErrorMessage(err))
     } finally {
@@ -200,7 +202,7 @@ function MessageView({ message: m, onBack }: { message: Message; onBack: () => v
       await remove({ data: { id: m.id } })
       toast.success('Message deleted.')
       onBack()
-      await router.invalidate()
+      await router.invalidate({ sync: true })
     } catch (err) {
       toast.error(serverErrorMessage(err))
     }

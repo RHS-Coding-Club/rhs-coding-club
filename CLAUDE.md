@@ -53,6 +53,12 @@ Google, GitHub, and email/password. Password sign-ups must confirm their email b
 - Tests: pure logic in `tests/unit`, anything touching D1 or Better Auth in `tests/integration` (runs inside workerd with a fresh migrated database per file), browser flows in `tests/e2e`.
 - Commits follow Conventional Commits.
 
+## Gotchas
+
+- `gsap` is stubbed in the Worker build (`src/lib/gsap-server-stub.ts`), because it starts a timer on import and Workers forbids that during SSR. Only call GSAP in effects, and add any new export you import to the stub.
+- After a mutation use `router.invalidate({ sync: true })`. Plain `invalidate()` resolves before the new data is on screen, so controls re-enable with stale state.
+- The CSP is off in dev, so check new external hosts against `src/lib/security-headers.ts` with a production build (`bun run build`, `bunx vite preview`).
+
 ## Secrets
 
 Local secrets go in `.dev.vars` (gitignored). Production secrets are set with `wrangler secret put`. Public config lives in `wrangler.jsonc` `vars`. Never commit `.dev.vars` or `.env`.

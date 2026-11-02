@@ -2,8 +2,9 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { env, waitUntil } from 'cloudflare:workers'
 import { APIError } from 'better-auth/api'
-import { and, count, eq, gt, like, lte } from 'drizzle-orm'
+import { and, count, eq, gt, like, lte, sql } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
+import { canonicalMailbox } from '#/lib/email-address'
 import { sendEmail } from '#/services/email'
 import type { EmailMessage } from '#/services/email'
 import { renderEmail, siteUrl } from '#/services/email-templates'
@@ -27,25 +28,19 @@ const DAY = 24 * HOUR
  */
 async function overLimit(key: string, max: number, windowMs: number) {
   const db = getDb()
-  const { verification } = schema
+  const { verification: v } = schema
   const identifier = `email-throttle:${key}`
-  const now = new Date()
+  const now = Date.now()
   await db
-    .delete(verification)
-    .where(and(eq(verification.identifier, identifier), lte(verification.expiresAt, now)))
-  const sent = await db
-    .select({ n: count() })
-    .from(verification)
-    .where(eq(verification.identifier, identifier))
-    .then((rows) => rows.at(0)?.n ?? 0)
-  if (sent >= max) return true
-  await db.insert(verification).values({
-    id: crypto.randomUUID(),
-    identifier,
-    value: '1',
-    expiresAt: new Date(now.getTime() + windowMs),
-  })
-  return false
+    .delete(v)
+    .where(and(eq(v.identifier, identifier), lte(v.expiresAt, new Date(now))))
+  // One statement, so requests at the same moment can't all pass the count.
+  const inserted = await db.run(sql`
+    INSERT INTO verification (id, identifier, value, expires_at, created_at, updated_at)
+    SELECT ${crypto.randomUUID()}, ${identifier}, '1', ${now + windowMs}, ${now}, ${now}
+    WHERE (SELECT count(*) FROM verification WHERE identifier = ${identifier}) < ${max}
+  `)
+  return inserted.meta.changes === 0
 }
 
 /** Sends mail the public can trigger, after the response so timing reveals nothing. */
@@ -53,7 +48,7 @@ function sendThrottled(
   limit: { kind: string; email: string; max: number; windowMs: number },
   message: EmailMessage,
 ) {
-  const key = `${limit.kind}:${limit.email.toLowerCase()}`
+  const key = `${limit.kind}:${canonicalMailbox(limit.email)}`
   waitUntil(
     overLimit(key, limit.max, limit.windowMs).then((over) =>
       over ? undefined : sendEmail(getDb(), message, 'public').then(() => undefined),

@@ -23,7 +23,7 @@ export const clubInfoSchema = z.object({
     .email('Enter a valid email address.')
     .or(z.literal(''))
     .default(''),
-  meetingLocation: z.string().max(120).default("Mr. Derrick's classroom"),
+  meetingLocation: z.string().max(120).default("Mr. Derrick's classroom (C3)"),
   meetingSchedule: z.string().max(120).default('Lunch, every week'),
 })
 
