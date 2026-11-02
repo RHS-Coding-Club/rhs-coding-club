@@ -75,6 +75,7 @@ Google, GitHub, and email/password. Password sign-ups must confirm their email b
 - Create any new R2 bucket in the `r2_buckets` config before merging, or the deploy fails.
 - The Turnstile widget is off in dev and tests (`TURNSTILE_SITE_KEY` is null), so forms skip the check there. To try it locally, set `VITE_TURNSTILE_SITE_KEY` in `.env` and `TURNSTILE_SECRET` in `.dev.vars`.
 - The CSP is off in dev, so check new external hosts against `src/lib/security-headers.ts` with a production build (`bun run build`, `bunx vite preview`).
+- Only the two jobs in `ci.yml` run on Blacksmith, which gives the org 3,000 free 2vCPU minutes a month; a 4vCPU runner uses them twice as fast. Everything else stays on GitHub's runners, which are free for public repos, and Scorecard's publishing requires a GitHub-hosted runner.
 
 ## Secrets
 
