@@ -1,0 +1,50 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rhs",
+  "account_id": "1983615f2ba0e1faf04dd17e6626905c",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "src/server.ts",
+  "observability": { "enabled": true },
+
+  // Public, non-secret configuration for the deployed Worker. Secrets go in
+  // .dev.vars locally and `wrangler secret put` in production. Local dev
+  // overrides APP_URL from .dev.vars.
+  "vars": {
+    "APP_URL": "https://rhs.riponhighcodingclub.workers.dev",
+    "GITHUB_ORG": "RHS-Coding-Club",
+    "GITHUB_CLIENT_ID": "Ov23lia4t3tmuH69lU05",
+    "GOOGLE_CLIENT_ID": "984837526432-nmjg5r6p1344oi6ustjrjrglnk7dgjve.apps.googleusercontent.com",
+    "GMAIL_USER": "riponhighcodingclub@gmail.com",
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rhs-coding-club",
+      "database_id": "55e2c11a-5adf-4bef-ad9f-75577dd60b45",
+      "migrations_dir": "src/db/migrations",
+    },
+  ],
+
+  // Per-IP limits. namespace_id is any account-unique number. Auth covers
+  // password checks and email-sending routes; forms cover contact and newsletter.
+  "ratelimits": [
+    {
+      "name": "AUTH_LIMIT",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 },
+    },
+    {
+      "name": "FORM_LIMIT",
+      "namespace_id": "1002",
+      "simple": { "limit": 5, "period": 60 },
+    },
+  ],
+
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "rhs-coding-club-files" }],
+
+  // Background jobs (src/services/cron.ts): hourly announcements, reminders,
+  // and GitHub invite sync; the weekly digest on Monday mornings.
+  "triggers": { "crons": ["0 * * * *", "0 16 * * 1"] },
+}

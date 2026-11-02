@@ -1,82 +1,135 @@
-import React from 'react';
-import { Resource } from '@/lib/firebase-collections';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ExternalLink, Star } from 'lucide-react';
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
+import { ArrowUpRight, Bookmark, BookmarkCheck, Clock } from 'lucide-react'
+import ClickSpark from '#/components/bits/ClickSpark'
+import { LEVEL_LABEL, resourceDomain } from '#/lib/schemas/resources'
+import type { Level } from '#/lib/schemas/resources'
+import { cn } from '#/lib/utils'
+import { safeHref } from '#/lib/rich-text'
 
-interface ResourceCardProps {
-  resource: Resource;
-  isBookmarked?: boolean;
-  onToggleBookmark?: (id: string) => void;
+export interface ResourceCardData {
+  id: string
+  title: string
+  description: string
+  url: string
+  tags: string[]
+  level: Level
+  approved: boolean
+  saved: boolean
 }
 
-const getLevelColor = (level: string) => {
-  switch (level) {
-    case 'beginner':
-      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-    case 'intermediate':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-    case 'advanced':
-      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-    default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-  }
-};
+const LEVEL_DOT: Record<Level, string> = {
+  beginner: 'bg-[#5fb2ee]',
+  intermediate: 'bg-[#2a7fc4]',
+  advanced: 'bg-[#1f4f8a] dark:bg-[#9ccbf2]',
+}
 
-export const ResourceCard = React.memo(function ResourceCard({ resource, isBookmarked, onToggleBookmark }: ResourceCardProps) {
+/**
+ * One resource: level and domain, the title as the link (new tab), a line
+ * of description, and tags. Signed-in visitors get a bookmark toggle that
+ * throws sparks when it saves.
+ */
+export function ResourceCard({
+  resource,
+  canSave,
+  onToggleSave,
+  onTag,
+  busy,
+}: {
+  resource: ResourceCardData
+  canSave: boolean
+  onToggleSave: () => void
+  onTag: (tag: string) => void
+  busy?: boolean
+}) {
+  const r = resource
+  const domain = resourceDomain(r.url)
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <div className="space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-lg line-clamp-2 flex-1">{resource.title}</CardTitle>
-            {onToggleBookmark && (
-              <button
-                type="button"
-                aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-                onClick={() => onToggleBookmark(resource.id)}
-                className={cn(
-                  'p-1 rounded-md transition-colors border hover:bg-muted',
-                  isBookmarked ? 'text-yellow-500' : 'text-muted-foreground'
-                )}
-              >
-                <Star className={cn('h-4 w-4', isBookmarked ? 'fill-yellow-500/70' : 'fill-none')} />
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge className={getLevelColor(resource.level)}>
-              {resource.level.charAt(0).toUpperCase() + resource.level.slice(1)}
-            </Badge>
-            {resource.tags.slice(0, 2).map((tag, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-            {resource.tags.length > 2 && (
-              <Badge variant="outline" className="text-xs">
-                +{resource.tags.length - 2}
-              </Badge>
-            )}
-          </div>
+    <article
+      className={cn(
+        'group bg-card relative flex h-full flex-col rounded-3xl p-6 ring-1 transition-[box-shadow,transform] duration-300 hover:shadow-[var(--bits-shadow)]',
+        r.approved ? 'ring-border/70' : 'border-brand-sky/55 border border-dashed ring-0',
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="text-muted-foreground flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+          <span className="text-foreground/80 inline-flex items-center gap-1.5 font-medium">
+            <span
+              aria-hidden="true"
+              className={cn('size-2 rounded-full', LEVEL_DOT[r.level])}
+            />
+            {LEVEL_LABEL[r.level]}
+          </span>
+          <span className="truncate font-mono">{domain}</span>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <p className="text-sm text-muted-foreground line-clamp-3">
-            {resource.description}
-          </p>
-          <Button variant="outline" size="sm" className="w-full" asChild>
-            <Link href={resource.url} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="h-4 w-4 mr-2" />
-              View Resource
-            </Link>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-});
+        {canSave && (
+          <ClickSpark
+            sparkColor={['#5fb2ee', '#9ccbf2', '#2a7fc4']}
+            sparkCount={10}
+            sparkRadius={22}
+            sparkSize={7}
+            duration={450}
+            disabled={r.saved}
+            className="z-[2] -mt-1.5 -mr-1.5 size-9! shrink-0"
+          >
+            <button
+              type="button"
+              onClick={onToggleSave}
+              disabled={busy}
+              aria-pressed={r.saved}
+              aria-label={r.saved ? `Remove ${r.title} from saved` : `Save ${r.title}`}
+              className={cn(
+                'focus-visible:ring-ring/50 inline-flex size-9 items-center justify-center rounded-xl transition-colors outline-none focus-visible:ring-3 disabled:opacity-60',
+                r.saved
+                  ? 'text-brand-sky bg-brand-sky/12'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+              )}
+            >
+              {r.saved ? (
+                <BookmarkCheck className="size-[18px]" aria-hidden="true" />
+              ) : (
+                <Bookmark className="size-[18px]" aria-hidden="true" />
+              )}
+            </button>
+          </ClickSpark>
+        )}
+      </div>
+
+      <h3 className="mt-4 text-xl leading-snug font-semibold tracking-[-0.02em]">
+        <a
+          href={safeHref(r.url) ?? undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="focus-visible:ring-ring/50 rounded-md outline-none after:absolute after:inset-0 after:rounded-3xl after:content-[''] focus-visible:ring-3"
+        >
+          {r.title}
+          <ArrowUpRight
+            className="text-muted-foreground group-hover:text-brand-sky ml-1 inline size-4 -translate-y-px transition-[color,transform] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            aria-hidden="true"
+          />
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>
+      </h3>
+      <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed">
+        {r.description}
+      </p>
+
+      <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-5">
+        {!r.approved && (
+          <span className="bg-brand-sky/12 text-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium">
+            <Clock className="size-3" aria-hidden="true" />
+            Pending review
+          </span>
+        )}
+        {r.tags.map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => onTag(t)}
+            className="bg-muted text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 relative z-[2] rounded-full px-2.5 py-1 font-mono text-xs transition-colors outline-none focus-visible:ring-3"
+          >
+            #{t}
+          </button>
+        ))}
+      </div>
+    </article>
+  )
+}

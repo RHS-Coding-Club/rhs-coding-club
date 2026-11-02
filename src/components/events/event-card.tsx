@@ -1,123 +1,104 @@
-'use client';
+import { Link } from '@tanstack/react-router'
+import { Check, CircleHelp, Clock, MapPin, Radio } from 'lucide-react'
+import GlareHover from '#/components/bits/GlareHover'
+import type { EventCardData } from '#/services/events'
+import { fmtTimeRange } from '#/lib/events'
+import { cn } from '#/lib/utils'
+import { DateTile, FaceStack, TagList } from './parts'
 
-import React from 'react';
-import Link from 'next/link';
-import { format } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, Users, ExternalLink } from 'lucide-react';
-import { EventWithRsvps, generateGoogleCalendarUrl } from '@/lib/services/events';
-import { RSVPButton } from './rsvp-button';
-import { cn } from '@/lib/utils';
-
-interface EventCardProps {
-  event: EventWithRsvps;
-  onRsvpChange?: () => void;
-  showRsvpButton?: boolean;
-  compact?: boolean;
+/**
+ * An upcoming event on React Bits Glare Hover: a streak of light crosses the
+ * card when the pointer (or keyboard focus) arrives, so the grid feels
+ * touchable without moving anything.
+ */
+export function EventCard({ event, dark }: { event: EventCardData; dark: boolean }) {
+  return (
+    <GlareHover
+      width="100%"
+      height="100%"
+      background="var(--bits-surface)"
+      borderColor="var(--bits-edge)"
+      borderRadius="1.5rem"
+      glareColor={dark ? '#ffffff' : '#5fb2ee'}
+      glareOpacity={dark ? 0.22 : 0.35}
+      blendMode={dark ? 'screen' : 'multiply'}
+      glareSize={45}
+      transitionDuration={800}
+      className="group place-items-stretch! shadow-(--bits-shadow)"
+    >
+      <Link
+        to="/events/$id"
+        params={{ id: event.id }}
+        className="focus-visible:ring-ring/50 grid h-full grid-cols-[auto_minmax(0,1fr)] content-start gap-x-4 gap-y-4 rounded-3xl p-5 outline-none focus-visible:ring-3 sm:flex sm:flex-col sm:gap-5 sm:p-6"
+      >
+        <div className="sm:flex sm:items-start sm:justify-between sm:gap-4">
+          <DateTile date={event.startsAt} />
+          <Status event={event} className="hidden sm:flex sm:flex-col sm:items-end" />
+        </div>
+        <div className="min-w-0 sm:flex-1">
+          <h3 className="group-hover:decoration-brand-sky text-lg leading-snug font-semibold tracking-[-0.02em] text-balance group-hover:underline group-hover:underline-offset-4 sm:text-xl">
+            {event.title}
+          </h3>
+          <dl className="text-muted-foreground mt-2 flex flex-col gap-1.5 text-sm sm:mt-3">
+            <div className="flex items-center gap-2">
+              <dt className="sr-only">When</dt>
+              <Clock className="size-4 shrink-0" aria-hidden="true" />
+              <dd>{fmtTimeRange(event.startsAt, event.endsAt)}</dd>
+            </div>
+            <div className="flex items-center gap-2">
+              <dt className="sr-only">Where</dt>
+              <MapPin className="size-4 shrink-0" aria-hidden="true" />
+              <dd className="truncate">{event.location}</dd>
+            </div>
+          </dl>
+        </div>
+        {(event.checkInLive ||
+          event.viewerRsvp === 'yes' ||
+          event.viewerRsvp === 'maybe') && (
+          <Status
+            event={event}
+            className="col-span-2 flex flex-wrap items-center sm:hidden"
+          />
+        )}
+        <TagList tags={event.tags} className="col-span-2" />
+        <div className="border-border/70 col-span-2 border-t pt-4">
+          <FaceStack faces={event.faces} count={event.going} size="sm" />
+        </div>
+      </Link>
+    </GlareHover>
+  )
 }
 
-export const EventCard = React.memo(function EventCard({
-  event,
-  onRsvpChange,
-  showRsvpButton = true,
-  compact = false,
-}: EventCardProps) {
-  const eventDate = event.date.toDate();
-  const isPastEvent = eventDate < new Date();
-  const googleCalendarUrl = generateGoogleCalendarUrl(event);
-
+function Status({ event, className }: { event: EventCardData; className?: string }) {
   return (
-    <Card className={cn("transition-shadow hover:shadow-md", compact && "p-3")}>
-      <CardHeader className={cn("space-y-3", compact && "p-3 pb-2")}>
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-          <div className="space-y-2 flex-1">
-            <Link
-              href={`/events/${event.id}`}
-              className="block group"
-            >
-              <CardTitle className={cn(
-                "group-hover:text-primary transition-colors",
-                compact ? "text-lg" : "text-xl"
-              )}>
-                {event.title}
-              </CardTitle>
-            </Link>
-            <div className="flex flex-wrap gap-2">
-              {event.tags?.map(tag => (
-                <Badge key={tag} variant="secondary" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
-              {isPastEvent && (
-                <Badge variant="outline" className="text-xs text-muted-foreground">
-                  Past Event
-                </Badge>
-              )}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            {showRsvpButton && !isPastEvent && (
-              <RSVPButton
-                eventId={event.id}
-                currentRsvp={event.userRsvp}
-                onRsvpChange={onRsvpChange}
-                size={compact ? "sm" : "default"}
-              />
-            )}
-            <Button
-              variant="outline"
-              size={compact ? "sm" : "default"}
-              onClick={() => window.open(googleCalendarUrl, '_blank')}
-              className="gap-2"
-              aria-label="Add to Google Calendar"
-            >
-              <ExternalLink className="h-4 w-4" />
-              {compact ? "" : "Add to Calendar"}
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className={cn("space-y-3", compact && "p-3 pt-0")}>
-        {!compact && (
-          <p className="text-muted-foreground line-clamp-2">
-            {event.description}
-          </p>
-        )}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Calendar className="h-4 w-4 flex-shrink-0" />
-            <span>
-              {format(eventDate, 'MMM d, yyyy')} at {format(eventDate, 'h:mm a')}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <MapPin className="h-4 w-4 flex-shrink-0" />
-            <span>{event.location}</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Users className="h-4 w-4 flex-shrink-0" />
-            <span>
-              {event.rsvpCount.yes} going
-              {event.rsvpCount.maybe > 0 && `, ${event.rsvpCount.maybe} maybe`}
-            </span>
-          </div>
-        </div>
-        {!compact && (
-          <div className="flex justify-between items-center pt-2">
-            <div className="text-sm text-muted-foreground">
-              {event.rsvpCount.total} total responses
-            </div>
-            <Link href={`/events/${event.id}`}>
-              <Button variant="ghost" size="sm" className="gap-2">
-                View Details
-                <ExternalLink className="h-3 w-3" />
-              </Button>
-            </Link>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-});
+    <div className={cn('gap-2', className)}>
+      {event.checkInLive && (
+        <span className="text-brand-sky inline-flex items-center gap-1.5 text-xs font-medium">
+          <Radio className="size-3.5" aria-hidden="true" />
+          Check-in open
+        </span>
+      )}
+      <ViewerBadge status={event.viewerRsvp} />
+    </div>
+  )
+}
+
+export function ViewerBadge({ status }: { status: 'yes' | 'maybe' | 'no' | null }) {
+  if (status === 'yes') {
+    return (
+      <span className="bg-brand-sky inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium text-[#0b0f15]">
+        <Check className="size-3.5" aria-hidden="true" />
+        You're going
+      </span>
+    )
+  }
+  if (status === 'maybe') {
+    return (
+      <span className="bg-muted text-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
+        <CircleHelp className="size-3.5" aria-hidden="true" />
+        Maybe
+      </span>
+    )
+  }
+  return null
+}

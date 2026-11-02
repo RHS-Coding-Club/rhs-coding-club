@@ -1,128 +1,69 @@
-# Contributing to RHS Coding Club Website
+# Contributing to the RHS Coding Club website
 
-First off, thank you for considering contributing to the RHS Coding Club website! It's people like you that make this community such a great place to learn and grow.
+Thanks for helping out. This guide covers getting the site running and how changes get merged.
 
-This guide will help you get started with setting up your development environment and understanding our contribution workflow.
+## Getting started
 
-## 🚀 Getting Started
+You need [bun](https://bun.sh) 1.3 or newer.
 
-### 1. Fork and Clone
-1.  Fork the repository to your own GitHub account.
-2.  Clone your fork to your local machine:
-    ```bash
-    git clone https://github.com/YOUR_USERNAME/rhs-coding-club.git
-    cd rhs-coding-club
-    ```
-3.  Add the original repository as a remote (upstream):
-    ```bash
-    git remote add upstream https://github.com/JashanMaan28/rhs-coding-club.git
-    ```
-
-### 2. Install Dependencies
-We use `npm` (or `yarn`/`pnpm`) to manage dependencies.
 ```bash
-npm install
+git clone https://github.com/YOUR_USERNAME/rhs-coding-club.git
+cd rhs-coding-club
+git remote add upstream https://github.com/RHS-Coding-Club/rhs-coding-club.git
+
+bun install
+cp .dev.vars.example .dev.vars   # set BETTER_AUTH_SECRET: openssl rand -base64 32
+bun run cf:types
+bun run db:migrate
+bun run db:seed
+bun run dev                      # http://localhost:3000
 ```
 
-### 3. Environment Setup
-Refer to the [README.md](./README.md#getting-started) for the list of required environment variables. You'll need to create a `.env.local` file in the root directory.
+Log in with `admin@test.local`, `officer@test.local`, `member@test.local`, or `guest@test.local`, all with the password `password123`. Emails print to the dev server console instead of being sent, including links to confirm an account or reset a password.
 
-### 4. Run Locally
-Start the development server:
+## Making a change
+
+Branch from `main` with a descriptive name, such as `feature/new-challenge-page`, `fix/mobile-nav-overflow`, or `docs/update-readme`.
+
+Before you push, run:
+
 ```bash
-npm run dev
+bun run type-check
+bun run lint
+bun run format
+bun run test:unit
+bun run test:integration
+bun run test:e2e
 ```
-The site will be available at `http://localhost:3000`.
 
-## 👩‍💻 Development Workflow
+Commits follow [Conventional Commits](https://www.conventionalcommits.org): `feat: add leaderboard filters`, `fix: keep the RSVP from snapping back`.
 
-### Branching Strategy
-We recommend using descriptive branch names that include the type of change and a brief description.
+Open a pull request against `main`, fill out the template, and link any related issue. CI runs the same checks.
 
--   **Features**: `feature/add-dark-mode`, `feature/new-challenge-page`
--   **Bug Fixes**: `fix/mobile-nav-overflow`, `fix/auth-error`
--   **Documentation**: `docs/update-readme`
--   **Chore**: `chore/update-dependencies`
+## How the code is organized
 
-1.  Make sure your `main` branch is up to date:
-    ```bash
-    git checkout main
-    git pull upstream main
-    ```
-2.  Create a new branch:
-    ```bash
-    git checkout -b feature/your-feature-name
-    ```
+[`CLAUDE.md`](./CLAUDE.md) has the full architecture rules. The ones that come up most:
 
-### Committing Changes
-We encourage using **Conventional Commits** for clear history:
--   `feat: add new leaderboard component`
--   `fix: resolve hydration error on homepage`
--   `docs: update contributing guide`
--   `style: format code with prettier`
--   `refactor: simplify auth context`
+- **The browser never touches the database.** Reads go through route loaders calling server functions, and writes are server functions.
+- **Authorization lives in server-function middleware** (`requireMember`, `requireOfficer`, `requireAdmin`). Route redirects are only for the user experience.
+- **Validate every input with Zod.** Schemas live in `src/lib/schemas/` and are shared with the forms.
+- **Points are a ledger.** Never store a total; change points through `src/services/points.ts`.
+- **Rich text is stored as Tiptap JSON** and rendered with `RichText`. Never store or inject HTML.
+- **Keep it free.** The club has no budget, so don't add anything that needs a paid plan or a paid domain.
 
-### Pull Requests
-1.  Push your branch to your fork:
-    ```bash
-    git push origin feature/your-feature-name
-    ```
-2.  Open a Pull Request (PR) on the original repository.
-3.  Fill out the PR template or provide a clear description of your changes.
-4.  Link any related issues (e.g., "Closes #123").
+After changing `src/db/schema/**`, run `bun run db:generate`, then `bun run db:migrate`. After editing `wrangler.jsonc` or `.dev.vars.example`, run `bun run cf:types`.
 
-## 🎨 Coding Standards
+Tests go in `tests/unit` for pure logic, `tests/integration` for anything touching D1 or Better Auth, and `tests/e2e` for browser flows.
 
-### Tech Stack & Style
--   **Framework**: Next.js 15 (App Router).
--   **Language**: TypeScript. Please avoid `any` types whenever possible.
--   **Styling**: Tailwind CSS. Use utility classes over custom CSS files.
--   **Components**: Use functional components and React Hooks.
--   **UI Library**: We use Shadcn UI (built on Radix UI). Check `src/components/ui` for existing components before building new ones.
+## Reporting issues
 
-### Linting and Formatting
-We use **ESLint** and **Prettier** to ensure code quality and consistent formatting.
+Open a GitHub issue with the steps to reproduce a bug, or what a feature is for and how it might work. Report security problems the way [SECURITY.md](./SECURITY.md) describes, not in a public issue.
 
--   **Check for errors**:
-    ```bash
-    npm run lint
-    ```
--   **Check formatting**:
-    ```bash
-    npm run format:check
-    ```
--   **Format code**:
-    ```bash
-    npm run format
-    ```
--   **Type check**:
-    ```bash
-    npm run type-check
-    ```
+## Roles
 
-**Note**: Please run `npm run format` and `npm run lint:fix` before committing your changes.
+- **Contributors:** anyone who opens a pull request.
+- **Officers and admins:** club officers who review pull requests and run the project.
 
-## 📂 Project Structure Overview
+## License
 
--   `src/app`: Application routes and pages (Next.js App Router).
--   `src/components`: Reusable React components.
-    -   `src/components/ui`: Base UI components (buttons, inputs, etc.).
--   `src/lib`: Utility functions, Firebase configuration, and services.
--   `src/hooks`: Custom React hooks.
--   `src/contexts`: React Context providers.
--   `public`: Static assets (images, icons).
-
-## 🐛 Reporting Issues
-
-If you find a bug or have a feature request, please open an issue on GitHub.
--   **Bugs**: Describe the issue, steps to reproduce, and expected behavior.
--   **Features**: Explain the feature, why it's useful, and how it might work.
-
-## 👥 Roles
-
--   **Contributors**: Anyone who submits a PR.
--   **Officers/Admins**: Club officers who manage the repository, review PRs, and oversee the project.
-
-## 📜 License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions are licensed under the MIT License.

@@ -1,161 +1,131 @@
-<p align="center">
-  <img src="assets/icon.png" alt="RHS Coding Club Logo" width="150" />
-  <h1>RHS Coding Club Website</h1>
-</p>
+# RHS Coding Club
 
-Welcome to the official repository for the Ripon High School's Coding Club website. This platform serves as the central hub for our members, featuring challenges, events, resources, and a showcase of student projects.
+The website for the Ripon High School Coding Club: weekly challenges, events and RSVPs, member projects, a blog, learning resources, and a points and badges system.
 
-## 🚀 Overview
+Live at **https://rhs.riponhighcodingclub.workers.dev**.
 
-This website is designed to:
-- **Connect Members**: Provide a space for students to join, track their progress, and participate in club activities.
-- **Showcase Work**: Highlight student projects and achievements through a Hall of Fame and project gallery.
-- **Manage Activities**: Host coding challenges, schedule events, and manage club resources.
-- **Gamify Learning**: Implement a badge system and leaderboard to encourage participation and learning.
+Built with TanStack Start and deployed to Cloudflare Workers. Data lives in D1 (SQLite), files in R2, auth is Better Auth, email goes through the club's Gmail account. The club has no budget, so everything runs on free tiers and there is no paid domain.
 
-## ✨ Features
+## Stack
 
-- **Home Page**: Overview of the club, recent stats, and featured content.
-- **Challenges**: Interactive coding challenges for members to solve.
-- **Events**: Calendar and details of upcoming club meetings and workshops.
-- **Projects**: A gallery where members can showcase their personal or club projects.
-- **Resources**: Curated learning materials and bookmarks.
-- **Blog**: Articles and updates from the club.
-- **Dashboard**: User-specific area to track badges, progress, and settings.
-- **Leaderboard**: Rankings based on participation and challenge completion.
-- **Admin Panel**: Tools for club officers to manage content, users, and settings.
-- **GitHub Integration**: Link GitHub accounts for verification and automated badge awarding.
+| Layer     | Choice                                              |
+| --------- | --------------------------------------------------- |
+| Framework | TanStack Start (React 19, Vite)                     |
+| Runtime   | Cloudflare Workers via `@cloudflare/vite-plugin`    |
+| Database  | Cloudflare D1 with Drizzle ORM                      |
+| Auth      | Better Auth (Google, GitHub, email/password)        |
+| Files     | Cloudflare R2                                       |
+| Email     | Gmail SMTP (`worker-mailer`)                        |
+| UI        | Tailwind CSS v4, Shadcn UI, lucide icons            |
+| Tests     | Vitest (unit + Workers integration), Playwright e2e |
+| Tooling   | bun, ESLint, Prettier, GitHub Actions               |
 
-## 🛠️ Tech Stack
+## Getting started
 
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components**: [Radix UI](https://www.radix-ui.com/), [Shadcn UI](https://ui.shadcn.com/) & [Aceternity UI](https://ui.aceternity.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Backend / Database**: [Firebase](https://firebase.google.com/) (Firestore, Auth, Storage)
-- **Email**: [Brevo](https://www.brevo.com/)
-- **Deployment**: [Vercel](https://vercel.com/)
+Requirements: [bun](https://bun.sh) 1.3+.
 
-## 📂 Project Structure
-
-```
-rhs-coding-club/
-├── public/              # Static assets
-├── src/
-│   ├── app/             # Next.js App Router pages and API routes
-│   │   ├── api/         # Backend API endpoints
-│   │   ├── (routes)/    # Page routes (about, blog, challenges, etc.)
-│   ├── components/      # Reusable UI components
-│   │   ├── ui/          # Base UI components (buttons, inputs, etc.)
-│   │   └── ...          # Feature-specific components
-│   ├── contexts/        # React Context providers (Auth, Settings, etc.)
-│   ├── hooks/           # Custom React hooks
-│   ├── lib/             # Utility functions and services
-│   │   ├── firebase.ts  # Firebase client configuration
-│   │   └── ...          # Other services (Brevo, GitHub, etc.)
-└── ...config files      # Configuration files (Next.js, Tailwind, TS, etc.)
+```bash
+bun install
+cp .dev.vars.example .dev.vars   # fill in BETTER_AUTH_SECRET at minimum
+bun run cf:types                 # generate worker-configuration.d.ts
+bun run db:migrate               # apply migrations to the local D1
+bun run db:seed                  # test users + sample content
+bun run dev                      # http://localhost:3000
 ```
 
-## 🏁 Getting Started
+Seeded logins, which only work locally (all with password `password123`):
 
-### Prerequisites
+| Email                | Role    |
+| -------------------- | ------- |
+| `admin@test.local`   | admin   |
+| `officer@test.local` | officer |
+| `member@test.local`  | member  |
+| `guest@test.local`   | guest   |
 
-- Node.js (v18 or higher recommended)
-- npm, yarn, or pnpm
+Google and GitHub login need OAuth apps whose callback URLs are `{APP_URL}/api/auth/callback/google` and `{APP_URL}/api/auth/callback/github`. Without credentials in `.dev.vars` those buttons won't work locally. Everything else does: with no `GMAIL_APP_PASSWORD`, emails print to the dev server console, including the links to confirm an account or reset a password.
 
-### Installation
+## Scripts
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/JashanMaan28/rhs-coding-club.git
-    cd rhs-coding-club
-    ```
+| Command                    | What it does                                          |
+| -------------------------- | ----------------------------------------------------- |
+| `bun run dev`              | Vite dev server with the Workers runtime              |
+| `bun run build`            | Production build                                      |
+| `bun run deploy`           | Build and `wrangler deploy`                           |
+| `bun run type-check`       | `tsc --noEmit`                                        |
+| `bun run lint` / `format`  | ESLint / Prettier                                     |
+| `bun run db:generate`      | Generate a migration from `src/db/schema`             |
+| `bun run db:migrate`       | Apply migrations to local D1                          |
+| `bun run db:migrate:prod`  | Apply migrations to the production D1                 |
+| `bun run db:seed`          | Seed local D1                                         |
+| `bun run test:unit`        | Pure-function tests in Node                           |
+| `bun run test:integration` | Server code against a real D1 inside workerd          |
+| `bun run test:e2e`         | Playwright smoke tests against the dev server         |
+| `bun run cf:types`         | Regenerate binding types after editing wrangler.jsonc |
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # or
-    yarn install
-    # or
-    pnpm install
-    ```
+## Project layout
 
-3.  **Set up Environment Variables:**
-    Create a `.env` file in the root directory and add the following variables. You will need a Firebase project and other service accounts.
+```
+src/
+  routes/          file-based routes; _authed and _admin are pathless guards
+  server/          server functions and auth middleware
+  services/        business logic; takes the database as an argument
+  db/schema/       Drizzle tables (auth.ts = Better Auth, club.ts = everything else)
+  db/migrations/   generated SQL, applied by Wrangler
+  lib/             pure helpers, auth config, zod schemas
+  components/      ui/ (Shadcn), bits/ (vendored React Bits), feature components
+scripts/           local seed and the one-time import from the old Firebase site
+tests/             unit/, integration/, e2e/
+```
 
-    ```env
-      # Firebase Configuration
-      NEXT_PUBLIC_FIREBASE_API_KEY=
-      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-      NEXT_PUBLIC_FIREBASE_APP_ID=
-      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+## Accounts and sign-in
 
-      # Brevo Configuration
-      BREVO_API_KEY=
-      BREVO_SENDER_EMAIL=
-      BREVO_SENDER_NAME=
+People sign in with Google, GitHub, or an email and password. A password sign-up has to confirm its email before it can log in. Signing up with an address that already has an account gets the same response as a new sign-up, and the owner gets an email telling them to log in or set a password, so the form can't be used to find out who has an account.
 
-      # Site Configuration
-      NEXT_PUBLIC_SITE_URL=http://localhost:3000
+Members imported from the old site have no password. They set one through **Forgot password**, or sign in with a Google or GitHub account that uses the same email.
 
+## Authorization
 
-      # GitHub Organization Configuration
-      # Replace 'your-github-org' with your actual GitHub organization name
-      GITHUB_ORG_NAME=your-github-org
+Roles are `guest < member < officer < admin`. New sign-ups are guests until an officer approves their membership application. Emails listed in `BOOTSTRAP_ADMIN_EMAILS` become admin the first time they sign in with Google or GitHub. Password sign-up is refused for those addresses, because it doesn't prove ownership until the email is confirmed.
 
-      # GitHub Personal Access Token with the following permissions:
-      # - admin:org (for inviting users to organization)
-      # - read:user (for reading user information)
-      # Generate token at: https://github.com/settings/tokens/new
-      GITHUB_TOKEN=your_github_personal_access_token_here
+Every protected server function uses `requireUser`, `requireMember`, `requireOfficer`, or `requireAdmin` from `src/server/auth.ts`. Route layouts redirect too, but the server-function middleware is the actual security boundary.
 
+## Security
 
-      # Firebase Admin SDK Configuration
-      # These are needed for server-side authentication in API routes
-      FIREBASE_PROJECT_ID=your-firebase-project-id
-      FIREBASE_CLIENT_EMAIL=your-firebase-service-account-email
-      FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nyour-private-key-here\n-----END PRIVATE KEY-----"
-    
-    ```
+`src/server.ts` adds security headers to every response (`src/lib/security-headers.ts`) and rate limits per IP: 10 a minute on sign-in, sign-up, and reset routes, and 5 a minute on the contact and newsletter forms. The limits are Workers rate limiting bindings in `wrangler.jsonc`, which is free, and only apply on Cloudflare, not in local dev.
 
-4.  **Run the development server:**
-    ```bash
-    npm run dev
-    ```
-    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Email
 
-## 🤝 How to Contribute
+`src/services/email.ts` sends through the club's Gmail account over SMTP using an app password. Gmail allows about 500 recipients a day, so each kind of mail gets a limit (`TIER_LIMIT`): public-triggered mail stops first and password resets always have room left. Bulk sends beyond a limit are dropped and logged, not queued.
 
-We welcome contributions from club members and the community! Please read our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on how to get started.
+Changing the Gmail password cancels the app password, and email stops until a new one is generated and set as `GMAIL_APP_PASSWORD`.
 
-### Quick Start
-1.  **Fork the repository** to your own GitHub account.
-2.  **Create a new branch** for your feature or bug fix.
-3.  **Make your changes** and commit them.
-4.  **Push to your branch** and open a Pull Request.
+## Running the site
 
-### Coding Style
-- We use **ESLint** and **Prettier**.
-- Run `npm run lint` and `npm run format` before committing.
+Everything belongs to the club account `riponhighcodingclub@gmail.com`, so it can be handed to next year's officers by passing on that login. That account owns the Cloudflare account, the OAuth apps, and the mailbox the site sends from. The card on the Cloudflare account is only there because R2 requires one.
 
-## 🤝 Code of Conduct
+Set these on the `rhs` Worker as secrets (`bunx wrangler secret put NAME`, or the dashboard):
 
-Please note that we have a [Code of Conduct](CODE_OF_CONDUCT.md). Please follow it in all your interactions with the project.
+| Secret                   | Needed for                                         |
+| ------------------------ | -------------------------------------------------- |
+| `BETTER_AUTH_SECRET`     | Signing sessions. `openssl rand -base64 32`        |
+| `GOOGLE_CLIENT_SECRET`   | Google sign-in                                     |
+| `GITHUB_CLIENT_SECRET`   | GitHub sign-in                                     |
+| `GMAIL_APP_PASSWORD`     | Sending email                                      |
+| `GITHUB_TOKEN`           | Org invites. Needs `admin:org` and `read:user`     |
+| `BOOTSTRAP_ADMIN_EMAILS` | Optional. Only for setting up a brand new database |
 
-## 🛡️ Security
+Public configuration (`APP_URL`, the OAuth client IDs, the Gmail address) lives in `wrangler.jsonc`.
 
-For information on how to report security vulnerabilities, please see our [Security Policy](SECURITY.md).
+To deploy:
 
-## 📄 License
+1. `bunx wrangler login` as the club account
+2. `bun run db:migrate:prod` if the change includes a migration
+3. `bun run deploy`
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Free tier limits to watch: Workers requests and CPU time, D1 reads and writes, R2 storage (billed to the card past the free 10 GB), and Gmail's daily recipients. Cloudflare's own dashboard shows current usage.
 
-## 🙏 Acknowledgments
+The admin reset tool at `/admin/reset` handles the new school year, and offers a data backup first. That backup leaves out login data and uploaded files. To restore the database itself, use D1 Time Travel (`bunx wrangler d1 time-travel`).
 
-- Built by [Jashanpreet Singh](https://github.com/JashanMaan28).
-- Special thanks to all our club officers.
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Commit messages follow Conventional Commits.

@@ -12,41 +12,41 @@ What does it change or add?
 
 Check all that apply:
 
-- [ ]  Feature
-- [ ]  Bug fix
-- [ ]  Documentation update
-- [ ]  Refactor / code cleanup
-- [ ]  UI/UX update
-- [ ]  Security-related change
+- [ ] Feature
+- [ ] Bug fix
+- [ ] Documentation update
+- [ ] Refactor / code cleanup
+- [ ] UI/UX update
+- [ ] Security-related change
 - [ ] Other (describe below)
 
-##  Screenshots / GIFs (if UI changes)
+## Screenshots / GIFs (if UI changes)
 
 If your changes affect the UI, add before/after screenshots or GIFs.
 
 - Before:
 - After:
 
-##  How to Test
+## How to Test
 
 Steps for a reviewer to test this PR locally:
 
 1. `git checkout your-branch-name`
-2. `npm install` (if needed)
-3. `npm run dev`
+2. `bun install` (if needed)
+3. `bun run dev`
 4. Visit: `http://localhost:3000/...`
 5. Verify that...
 
-##  Environment / Config Changes
+## Environment / Config Changes
 
-Does this PR require new environment variables, Firebase rules, or config changes?
+Does this PR require new secrets, migrations, or changes to `wrangler.jsonc`?
 
-- [ ] Yes  
-- [ ] No  
+- [ ] Yes
+- [ ] No
 
 If **yes**, list them here:
 
 ```env
 # Example
-NEXT_PUBLIC_SOMETHING=
-FIREBASE_SOMETHING=
+SOME_SECRET=
+```
