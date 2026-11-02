@@ -1,241 +1,75 @@
 <!doctype html>
-<!--
-  Source of public/og.png. A drop falling into a sea of binary: the droplets and
-  the 0s and 1s come from the club logo, the glyph field and colors from the
-  home page's ASCII hero. Rendered by render.ts; open it in a browser to iterate.
--->
+<!-- Source of public/og.png. Rendered by render.ts: bun run og:render -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@500;600&display=swap"
     />
     <style>
       * {
         box-sizing: border-box;
         margin: 0;
       }
-      html,
       body {
-        width: 1200px;
-        height: 630px;
-        overflow: hidden;
-        background: #0b0f15;
-      }
-      #card {
         position: relative;
         width: 1200px;
         height: 630px;
         overflow: hidden;
-        background:
-          radial-gradient(420px 150px at 860px 408px, #38bdf866 0%, transparent 100%),
-          radial-gradient(900px 300px at 860px 420px, #1e3fd870 0%, transparent 100%),
-          radial-gradient(300px 300px at 860px 215px, #1e3fd855 0%, transparent 100%),
-          linear-gradient(180deg, #0b0f15 0%, #0b0f15 55%, #0c1626 100%);
-      }
-      canvas {
-        position: absolute;
-        inset: 0;
-      }
-      #copy {
-        position: absolute;
-        left: 64px;
-        top: 60px;
-        bottom: 60px;
+        padding: 64px 72px;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
+        background: #0b0f15;
         color: #fff;
         font-family: 'Geist', sans-serif;
       }
       #mark {
         display: flex;
         align-items: center;
-        gap: 16px;
-        font:
-          500 19px 'Geist Mono',
-          monospace;
-        color: #a5d8ff;
+        gap: 18px;
+        font-size: 26px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        color: #8b98a8;
       }
       #mark img {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
+        width: 72px;
+        height: 72px;
       }
       h1 {
-        margin-top: 44px;
-        font-size: 112px;
-        line-height: 0.98;
+        font-size: 128px;
+        line-height: 1.02;
         font-weight: 600;
         letter-spacing: -0.045em;
       }
-      p {
-        margin-top: auto;
-        font-size: 28px;
-        font-weight: 500;
-        letter-spacing: -0.015em;
-        color: #e8eef6;
+      svg {
+        position: absolute;
+        right: 72px;
+        top: 64px;
       }
     </style>
   </head>
   <body>
-    <div id="card">
-      <canvas id="field" width="1200" height="630"></canvas>
-      <div id="copy">
-        <div id="mark">
-          <img src="../../public/logo.png" alt="" />
-          <span>Ripon High School</span>
-        </div>
-        <h1>RHS<br />Coding<br />Club</h1>
-        <p>The most active club at RHS.</p>
-      </div>
+    <div id="mark">
+      <img src="../../public/logo.png" alt="" />
+      <span>Ripon High School</span>
     </div>
+    <svg width="148" height="72" viewBox="0 0 148 72" fill="none" aria-hidden="true">
+      <path
+        d="M34 12 8 36l26 24M114 12l26 24-26 24M88 6 60 66"
+        stroke="#5fb2ee"
+        stroke-width="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+    <h1>RHS<br />Coding Club</h1>
     <script>
-      const W = 1200
-      const H = 630
-      const CELL_W = 9
-      const CELL_H = 14
-      const HORIZON = 372
-      const DROP = { x: 860, y: 222, r: 98, tip: 176 }
-      const IMPACT = { x: 860, y: 482 }
-
-      /** Seeded, so every render is the same picture. */
-      let seed = 20260902
-      const rand = () => {
-        seed = (seed * 1664525 + 1013904223) >>> 0
-        return seed / 2 ** 32
-      }
-      const smooth = (a, b, v) => {
-        const t = Math.min(1, Math.max(0, (v - a) / (b - a)))
-        return t * t * (3 - 2 * t)
-      }
-      const mix = (a, b, t) => a + (b - a) * t
-
-      // The hero's palette, dark to light.
-      const RAMP = [
-        [0.0, [24, 48, 110]],
-        [0.3, [30, 63, 216]],
-        [0.6, [56, 189, 248]],
-        [0.85, [165, 216, 255]],
-        [1.0, [246, 248, 255]],
-      ]
-      function color(v) {
-        for (let i = 1; i < RAMP.length; i++) {
-          if (v <= RAMP[i][0]) {
-            const [a, ca] = RAMP[i - 1]
-            const [b, cb] = RAMP[i]
-            const t = (v - a) / (b - a)
-            return ca.map((c, j) => Math.round(mix(c, cb[j], t)))
-          }
-        }
-        return RAMP[RAMP.length - 1][1]
-      }
-
-      /** The drop: a circle whose top half tapers to a point. Returns shading or -1. */
-      function drop(x, y) {
-        const dy = y - DROP.y
-        const dx = x - DROP.x
-        let half
-        if (dy >= 0) {
-          if (dy > DROP.r) return -1
-          half = Math.sqrt(DROP.r * DROP.r - dy * dy)
-        } else {
-          const t = -dy / DROP.tip
-          if (t > 1) return -1
-          half = DROP.r * Math.pow(Math.cos((t * Math.PI) / 2), 1.8)
-        }
-        const u = dx / half
-        if (Math.abs(u) > 1) return -1
-        // Round shading, lit from the upper left, with a bright rim like a lens.
-        const vy = dy >= 0 ? dy / DROP.r : (dy / DROP.tip) * 0.8
-        const edge = Math.min(1, u * u + vy * vy)
-        const body = 0.5 + (-u * 0.16 - vy * 0.12)
-        const rim = Math.pow(edge, 5) * 0.32
-        const under = smooth(0.35, 1, vy) * 0.3
-        const shine = Math.exp(-(((u + 0.4) ** 2 + (vy + 0.3) ** 2) / 0.05))
-        return Math.min(1, body + rim + under + shine * 0.5)
-      }
-
-      /** Rings spreading from the point the drop will hit, flattened into perspective. */
-      function water(x, y) {
-        const fade = smooth(HORIZON - 6, HORIZON + 44, y)
-        if (fade === 0) return 0
-        const e = Math.hypot((x - IMPACT.x) / 3.2, y - IMPACT.y)
-        const wave = 0.5 + 0.5 * Math.cos(Math.pow(e, 0.86) * 0.29)
-        const crest = Math.pow(wave, 3)
-        const falloff = Math.exp(-e / 210)
-        const splash = Math.exp(-(e * e) / 90)
-        return fade * (crest * falloff * 1.1 + 0.05 + splash)
-      }
-
-      /** The copy needs quiet water behind it. */
-      function textMask(x, y) {
-        const fromRight = smooth(470, 700, x)
-        const belowText = smooth(528, 600, y) * 0.5
-        return Math.max(fromRight, belowText * smooth(120, 460, x))
-      }
-
-      async function paint() {
-        await Promise.all([
-          document.fonts.load('500 13px "Geist Mono"'),
-          document.fonts.load('600 112px "Geist"'),
-          document.fonts.load('500 28px "Geist"'),
-        ])
-        await document.fonts.ready
-        const ctx = document.getElementById('field').getContext('2d')
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.font = '500 13px "Geist Mono", monospace'
-
-        for (let row = 0; row * CELL_H < H; row++) {
-          for (let col = 0; col * CELL_W < W; col++) {
-            const x = (col + 0.5) * CELL_W
-            const y = (row + 0.5) * CELL_H
-            const noise = rand()
-            const bit = noise < 0.5 ? '0' : '1'
-            const d = drop(x, y)
-
-            if (d >= 0) {
-              ctx.fillStyle = `rgb(${color(d)})`
-              ctx.globalAlpha = 1
-              ctx.fillText(bit, x, y)
-              continue
-            }
-
-            // The trail the drop leaves as it falls.
-            const trail =
-              y < DROP.y - DROP.tip
-                ? Math.exp(-((x - DROP.x) ** 2) / 500) *
-                  smooth(-10, DROP.y - DROP.tip, y) *
-                  0.55
-                : 0
-            // Sparse glyphs in the air, thickening down toward the water.
-            const air =
-              y < HORIZON + 30 && noise < 0.04 + 0.1 * smooth(170, HORIZON, y)
-                ? 0.08 + 0.1 * smooth(170, HORIZON, y)
-                : 0
-            const v = Math.max(
-              water(x, y) * (0.82 + rand() * 0.36),
-              trail * (0.5 + rand()),
-              air,
-            )
-            const shown = v * textMask(x, y)
-            if (shown < 0.045) continue
-
-            const glyph =
-              shown > 0.2
-                ? bit
-                : shown > 0.1
-                  ? '+:/<>{}='[Math.floor(rand() * 8)]
-                  : '·.'[noise < 0.5 ? 0 : 1]
-            ctx.fillStyle = `rgb(${color(Math.min(1, shown))})`
-            ctx.globalAlpha = Math.min(1, 0.32 + shown * 1.3)
-            ctx.fillText(glyph, x, y)
-          }
-        }
+      document.fonts.ready.then(() => {
         document.body.dataset.ready = 'true'
-      }
-      paint()
+      })
     </script>
   </body>
 </html>
