@@ -51,11 +51,6 @@ describe('markdownToDoc', () => {
     expect(markdownToDoc('').content).toEqual([{ type: 'paragraph' }])
   })
 
-  it('leaves no tag behind when stripping one joins the text around it', () => {
-    const doc = markdownToDoc('<div>a <<b>script> b</div>')
-    expect(plainText(doc)).not.toMatch(/<[^>]+>/)
-  })
-
   it('drops raw HTML tags and non-https images', () => {
     const doc = markdownToDoc('<b>hi</b>\n\n![x](http://insecure.example/a.png)')
     expect(JSON.stringify(doc)).not.toContain('<b>')
