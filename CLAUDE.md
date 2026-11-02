@@ -37,6 +37,16 @@ The club has no budget and no paid domain, so everything must stay on free tiers
 
 Google, GitHub, and email/password. Password sign-ups must confirm their email before logging in, and sign-up answers the same whether or not the address has an account. Better Auth won't link a provider to an unverified account, which blocks anyone who pre-registers someone else's email, so leave `requireLocalEmailVerified` at its default.
 
+## MCP server
+
+`POST /mcp` lets officers and admins run the admin panel from an AI app. `src/server.ts` lazily imports `src/mcp/http.ts`, so page views never load it.
+
+- **Tools** live in `src/mcp/tools.ts`, one per officer or admin server function, calling the same services and schemas. Adding a protected server function fails `tests/integration/mcp.test.ts` until it has a tool or a stated reason not to. The admin reset tool and backup are left out on purpose.
+- **Sign-in** is OAuth through Better Auth (`mcp()` in `src/lib/auth.ts`). Apps identify themselves with Client ID Metadata Documents; dynamic registration and the client API are off. Only protocol 2026-07-28 is served (`legacy: 'reject'`).
+- **Roles** are read from the `user` row on every request and when a token is issued or refreshed. Tools set `minRole`; don't rely on the tool list for security.
+- **Approval:** a tool with `confirm` writes a `mcp_pending_action` instead of acting, and only runs when its caller presses Approve at `/admin/mcp/$id`. Use it for deletes, role and settings changes, and anything that emails people. Its `preview` must describe the action from the database, because the arguments come from an AI that may have read something malicious.
+- **Results** have email addresses removed unless the tool sets `revealEmails`, and rich text is exchanged as Markdown. Tools returning text from visitors or members set `untrusted`.
+
 ## Roles
 
 `guest < member < officer < admin`. Guests are signed-in users awaiting membership approval. Officers manage content, reviews, events, and badges. Only admins change roles, edit officers, or write settings. `BOOTSTRAP_ADMIN_EMAILS` grants admin on the first provider-verified sign-in and refuses password sign-up for those addresses.
@@ -57,6 +67,7 @@ Google, GitHub, and email/password. Password sign-ups must confirm their email b
 
 - `gsap` is stubbed in the Worker build (`src/lib/gsap-server-stub.ts`), because it starts a timer on import and Workers forbids that during SSR. Only call GSAP in effects, and add any new export you import to the stub.
 - After a mutation use `router.invalidate({ sync: true })`. Plain `invalidate()` resolves before the new data is on screen, so controls re-enable with stale state.
+- A Worker can't fetch its own `workers.dev` URL, so `src/mcp/http.ts` reads the JWKS in-process instead of giving the token verifier a URL.
 - The CSP is off in dev, so check new external hosts against `src/lib/security-headers.ts` with a production build (`bun run build`, `bunx vite preview`).
 
 ## Secrets

@@ -3,6 +3,7 @@ import { announceChallenges } from './challenges'
 import { sendEventReminders } from './events'
 import { syncGithubInvites } from './github'
 import { sendWeeklyDigest } from './digest'
+import { cleanUpMcp } from '#/mcp/cleanup'
 
 // Keep these in sync with `triggers.crons` in wrangler.jsonc.
 export const HOURLY = '0 * * * *'
@@ -22,6 +23,7 @@ export async function runScheduled(cron: string, now = new Date()) {
           announceChallenges: () => announceChallenges(db, now),
           eventReminders: () => sendEventReminders(db, now),
           githubInvites: () => syncGithubInvites(db, now),
+          mcpCleanUp: () => cleanUpMcp(db, now),
         }
 
   const results = await Promise.allSettled(

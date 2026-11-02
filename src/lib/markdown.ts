@@ -1,12 +1,13 @@
 import { Lexer } from 'marked'
 import type { Token, Tokens } from 'marked'
-import type { RichMark, RichNode } from '../../src/lib/rich-text'
+import { safeHref, safeSrc } from '#/lib/rich-text'
+import type { RichMark, RichNode } from '#/lib/rich-text'
 
 /**
- * The old site stored posts and challenge prompts as Markdown. This turns
- * Markdown into the Tiptap JSON the new site stores (see lib/rich-text),
- * emitting only node and mark types the renderer allows. Raw HTML is
- * dropped to plain text; images keep only https URLs.
+ * Turns Markdown into the Tiptap JSON the site stores (see lib/rich-text),
+ * emitting only node and mark types the renderer allows. Raw HTML is dropped
+ * to plain text; images keep only https URLs and the site's own uploads. Used
+ * by the old site's import and by the MCP tools, which read and write Markdown.
  */
 export function markdownToDoc(markdown: string): RichNode {
   const tokens = new Lexer({ gfm: true, breaks: false }).lex(
@@ -174,8 +175,8 @@ function inline(tokens: Token[] | undefined, marks: RichMark[] = []): RichNode[]
 }
 
 function image(tok: Tokens.Image): RichNode | null {
-  if (!/^https:\/\//i.test(tok.href)) return null
-  return { type: 'image', attrs: { src: tok.href, alt: tok.text || '' } }
+  const src = safeSrc(tok.href)
+  return src ? { type: 'image', attrs: { src, alt: tok.text || '' } } : null
 }
 
 const ENTITIES: Record<string, string> = {
@@ -187,3 +188,81 @@ const ENTITIES: Record<string, string> = {
 }
 const decode = (s: string) =>
   s.replace(/&(amp|lt|gt|quot|#39);/g, (m) => ENTITIES[m] ?? m)
+
+/** The reverse, for showing stored documents to an AI client as Markdown. */
+export function docToMarkdown(doc: RichNode): string {
+  return blocksToMarkdown(doc.content ?? []).trim()
+}
+
+function blocksToMarkdown(nodes: RichNode[]): string {
+  return nodes
+    .map(blockToMarkdown)
+    .filter((b) => b !== null)
+    .join('\n\n')
+}
+
+const indent = (text: string, by: string) => text.split('\n').join(`\n${by}`)
+
+function blockToMarkdown(node: RichNode): string | null {
+  switch (node.type) {
+    case 'paragraph':
+      return inlineToMarkdown(node.content)
+    case 'heading':
+      return `${'#'.repeat(Number(node.attrs?.level) || 2)} ${inlineToMarkdown(node.content)}`
+    case 'bulletList':
+      return (node.content ?? [])
+        .map((item) => `- ${indent(blocksToMarkdown(item.content ?? []), '  ')}`)
+        .join('\n')
+    case 'orderedList': {
+      const start = Number(node.attrs?.start) || 1
+      return (node.content ?? [])
+        .map((item, i) => {
+          const marker = `${start + i}. `
+          return (
+            marker +
+            indent(blocksToMarkdown(item.content ?? []), ' '.repeat(marker.length))
+          )
+        })
+        .join('\n')
+    }
+    case 'blockquote':
+      return blocksToMarkdown(node.content ?? [])
+        .split('\n')
+        .map((line) => (line ? `> ${line}` : '>'))
+        .join('\n')
+    case 'codeBlock': {
+      const language = typeof node.attrs?.language === 'string' ? node.attrs.language : ''
+      const code = (node.content ?? []).map((t) => t.text ?? '').join('')
+      return `\`\`\`${language}\n${code}\n\`\`\``
+    }
+    case 'horizontalRule':
+      return '---'
+    case 'image': {
+      const src = safeSrc(node.attrs?.src)
+      const alt = typeof node.attrs?.alt === 'string' ? node.attrs.alt : ''
+      return src ? `![${alt}](${src})` : null
+    }
+    default:
+      return node.content ? blocksToMarkdown(node.content) : (node.text ?? null)
+  }
+}
+
+function inlineToMarkdown(nodes: RichNode[] | undefined): string {
+  return (nodes ?? [])
+    .map((node) => {
+      if (node.type === 'hardBreak') return '  \n'
+      let out = node.text ?? ''
+      for (const mark of node.marks ?? []) {
+        if (mark.type === 'code') out = `\`${out}\``
+        else if (mark.type === 'bold') out = `**${out}**`
+        else if (mark.type === 'italic') out = `*${out}*`
+        else if (mark.type === 'strike') out = `~~${out}~~`
+        else if (mark.type === 'link') {
+          const href = safeHref(mark.attrs?.href)
+          if (href) out = `[${out}](${href})`
+        }
+      }
+      return out
+    })
+    .join('')
+}

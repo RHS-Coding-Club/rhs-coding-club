@@ -89,6 +89,18 @@ Roles are `guest < member < officer < admin`. New sign-ups are guests until an o
 
 Every protected server function uses `requireUser`, `requireMember`, `requireOfficer`, or `requireAdmin` from `src/server/auth.ts`. Route layouts redirect too, but the server-function middleware is the actual security boundary.
 
+## MCP server
+
+Officers and admins can run the admin panel from an AI app that speaks the 2026-07-28 MCP protocol. Point it at `{APP_URL}/mcp`, for example:
+
+```bash
+claude mcp add --transport http rhs https://rhs.riponhighcodingclub.workers.dev/mcp
+```
+
+The app opens the site to sign in, and the officer approves it. Its tools match the admin panel and the officer's role. Deleting things, changing roles or settings, adjusting points, and emailing the club return a link instead of acting, and a person has to approve them on the site. The reset tool stays website-only.
+
+`/admin/mcp` shows connected apps, waiting approvals, and recent activity. Calls are limited to 60 a minute per user.
+
 ## Security
 
 `src/server.ts` adds security headers to every response (`src/lib/security-headers.ts`) and rate limits per IP: 10 a minute on sign-in, sign-up, and reset routes, and 5 a minute on the contact and newsletter forms. The limits are Workers rate limiting bindings in `wrangler.jsonc`, which is free, and only apply on Cloudflare, not in local dev.

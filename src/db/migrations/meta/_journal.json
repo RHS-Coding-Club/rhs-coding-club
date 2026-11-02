@@ -15,6 +15,13 @@
       "when": 1793299836272,
       "tag": "0001_features",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793605434619,
+      "tag": "0002_mcp",
+      "breakpoints": true
     }
   ]
 }

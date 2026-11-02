@@ -27,8 +27,8 @@
     },
   ],
 
-  // Per-IP limits. namespace_id is any account-unique number. Auth covers
-  // password checks and email-sending routes; forms cover contact and newsletter.
+  // namespace_id is any account-unique number. Auth covers password checks and
+  // email-sending routes; forms cover contact and newsletter. Both are per IP.
   "ratelimits": [
     {
       "name": "AUTH_LIMIT",
@@ -39,6 +39,18 @@
       "name": "FORM_LIMIT",
       "namespace_id": "1002",
       "simple": { "limit": 5, "period": 60 },
+    },
+    // MCP sign-in, per IP, apart from AUTH_LIMIT so it can't block site logins.
+    {
+      "name": "OAUTH_LIMIT",
+      "namespace_id": "1004",
+      "simple": { "limit": 30, "period": 60 },
+    },
+    // MCP tool calls, per signed-in user.
+    {
+      "name": "MCP_LIMIT",
+      "namespace_id": "1003",
+      "simple": { "limit": 60, "period": 60 },
     },
   ],
 

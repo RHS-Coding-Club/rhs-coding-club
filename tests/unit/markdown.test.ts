@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { markdownToDoc } from '../../scripts/legacy/markdown'
+import { docToMarkdown, markdownToDoc } from '#/lib/markdown'
 import { plainText, richTextField } from '#/lib/rich-text'
 
-describe('markdownToDoc (old site import)', () => {
+describe('markdownToDoc', () => {
   const md = [
     '# Title',
     '',
@@ -55,5 +55,54 @@ describe('markdownToDoc (old site import)', () => {
     const doc = markdownToDoc('<b>hi</b>\n\n![x](http://insecure.example/a.png)')
     expect(JSON.stringify(doc)).not.toContain('<b>')
     expect(JSON.stringify(doc)).not.toContain('insecure')
+  })
+})
+
+describe('docToMarkdown', () => {
+  it('keeps the structure when a document goes out and comes back', () => {
+    const md = [
+      '## Title',
+      '',
+      'Some **bold**, *italic*, `code`, and a [link](https://github.com).',
+      '',
+      '- one',
+      '- two',
+      '',
+      '3. third',
+      '4. fourth',
+      '',
+      '```python',
+      'print("hi")',
+      '```',
+      '',
+      '---',
+      '',
+      '> quoted',
+      '',
+      '![a chart](/files/event/x.png)',
+    ].join('\n')
+    const doc = markdownToDoc(md)
+    expect(docToMarkdown(doc).replace(/\n+/g, '\n')).toBe(md.replace(/\n+/g, '\n'))
+    expect(markdownToDoc(docToMarkdown(doc))).toEqual(doc)
+  })
+
+  it('drops links and images the site would refuse to render', () => {
+    const doc = {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: 'click',
+              marks: [{ type: 'link', attrs: { href: 'javascript:alert(1)' } }],
+            },
+          ],
+        },
+        { type: 'image', attrs: { src: 'http://evil.example/x.png', alt: '' } },
+      ],
+    }
+    expect(docToMarkdown(doc)).toBe('click')
   })
 })
