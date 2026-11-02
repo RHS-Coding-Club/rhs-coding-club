@@ -27,7 +27,7 @@ The RHS Coding Club website, rewritten from scratch (September 2026) on TanStack
 8. **Settings** are one row per group in `setting`, each validated by a Zod schema in `src/lib/settings.ts`.
 9. **Points go through `src/services/points.ts`**: `settlePoints` (idempotent per source row; amount 0 reverses) or `adjustPoints` (officer manual). Both run the badge engine.
 10. **Rich text** (posts, challenge prompts, newsletters) is stored as Tiptap JSON, edited with `RichTextEditor`, and rendered with `RichText` (an allow-list renderer). Never store or inject HTML.
-11. **Email** goes through `src/services/email.ts` (Resend; logs to the console until `RESEND_API_KEY` and `EMAIL_FROM` are set) with the layout in `email-templates.ts`. Respect `recipientsFor`/`recipientById` so opt-outs and club-wide toggles apply.
+11. **Email** goes through `src/services/email.ts` (the club Gmail over SMTP with `worker-mailer`; logs to the console until `GMAIL_USER` and `GMAIL_APP_PASSWORD` are set; about 500 recipients a day, so broadcasts stop at 400 to keep room for resets) with the layout in `email-templates.ts`. Respect `recipientsFor`/`recipientById` so opt-outs and club-wide toggles apply.
 12. **Background jobs** run from the cron triggers in `wrangler.jsonc` via `src/server.ts` -> `src/services/cron.ts`. Every job must be idempotent (claim before sending).
 
 ## Roles

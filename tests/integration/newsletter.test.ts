@@ -2,6 +2,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { eq } from 'drizzle-orm'
 import { env } from 'cloudflare:workers'
 import { getDb, schema } from '#/db'
+import { fakeMailer } from './fake-mailer'
 import {
   deleteIssueDraft,
   issueEmail,
@@ -102,7 +103,7 @@ describe('unsubscribe by token', () => {
 describe('issues', () => {
   afterEach(() => {
     vi.restoreAllMocks()
-    env.RESEND_API_KEY = ''
+    env.GMAIL_APP_PASSWORD = ''
   })
 
   it('builds a per-recipient email with List-Unsubscribe', () => {
@@ -121,13 +122,7 @@ describe('issues', () => {
     await subscribeEmail(db, 'gone@test.local')
     await unsubscribeByToken(db, await tokenOf('gone@test.local'))
 
-    env.RESEND_API_KEY = 're_test'
-    env.EMAIL_FROM = 'club@test.local'
-    const sent: { to: string[]; headers?: Record<string, string>; html: string }[] = []
-    vi.spyOn(globalThis, 'fetch').mockImplementation(async (_url, init) => {
-      sent.push(...(JSON.parse(String(init?.body)) as typeof sent))
-      return new Response('{}', { status: 200 })
-    })
+    const { sent } = fakeMailer()
 
     const { id } = await saveIssueDraft(db, 'u_off', {
       subject: 'October update',
@@ -137,9 +132,9 @@ describe('issues', () => {
 
     const active = ['ada@test.local', 'dup@test.local', 'reader@test.local']
     expect(result).toMatchObject({ recipients: 3, sent: 3, failed: 0 })
-    expect(sent.map((m) => m.to[0]).sort()).toEqual(active)
+    expect(sent.map((m) => m.to).sort()).toEqual(active)
     for (const m of sent) {
-      const token = await tokenOf(m.to[0])
+      const token = await tokenOf(m.to)
       expect(m.headers?.['List-Unsubscribe']).toContain(`token=${token}`)
       expect(m.html).toContain(`token=${token}`)
     }

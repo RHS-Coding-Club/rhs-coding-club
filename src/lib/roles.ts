@@ -24,6 +24,16 @@ export function parseBootstrapAdmins(raw: string | undefined): Set<string> {
   )
 }
 
-export function initialRoleFor(email: string, bootstrapAdmins: Set<string>): Role {
-  return bootstrapAdmins.has(email.trim().toLowerCase()) ? 'admin' : 'guest'
+/**
+ * Admin only for an email the sign-in provider vouches for: password sign-up
+ * doesn't prove ownership, so anyone could otherwise register a listed address.
+ */
+export function initialRoleFor(
+  email: string,
+  bootstrapAdmins: Set<string>,
+  emailVerified: boolean,
+): Role {
+  return emailVerified && bootstrapAdmins.has(email.trim().toLowerCase())
+    ? 'admin'
+    : 'guest'
 }

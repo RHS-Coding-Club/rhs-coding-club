@@ -2,7 +2,7 @@
 
 The website for the Ripon High School Coding Club: weekly challenges, events and RSVPs, member projects, a blog, learning resources, and a points and badges system.
 
-Built with TanStack Start and deployed to Cloudflare Workers. Data lives in D1 (SQLite), files in R2, auth is Better Auth, email goes through Resend.
+Built with TanStack Start and deployed to Cloudflare Workers. Data lives in D1 (SQLite), files in R2, auth is Better Auth, email goes through the club's Gmail account.
 
 ## Stack
 
@@ -13,7 +13,7 @@ Built with TanStack Start and deployed to Cloudflare Workers. Data lives in D1 (
 | Database  | Cloudflare D1 with Drizzle ORM                      |
 | Auth      | Better Auth (Google, GitHub, email/password)        |
 | Files     | Cloudflare R2                                       |
-| Email     | Resend                                              |
+| Email     | Gmail SMTP (`worker-mailer`)                        |
 | UI        | Tailwind CSS v4, Shadcn UI, lucide icons            |
 | Tests     | Vitest (unit + Workers integration), Playwright e2e |
 | Tooling   | bun, ESLint, Prettier, GitHub Actions               |

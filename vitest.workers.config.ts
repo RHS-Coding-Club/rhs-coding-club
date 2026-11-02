@@ -21,7 +21,7 @@ export default defineConfig({
           bindings: {
             TEST_MIGRATIONS: migrations,
             BETTER_AUTH_SECRET: 'test-secret-test-secret-test-secret-1234',
-            BOOTSTRAP_ADMIN_EMAILS: 'admin@test.local',
+            BOOTSTRAP_ADMIN_EMAILS: 'admin@test.local,ada@admin.test',
           },
         },
       }

@@ -32,8 +32,10 @@ describe('bootstrap admins', () => {
 
   it('assigns admin only to listed emails', () => {
     const admins = parseBootstrapAdmins('ada@example.com')
-    expect(initialRoleFor('ADA@example.com', admins)).toBe('admin')
-    expect(initialRoleFor('someone@example.com', admins)).toBe('guest')
+    expect(initialRoleFor('ADA@example.com', admins, true)).toBe('admin')
+    expect(initialRoleFor('someone@example.com', admins, true)).toBe('guest')
+    // A password sign-up with a listed address proves nothing.
+    expect(initialRoleFor('ada@example.com', admins, false)).toBe('guest')
   })
 
   it('handles an unset env var', () => {

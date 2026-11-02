@@ -9,13 +9,13 @@ import { getSetting } from '#/services/settings'
 export const Route = createFileRoute('/blog/rss.xml')({
   server: {
     handlers: {
-      GET: async ({ request }) => {
+      GET: async () => {
         const db = getDb()
         const [posts, club] = await Promise.all([
           listPublishedPosts(db, 30),
           getSetting(db, 'club-info'),
         ])
-        const origin = env.APP_URL || new URL(request.url).origin
+        const origin = env.APP_URL
         const xml = rssXml(
           posts.map((p) => ({
             title: p.title,

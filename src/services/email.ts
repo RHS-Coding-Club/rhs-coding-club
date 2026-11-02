@@ -1,14 +1,16 @@
 import { and, eq, inArray, isNull } from 'drizzle-orm'
 import { env } from 'cloudflare:workers'
+import { WorkerMailer } from 'worker-mailer'
 import type { Db } from '#/db'
 import { schema } from '#/db'
 import type { EmailTopic } from '#/db/schema'
 import type { Role } from '#/lib/roles'
 import { getSetting } from './settings'
 
-// Transactional email through Resend's HTTP API. Until RESEND_API_KEY and
-// EMAIL_FROM are set, messages are printed to the Worker log instead, so every
-// flow that sends mail works locally and on the preview without a key.
+// Email goes out through the club's Gmail account over SMTP (an app password,
+// no paid provider, no domain needed). Until GMAIL_USER and GMAIL_APP_PASSWORD
+// are set, messages go to the Worker log instead, so every flow that sends mail
+// works locally without a key. Bodies hold reset links, so only dev logs them.
 
 export interface EmailMessage {
   to: string
@@ -25,73 +27,112 @@ export interface SendResult {
   failed: number
 }
 
-const RESEND = 'https://api.resend.com'
-const BATCH = 100
+/** Gmail allows about 500 recipients a day; broadcasts stop short of it. */
+const DAILY_LIMIT = 500
+const BROADCAST_LIMIT = 400
+/** A send to one person (a reset, a decision) may use the reserve. */
+const isBroadcast = (messages: EmailMessage[]) => messages.length > 1
+
+const QUOTA_KEY = 'cron:email-quota'
 
 function config() {
-  const apiKey = env.RESEND_API_KEY
-  const from = env.EMAIL_FROM
-  return apiKey && from ? { apiKey, from } : null
+  const username = env.GMAIL_USER
+  const password = env.GMAIL_APP_PASSWORD
+  return username && password ? { username, password } : null
+}
+
+/**
+ * Takes up to `wanted` sends from today's allowance and returns how many were
+ * granted. Read then write: two sends racing can overshoot by a little, which
+ * the reserve absorbs, and Gmail refuses anything past its own limit anyway.
+ */
+async function grant(db: Db, wanted: number, limit: number, now: Date) {
+  const day = now.toISOString().slice(0, 10)
+  const row = await db.query.setting.findFirst({
+    where: eq(schema.setting.key, QUOTA_KEY),
+  })
+  const stored = row?.value as { day?: string; count?: number } | undefined
+  const used = stored?.day === day ? (stored.count ?? 0) : 0
+  const granted = Math.min(wanted, Math.max(0, limit - used))
+  if (granted > 0) {
+    const value = { day, count: used + granted }
+    await db
+      .insert(schema.setting)
+      .values({ key: QUOTA_KEY, value })
+      .onConflictDoUpdate({ target: schema.setting.key, set: { value } })
+  }
+  return granted
 }
 
 /** Sends one or many messages. Never throws; failures are counted and logged. */
-export async function sendEmails(db: Db, messages: EmailMessage[]): Promise<SendResult> {
+export async function sendEmails(
+  db: Db,
+  messages: EmailMessage[],
+  now = new Date(),
+): Promise<SendResult> {
   const result: SendResult = { sent: 0, logged: 0, failed: 0 }
   if (messages.length === 0) return result
 
   const cfg = config()
   if (!cfg) {
     for (const m of messages) {
-      console.info(
-        `[email:dev] to=${m.to} subject=${JSON.stringify(m.subject)}\n${m.text}`,
-      )
+      const body = import.meta.env.DEV ? `\n${m.text}` : ''
+      console.info(`[email:dev] to=${m.to} subject=${JSON.stringify(m.subject)}${body}`)
     }
     result.logged = messages.length
     return result
   }
 
-  const { senderName, replyTo } = await getSetting(db, 'email')
-  const from = senderName ? `${senderName} <${addressOf(cfg.from)}>` : cfg.from
+  const limit = isBroadcast(messages) ? BROADCAST_LIMIT : DAILY_LIMIT
+  const allowed = await grant(db, messages.length, limit, now)
+  if (allowed < messages.length) {
+    result.failed += messages.length - allowed
+    console.error(
+      `[email] daily limit reached: ${messages.length - allowed} of ${messages.length} not sent`,
+    )
+  }
+  if (allowed === 0) return result
 
-  for (let i = 0; i < messages.length; i += BATCH) {
-    const chunk = messages.slice(i, i + BATCH).map((m) => ({
-      from,
-      to: [m.to],
-      subject: m.subject,
-      html: m.html,
-      text: m.text,
-      headers: m.headers,
-      ...(replyTo ? { reply_to: replyTo } : {}),
-    }))
-    try {
-      const res = await fetch(`${RESEND}/emails/batch`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${cfg.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(chunk),
-      })
-      if (res.ok) result.sent += chunk.length
-      else {
-        result.failed += chunk.length
-        console.error(`[email] Resend ${res.status}: ${await res.text()}`)
+  const { senderName, replyTo } = await getSetting(db, 'email')
+  const from = { name: senderName || 'RHS Coding Club', email: cfg.username }
+
+  let mailer: WorkerMailer | null = null
+  try {
+    mailer = await WorkerMailer.connect({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      authType: 'plain',
+      credentials: cfg,
+    })
+    for (const m of messages.slice(0, allowed)) {
+      try {
+        await mailer.send({
+          from,
+          to: m.to,
+          subject: m.subject,
+          html: m.html,
+          text: m.text,
+          headers: m.headers,
+          ...(replyTo ? { reply: replyTo } : {}),
+        })
+        result.sent++
+      } catch (err) {
+        result.failed++
+        console.error('[email] send failed', err)
       }
-    } catch (err) {
-      result.failed += chunk.length
-      console.error('[email] Resend request failed', err)
     }
+  } catch (err) {
+    result.failed += allowed - result.sent
+    console.error('[email] could not connect to Gmail', err)
+  } finally {
+    await mailer?.close().catch(() => undefined)
   }
   return result
 }
 
 export function sendEmail(db: Db, message: EmailMessage) {
   return sendEmails(db, [message])
-}
-
-/** "RHS Coding Club <hi@x.org>" -> "hi@x.org" */
-function addressOf(from: string) {
-  return /<([^>]+)>/.exec(from)?.[1] ?? from
 }
 
 /**

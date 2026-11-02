@@ -141,8 +141,8 @@ const SECTIONS: LegalSection[] = [
             storage.
           </li>
           <li>
-            <strong>Resend</strong> delivers our emails, so it sees the address and the
-            message.
+            <strong>Google</strong> delivers our emails through the club&apos;s Gmail
+            account, so it sees the address and the message.
           </li>
           <li>
             <strong>Google and GitHub</strong> handle sign-in if you choose them.

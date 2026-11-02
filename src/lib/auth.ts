@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
-import { env } from 'cloudflare:workers'
+import { env, waitUntil } from 'cloudflare:workers'
 import { APIError } from 'better-auth/api'
 import { count, eq } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
@@ -51,7 +51,8 @@ function createAuth() {
       revokeSessionsOnPasswordReset: true,
       // Also how members imported from the old site claim their account: the
       // reset creates their first password, and the email proves they own it.
-      // Not awaited, so response time doesn't reveal whether an email exists.
+      // Not awaited, so response time doesn't reveal whether an email exists;
+      // waitUntil keeps the Worker alive until the send finishes.
       sendResetPassword: async ({ user, url }) => {
         const { html, text } = renderEmail({
           preheader: 'Choose a new password for your RHS Coding Club account.',
@@ -64,12 +65,14 @@ function createAuth() {
           footer:
             "If you didn't ask for this, ignore this email. Your password won't change.",
         })
-        void sendEmail(getDb(), {
-          to: user.email,
-          subject: 'Reset your RHS Coding Club password',
-          html,
-          text,
-        })
+        waitUntil(
+          sendEmail(getDb(), {
+            to: user.email,
+            subject: 'Reset your RHS Coding Club password',
+            html,
+            text,
+          }),
+        )
       },
       onPasswordReset: async ({ user }) => {
         await getDb()
@@ -122,7 +125,10 @@ function createAuth() {
       user: {
         create: {
           before: async (u) => ({
-            data: { ...u, role: initialRoleFor(u.email, bootstrapAdmins) },
+            data: {
+              ...u,
+              role: initialRoleFor(u.email, bootstrapAdmins, u.emailVerified),
+            },
           }),
         },
       },

@@ -2,6 +2,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { env } from 'cloudflare:workers'
 import { and, eq } from 'drizzle-orm'
 import { getDb, schema } from '#/db'
+import { fakeMailer } from './fake-mailer'
 import { buildIcs } from '#/lib/events'
 import {
   calendarFeed,
@@ -101,7 +102,7 @@ beforeAll(async () => {
 
 afterEach(() => {
   vi.restoreAllMocks()
-  env.RESEND_API_KEY = ''
+  env.GMAIL_APP_PASSWORD = ''
 })
 
 describe('RSVP', () => {
@@ -359,18 +360,12 @@ describe('sendEventReminders', () => {
     )
     await setRsvp(db, { eventId: 'e_tomorrow', user: officer, status: 'no' }, now)
 
-    env.RESEND_API_KEY = 're_test'
-    env.EMAIL_FROM = 'club@test.local'
-    const sent: { to: string[]; subject: string; html: string; text: string }[] = []
-    vi.spyOn(globalThis, 'fetch').mockImplementation(async (_url, init) => {
-      sent.push(...(JSON.parse(String(init?.body)) as typeof sent))
-      return new Response('{}', { status: 200 })
-    })
+    const { sent } = fakeMailer()
 
     const first = await sendEventReminders(db, now)
     // e_tomorrow is the only event starting in the next 24 hours.
     expect(first).toEqual({ events: 1, sent: 2 })
-    expect(sent.map((m) => m.to[0]).sort()).toEqual(['ada@test.local', 'bo@test.local'])
+    expect(sent.map((m) => m.to).sort()).toEqual(['ada@test.local', 'bo@test.local'])
     expect(sent[0]?.subject).toContain('RAP teaching day')
     expect(sent[0]?.text).toContain('Ripon Elementary')
     expect(sent[0]?.text).toContain('/events/e_tomorrow')

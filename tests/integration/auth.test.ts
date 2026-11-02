@@ -21,18 +21,30 @@ describe('sign-up and roles', () => {
     expect(row?.email).toBe('newbie@test.local')
   })
 
-  it('grants admin to bootstrap emails on first sign-in', async () => {
-    const created = await signUp('admin@test.local', 'Ada')
+  it('does not grant admin for a bootstrap email from a password sign-up', async () => {
+    const created = await signUp('admin@test.local', 'Fake Ada')
     const row = await getDb().query.user.findFirst({
       where: eq(schema.user.id, created.id),
     })
-    expect(row?.role).toBe('admin')
+    expect(row?.role).toBe('guest')
   })
 
-  it('exposes role on the session', async () => {
+  it('grants admin to a bootstrap email a provider verified, and exposes it on the session', async () => {
     const auth = getAuth()
+    const ctx = await auth.$context
+    const created = await ctx.internalAdapter.createUser(
+      { email: 'ada@admin.test', name: 'Ada', emailVerified: true },
+      { method: 'oauth', oauth: { providerId: 'github' } },
+    )
+    expect((created as { role?: string }).role).toBe('admin')
+    await ctx.internalAdapter.linkAccount({
+      userId: created.id,
+      providerId: 'credential',
+      accountId: created.id,
+      password: await ctx.password.hash('password123'),
+    })
     const signIn = await auth.api.signInEmail({
-      body: { email: 'admin@test.local', password: 'password123' },
+      body: { email: 'ada@admin.test', password: 'password123' },
       asResponse: true,
     })
     const cookie = signIn.headers.get('set-cookie') ?? ''
