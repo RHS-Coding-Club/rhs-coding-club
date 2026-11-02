@@ -1,14 +1,11 @@
 <!doctype html>
-<!--
-  Source of public/og.jpg. Rendered by render.ts: bun run og:render
-  hero-bg.jpg is a 1200x630 screenshot of the home page's AsciiBackground in dark mode.
--->
+<!-- Source of public/og.png. Rendered by render.ts: bun run og:render -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@900&display=swap"
     />
     <style>
       * {
@@ -20,46 +17,35 @@
         width: 1200px;
         height: 630px;
         overflow: hidden;
-        background: #121924 url(hero-bg.jpg) center / cover;
+        /* The royal blue from the home page's ASCII hero. */
+        background: #1e3fd8;
       }
-      #lockup {
-        position: absolute;
-        left: 60px;
-        right: 60px;
-        bottom: 56px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      /* The headline highlight from the home page hero. */
       h1 {
+        position: absolute;
+        left: 36px;
+        bottom: 48px;
         font-family: 'Geist', sans-serif;
-        font-size: 116px;
-        font-weight: 600;
-        line-height: 1.08;
+        font-size: 196px;
+        font-weight: 900;
+        line-height: 0.9;
         letter-spacing: -0.045em;
         white-space: nowrap;
         color: #fff;
       }
-      h1 span {
-        display: inline-block;
-        margin-left: 0.04em;
-        padding: 0 0.14em 0.06em;
-        border-radius: 0.16em;
-        background: #5fb2ee;
-        color: #0b0f15;
-      }
       img {
-        width: 124px;
-        height: 124px;
+        position: absolute;
+        top: 44px;
+        right: 56px;
+        width: 250px;
+        height: 250px;
+        transform: rotate(9deg);
+        filter: drop-shadow(0 14px 22px rgb(4 12 60 / 0.45));
       }
     </style>
   </head>
   <body>
-    <div id="lockup">
-      <h1>RHS <span>Coding Club</span></h1>
-      <img src="../../public/logo.png" alt="" />
-    </div>
+    <h1>RHS<br />Coding Club</h1>
+    <img src="../../public/logo.png" alt="" />
     <script>
       document.fonts.ready.then(() => {
         document.body.dataset.ready = 'true'

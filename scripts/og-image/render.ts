@@ -1,5 +1,5 @@
 /**
- * Renders scripts/og-image/og.html to public/og.jpg with Playwright's Chromium.
+ * Renders scripts/og-image/og.html to public/og.png with Playwright's Chromium.
  *
  *   bun run og:render
  */
@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from '@playwright/test'
 
 const source = new URL('./og.html', import.meta.url).href
-const target = fileURLToPath(new URL('../../public/og.jpg', import.meta.url))
+const target = fileURLToPath(new URL('../../public/og.png', import.meta.url))
 
 const browser = await chromium.launch()
 try {
@@ -17,7 +17,7 @@ try {
   })
   await page.goto(source, { waitUntil: 'networkidle' })
   await page.waitForFunction(() => document.body.dataset.ready === 'true')
-  await page.screenshot({ path: target, type: 'jpeg', quality: 90 })
+  await page.screenshot({ path: target })
   console.log(`Wrote ${target}`)
 } finally {
   await browser.close()
