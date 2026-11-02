@@ -1,52 +1,21 @@
+<!-- The PR title becomes the commit message on main, so write it as a Conventional Commit: `feat: add leaderboard filters`, `fix(auth): keep the session after a reset`. `feat` and `fix` appear in the changelog. -->
+
 ## Summary
 
-Describe the purpose of this pull request.  
-What does it change or add?
+<!-- What changes and why? -->
 
-## Related Issues
+Closes #
 
-- Closes #ISSUE_NUMBER (if applicable)
-- Related to #ISSUE_NUMBER (if applicable)
+## How to test
 
-## Type of Change
+<!-- Steps a reviewer can follow, or the tests that cover this. -->
 
-Check all that apply:
+## Screenshots
 
-- [ ] Feature
-- [ ] Bug fix
-- [ ] Documentation update
-- [ ] Refactor / code cleanup
-- [ ] UI/UX update
-- [ ] Security-related change
-- [ ] Other (describe below)
+<!-- Before and after, for UI changes. Leave out students' personal details. Delete this section if it doesn't apply. -->
 
-## Screenshots / GIFs (if UI changes)
+## Checklist
 
-If your changes affect the UI, add before/after screenshots or GIFs.
-
-- Before:
-- After:
-
-## How to Test
-
-Steps for a reviewer to test this PR locally:
-
-1. `git checkout your-branch-name`
-2. `bun install` (if needed)
-3. `bun run dev`
-4. Visit: `http://localhost:3000/...`
-5. Verify that...
-
-## Environment / Config Changes
-
-Does this PR require new secrets, migrations, or changes to `wrangler.jsonc`?
-
-- [ ] Yes
-- [ ] No
-
-If **yes**, list them here:
-
-```env
-# Example
-SOME_SECRET=
-```
+- [ ] `bun run type-check`, `bun run lint`, and `bun run format` pass
+- [ ] Tests are added or updated where they make sense
+- [ ] Any migration, new secret, or `wrangler.jsonc` change is described above, because merging to `main` deploys the site

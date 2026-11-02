@@ -1,0 +1,22 @@
+name: Documentation
+description: Something in the docs is wrong, missing, or confusing.
+title: 'docs: '
+labels: ['type: docs', 'status: needs triage']
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Where is it?
+      description: A file or page, such as CONTRIBUTING.md.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What should it say?

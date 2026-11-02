@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security problem
+    url: https://github.com/RHS-Coding-Club/rhs-coding-club/security/advisories/new
+    about: Please report vulnerabilities privately, not in a public issue.
+  - name: Ask a question on Discord
+    url: https://discord.com/invite/UQR79bn6ZZ
+    about: The fastest way to get help or talk to club members.
+  - name: Contact the club
+    url: https://rhs.riponhighcodingclub.workers.dev/contact
+    about: Questions about joining or anything else that isn't about the code.
