@@ -25,7 +25,7 @@ export function FeaturedProject({
   return (
     <SpotlightCard
       theme={dark ? 'dark' : 'light'}
-      spotlightColor="rgba(95, 178, 238, 0.9)"
+      spotlightColor="color-mix(in srgb, var(--brand-sky) 90%, transparent)"
       intensity={0.16}
       className="w-full min-w-0 rounded-4xl! p-2.5!"
       style={

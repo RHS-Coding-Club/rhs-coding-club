@@ -106,7 +106,7 @@ export function AdminNav({
             <Icon className="size-4 shrink-0" />
             {item.label}
             {n > 0 && (
-              <span className="tabular ml-auto rounded-full bg-[#e5484d] px-1.5 py-0.5 font-mono text-[11px] leading-none text-white">
+              <span className="tabular ml-auto rounded-full bg-alert px-1.5 py-0.5 font-mono text-[11px] leading-none text-white">
                 {n}
               </span>
             )}

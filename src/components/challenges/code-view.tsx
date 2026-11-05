@@ -46,11 +46,11 @@ export function SamplePanel({
   return (
     <figure
       className={cn(
-        'overflow-hidden rounded-2xl bg-[#0b0f15] text-[#e6edf5] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]',
+        'overflow-hidden rounded-2xl bg-code-bg text-code-fg shadow-[inset_0_0_0_1px_var(--code-edge)]',
         className,
       )}
     >
-      <figcaption className="flex items-center gap-2 border-b border-white/7 px-4 py-2.5 font-mono text-xs text-[#8b98a8]">
+      <figcaption className="flex items-center gap-2 border-b border-code-edge px-4 py-2.5 font-mono text-xs text-code-muted">
         <span aria-hidden="true" className="bg-brand-sky size-1.5 rounded-full" />
         {label}
       </figcaption>

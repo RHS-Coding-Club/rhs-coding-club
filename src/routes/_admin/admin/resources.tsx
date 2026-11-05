@@ -212,8 +212,8 @@ function AdminResources() {
                       className={cn(
                         'rounded-full px-2 py-0.5 text-xs',
                         r.approved
-                          ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300'
-                          : 'bg-amber-500/12 text-amber-700 dark:text-amber-300',
+                          ? 'bg-success/12 text-success'
+                          : 'bg-warning/12 text-warning',
                       )}
                     >
                       {r.approved ? 'Approved' : 'Pending'}

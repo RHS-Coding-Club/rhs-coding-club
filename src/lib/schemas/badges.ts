@@ -19,10 +19,10 @@ export const RARITY_LABEL: Record<Rarity, string> = {
 
 /** Ring and glow colors per rarity, used by the badge preview and lists. */
 export const RARITY_COLOR: Record<Rarity, string> = {
-  common: '#8b98a8',
-  rare: '#5fb2ee',
-  epic: '#a78bfa',
-  legendary: '#f2b84b',
+  common: 'var(--rarity-common)',
+  rare: 'var(--rarity-rare)',
+  epic: 'var(--rarity-epic)',
+  legendary: 'var(--rarity-legendary)',
 }
 
 export const CRITERIA_LABEL: Record<Criteria, string> = {

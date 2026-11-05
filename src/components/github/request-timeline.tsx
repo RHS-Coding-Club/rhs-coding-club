@@ -69,10 +69,10 @@ function Step({
         aria-hidden="true"
         className={cn(
           'relative grid size-8 shrink-0 place-items-center rounded-full',
-          done && 'bg-brand-sky text-[#0b0f15]',
+          done && 'bg-brand-sky text-on-sky',
           current && 'bg-background ring-brand-sky ring-2',
           step.state === 'upcoming' && 'bg-background ring-border ring-2',
-          denied && 'bg-destructive text-white dark:text-[#0b0f15]',
+          denied && 'bg-destructive text-destructive-foreground',
         )}
       >
         {done && <Check className="size-4" strokeWidth={3} />}

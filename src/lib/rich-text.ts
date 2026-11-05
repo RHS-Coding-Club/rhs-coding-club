@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { slugify } from '#/lib/format'
+import { BRAND, EMAIL } from '#/lib/static-palette'
 
 // Rich text (blog posts, challenge prompts, newsletter issues) is stored as
 // a Tiptap/ProseMirror JSON document in a text column. It is never stored or
@@ -168,7 +169,7 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ESC[c] ?? c)
 export function richTextToEmailHtml(node: RichNode, origin = ''): string {
   const kids = () =>
     (node.content ?? []).map((child) => richTextToEmailHtml(child, origin)).join('')
-  const p = 'margin:0 0 16px;font-size:16px;line-height:1.6;color:#101826'
+  const p = `margin:0 0 16px;font-size:16px;line-height:1.6;color:${BRAND.ink}`
   switch (node.type) {
     case 'doc':
       return kids()
@@ -177,7 +178,7 @@ export function richTextToEmailHtml(node: RichNode, origin = ''): string {
     case 'heading': {
       const l = headingLevel(node.attrs)
       const size = l === 2 ? 20 : l === 3 ? 18 : 16
-      return `<h${l} style="margin:24px 0 12px;font-size:${size}px;color:#101826">${kids()}</h${l}>`
+      return `<h${l} style="margin:24px 0 12px;font-size:${size}px;color:${BRAND.ink}">${kids()}</h${l}>`
     }
     case 'bulletList':
       return `<ul style="margin:0 0 16px;padding-left:22px">${kids()}</ul>`
@@ -186,11 +187,11 @@ export function richTextToEmailHtml(node: RichNode, origin = ''): string {
     case 'listItem':
       return `<li style="margin:0 0 6px">${kids()}</li>`
     case 'blockquote':
-      return `<blockquote style="margin:0 0 16px;padding-left:14px;border-left:3px solid #5fb2ee;color:#3a4556">${kids()}</blockquote>`
+      return `<blockquote style="margin:0 0 16px;padding-left:14px;border-left:3px solid ${BRAND.sky};color:${EMAIL.quote}">${kids()}</blockquote>`
     case 'codeBlock':
-      return `<pre style="margin:0 0 16px;padding:14px;background:#0b0f15;color:#e6edf5;border-radius:10px;font-size:13px;overflow:auto"><code>${esc(plainText(node))}</code></pre>`
+      return `<pre style="margin:0 0 16px;padding:14px;background:${BRAND.codeBg};color:${BRAND.codeFg};border-radius:10px;font-size:13px;overflow:auto"><code>${esc(plainText(node))}</code></pre>`
     case 'horizontalRule':
-      return '<hr style="border:0;border-top:1px solid #dbe2ea;margin:24px 0">'
+      return `<hr style="border:0;border-top:1px solid ${EMAIL.rule};margin:24px 0">`
     case 'hardBreak':
       return '<br>'
     case 'image': {
@@ -207,10 +208,10 @@ export function richTextToEmailHtml(node: RichNode, origin = ''): string {
         else if (m.type === 'underline') out = `<u>${out}</u>`
         else if (m.type === 'strike') out = `<s>${out}</s>`
         else if (m.type === 'code')
-          out = `<code style="background:#eef2f7;padding:1px 5px;border-radius:5px;font-size:14px">${out}</code>`
+          out = `<code style="background:${EMAIL.ground};padding:1px 5px;border-radius:5px;font-size:14px">${out}</code>`
         else if (m.type === 'link') {
           const href = safeHref(m.attrs?.href)
-          if (href) out = `<a href="${esc(href)}" style="color:#1f4f8a">${out}</a>`
+          if (href) out = `<a href="${esc(href)}" style="color:${BRAND.navy}">${out}</a>`
         }
       }
       return out

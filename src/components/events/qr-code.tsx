@@ -10,7 +10,7 @@ export function QrCode({
   value,
   label,
   className,
-  color = '#101826',
+  color = 'var(--brand-ink)',
 }: {
   value: string
   /** Accessible name, e.g. "QR code to check in". */
@@ -37,7 +37,7 @@ export function QrCode({
       shapeRendering="crispEdges"
       className={cn('block bg-white', className)}
     >
-      <rect width={size} height={size} fill="#ffffff" />
+      <rect width={size} height={size} fill="white" />
       <path d={path} fill={color} />
     </svg>
   )

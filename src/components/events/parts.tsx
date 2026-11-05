@@ -30,7 +30,7 @@ export function DateTile({
     >
       <div
         className={cn(
-          'bg-brand-navy font-mono font-medium tracking-[0.12em] text-[#e6edf5] uppercase',
+          'bg-brand-navy font-mono font-medium tracking-[0.12em] text-brand-frost uppercase',
           size === 'sm' && 'py-0.5 text-[10px]',
           size === 'md' && 'py-1 text-[11px]',
           size === 'lg' && 'py-1.5 text-xs',

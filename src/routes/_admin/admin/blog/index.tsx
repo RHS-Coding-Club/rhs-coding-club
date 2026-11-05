@@ -183,7 +183,7 @@ function AdminBlog() {
                       className={cn(
                         'inline-flex rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ring-1',
                         p.publishedAt
-                          ? 'bg-emerald-500/12 text-emerald-700 ring-emerald-500/30 dark:text-emerald-300'
+                          ? 'bg-success/12 text-success ring-success/30'
                           : 'bg-muted text-muted-foreground ring-border',
                       )}
                     >

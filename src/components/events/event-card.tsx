@@ -19,7 +19,7 @@ export function EventCard({ event, dark }: { event: EventCardData; dark: boolean
       background="var(--bits-surface)"
       borderColor="var(--bits-edge)"
       borderRadius="1.5rem"
-      glareColor={dark ? '#ffffff' : '#5fb2ee'}
+      glareColor={dark ? 'var(--ink)' : 'var(--brand-sky)'}
       glareOpacity={dark ? 0.22 : 0.35}
       blendMode={dark ? 'screen' : 'multiply'}
       glareSize={45}
@@ -86,7 +86,7 @@ function Status({ event, className }: { event: EventCardData; className?: string
 export function ViewerBadge({ status }: { status: 'yes' | 'maybe' | 'no' | null }) {
   if (status === 'yes') {
     return (
-      <span className="bg-brand-sky inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium text-[#0b0f15]">
+      <span className="bg-brand-sky inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium text-on-sky">
         <Check className="size-3.5" aria-hidden="true" />
         You're going
       </span>

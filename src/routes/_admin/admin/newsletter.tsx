@@ -195,7 +195,7 @@ function IssueHistory({ issues }: { issues: Data['issues'] }) {
                 <TableCell>
                   {i.sentAt ? (
                     <span className="text-sm">
-                      <span className="rounded-full bg-emerald-500/12 px-2 py-0.5 text-xs text-emerald-700 dark:text-emerald-300">
+                      <span className="rounded-full bg-success/12 px-2 py-0.5 text-xs text-success">
                         Sent
                       </span>{' '}
                       <span className="text-muted-foreground font-mono text-xs">
@@ -203,7 +203,7 @@ function IssueHistory({ issues }: { issues: Data['issues'] }) {
                       </span>
                     </span>
                   ) : (
-                    <span className="rounded-full bg-amber-500/12 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-300">
+                    <span className="rounded-full bg-warning/12 px-2 py-0.5 text-xs text-warning">
                       Draft
                     </span>
                   )}
@@ -367,7 +367,7 @@ function Subscribers({ rows }: { rows: Data['subscribers'] }) {
                         Unsubscribed {fmtDate(r.unsubscribedAt, 'short')}
                       </span>
                     ) : (
-                      <span className="rounded-full bg-emerald-500/12 px-2 py-0.5 text-xs text-emerald-700 dark:text-emerald-300">
+                      <span className="rounded-full bg-success/12 px-2 py-0.5 text-xs text-success">
                         Active
                       </span>
                     )}

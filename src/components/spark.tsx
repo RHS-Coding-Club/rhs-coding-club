@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useRef } from 'react'
 import ClickSpark from '#/components/bits/ClickSpark'
 import type { ClickSparkHandle } from '#/components/bits/ClickSpark'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 const SparkContext = createContext<((el: Element | null) => void) | null>(null)
 
@@ -11,6 +12,7 @@ const SparkContext = createContext<((el: Element | null) => void) | null>(null)
  * and `useSpark()` fires it from code (a check-in going through).
  */
 export function SparkRoot({ children }: { children: React.ReactNode }) {
+  const colors = useCssColors('--brand-sky', '--brand-sky-soft', '--brand-navy')
   const ref = useRef<ClickSparkHandle>(null)
   const burst = useCallback((el: Element | null) => {
     if (!el) return ref.current?.spark()
@@ -23,7 +25,7 @@ export function SparkRoot({ children }: { children: React.ReactNode }) {
         ref={ref}
         only="[data-spark]"
         fixedLayer
-        sparkColor={['#5fb2ee', '#9ccbf2', '#1f4f8a']}
+        sparkColor={colors}
         sparkCount={12}
         sparkRadius={42}
         sparkSize={12}

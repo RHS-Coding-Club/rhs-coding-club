@@ -65,7 +65,7 @@ function MemberPage() {
               href={`https://github.com/${user.githubUsername}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-[#101826]/6 px-4 py-2 font-mono text-sm text-[#101826] ring-1 ring-[#101826]/10 transition-colors hover:bg-[#101826]/10 dark:bg-white/8 dark:text-white dark:ring-white/12 dark:hover:bg-white/14"
+              className="inline-flex items-center gap-2 rounded-full bg-ink/8 px-4 py-2 font-mono text-sm text-ink ring-1 ring-ink/12 transition-colors hover:bg-ink/14"
             >
               <Github className="size-4" aria-hidden="true" />
               {user.githubUsername}
@@ -84,7 +84,7 @@ function MemberPage() {
             {user.skills.map((s) => (
               <li
                 key={s}
-                className="rounded-full bg-white/70 px-3 py-1 text-sm text-[#101826] ring-1 ring-[#101826]/8 backdrop-blur dark:bg-white/8 dark:text-white/85 dark:ring-white/10"
+                className="rounded-full bg-white/70 px-3 py-1 text-sm text-ink/85 ring-1 ring-ink/10 backdrop-blur dark:bg-white/8"
               >
                 {s}
               </li>
@@ -175,9 +175,9 @@ function Section({
 }
 
 const DIFFICULTY_STYLE = {
-  easy: 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-300',
-  medium: 'text-amber-700 bg-amber-500/10 dark:text-amber-300',
-  hard: 'text-rose-700 bg-rose-500/10 dark:text-rose-300',
+  easy: 'text-success bg-success/10',
+  medium: 'text-warning bg-warning/10',
+  hard: 'text-destructive bg-destructive/10',
 } as const
 
 function SolvedList({ rows }: { rows: MemberProfile['solved'] }) {

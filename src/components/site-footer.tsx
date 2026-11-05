@@ -62,7 +62,7 @@ export function SiteFooter({ theme }: { theme: Theme }) {
         <NewsletterCard theme={theme} />
       </FadeUp>
 
-      <div className="bg-brand-navy rounded-3xl px-6 pt-[22rem] pb-10 text-[#e6edf5] sm:px-10 lg:px-16">
+      <div className="bg-brand-navy rounded-3xl px-6 pt-[22rem] pb-10 text-brand-frost sm:px-10 lg:px-16">
         <div className="mx-auto flex max-w-6xl flex-col gap-12 md:flex-row md:justify-between">
           <Link
             to="/"
@@ -79,7 +79,7 @@ export function SiteFooter({ theme }: { theme: Theme }) {
           >
             {COLUMNS.map((col) => (
               <div key={col.title}>
-                <p className="font-mono text-[11px] tracking-[0.14em] text-[#e6edf5]/80 uppercase">
+                <p className="font-mono text-[11px] tracking-[0.14em] text-brand-frost/80 uppercase">
                   {col.title}
                 </p>
                 <ul className="mt-4 space-y-2.5 text-sm">
@@ -88,7 +88,7 @@ export function SiteFooter({ theme }: { theme: Theme }) {
                       {link.to ? (
                         <Link
                           to={link.to}
-                          className="text-[#e6edf5]/90 transition-colors hover:text-white"
+                          className="text-brand-frost/90 transition-colors hover:text-white"
                         >
                           {link.label}
                         </Link>
@@ -97,7 +97,7 @@ export function SiteFooter({ theme }: { theme: Theme }) {
                           href={link.href}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#e6edf5]/90 transition-colors hover:text-white"
+                          className="text-brand-frost/90 transition-colors hover:text-white"
                         >
                           {link.label}
                         </a>
@@ -110,7 +110,7 @@ export function SiteFooter({ theme }: { theme: Theme }) {
           </nav>
         </div>
 
-        <p className="mt-20 text-center text-sm text-[#e6edf5]/80">
+        <p className="mt-20 text-center text-sm text-brand-frost/80">
           © 2026 RHS Coding Club
         </p>
       </div>

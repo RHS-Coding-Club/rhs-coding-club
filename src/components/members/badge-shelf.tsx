@@ -6,6 +6,7 @@ import { fmtDate } from '#/lib/format'
 import { cn } from '#/lib/utils'
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip'
 import { RARITY } from './rarity'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 export interface ShelfBadge {
   id: string
@@ -23,6 +24,7 @@ export interface ShelfBadge {
  * focus: what it is for and when it was earned.
  */
 export function BadgeShelf({ badges, dark }: { badges: ShelfBadge[]; dark: boolean }) {
+  const [epic, legendary] = useCssColors(RARITY.epic.token, RARITY.legendary.token)
   return (
     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
       {badges.map((b) => (
@@ -34,7 +36,7 @@ export function BadgeShelf({ badges, dark }: { badges: ShelfBadge[]; dark: boole
                   as="div"
                   tabIndex={0}
                   theme={dark ? 'dark' : 'light'}
-                  color={RARITY[b.rarity].color}
+                  color={b.rarity === 'legendary' ? legendary : epic}
                   radius={24}
                   thickness={1.5}
                   stars={2}

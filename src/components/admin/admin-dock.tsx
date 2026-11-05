@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import type { CSSProperties } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
 import { Ellipsis, Moon, Sun } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -12,6 +11,7 @@ import { Sheet, SheetContent, SheetTitle } from '#/components/ui/sheet'
 import { useIsDark } from '#/hooks/use-is-dark'
 import { hasRole } from '#/lib/roles'
 import type { Role } from '#/lib/roles'
+import { DOCK_VARS } from '#/components/bits-theme'
 
 type Counts = Record<AdminQueueKey, number>
 type NavItem = (typeof ADMIN_NAV)[number]
@@ -58,24 +58,10 @@ const COMPACT: NavItem['to'][] = [
  * and tile tokens (the same surfaces as the header card), so it matches and
  * follows the theme class without a re-render.
  */
-const DOCK_VARS = {
-  '--dock-panel': 'var(--bits-glass)',
-  '--dock-panel-edge': 'var(--bits-edge)',
-  '--dock-panel-highlight': 'var(--bits-highlight)',
-  '--dock-panel-shadow': 'var(--bits-shadow)',
-  '--dock-tile': 'var(--bits-tile)',
-  '--dock-tile-edge': 'var(--bits-edge)',
-  '--dock-tile-highlight': 'var(--bits-highlight)',
-  '--dock-ink': 'var(--foreground)',
-  '--dock-label': 'var(--popover)',
-  '--dock-label-ink': 'var(--popover-foreground)',
-  '--dock-dot': '#5fb2ee',
-  '--dock-separator': 'var(--border)',
-} as CSSProperties
 
 /** The current page's tile: the brand navy-to-sky, white icon. */
 const ACTIVE_TILE =
-  '[--dock-tile:linear-gradient(180deg,#2a7fc4_0%,#1f4f8a_100%)] [--dock-tile-edge:rgba(95,178,238,0.5)] [--dock-ink:#ffffff]'
+  '[--dock-tile:linear-gradient(180deg,var(--brand-blue)_0%,var(--brand-navy)_100%)] [--dock-tile-edge:color-mix(in_srgb,var(--brand-sky)_50%,transparent)] [--dock-ink:var(--brand-frost)]'
 
 const icon = (Icon: LucideIcon) => <Icon className="size-[45%]" strokeWidth={1.8} />
 
@@ -162,8 +148,8 @@ export function AdminDock({
   const shared = {
     theme: dark ? ('dark' as const) : ('light' as const),
     position: 'bottom' as const,
-    accentColor: '#5fb2ee',
-    badgeColor: '#e5484d',
+    accentColor: 'var(--brand-sky)',
+    badgeColor: 'var(--alert)',
     baseItemSize: 46,
     magnification: 66,
     panelHeight: 62,

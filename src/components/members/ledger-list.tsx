@@ -30,9 +30,7 @@ export function LedgerList({
           <span
             className={cn(
               'font-mono text-sm font-medium tabular-nums',
-              e.delta > 0
-                ? 'text-emerald-600 dark:text-emerald-400'
-                : 'text-rose-600 dark:text-rose-400',
+              e.delta > 0 ? 'text-success' : 'text-destructive',
             )}
           >
             {formatDelta(e.delta)}

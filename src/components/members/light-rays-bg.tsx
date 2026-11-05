@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import { useIsDark } from '#/hooks/use-is-dark'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 // WebGL only ever loads in the browser; PageHero renders this client-only.
 const LightRays = lazy(() => import('#/components/bits/LightRays'))
@@ -10,12 +11,15 @@ const LightRays = lazy(() => import('#/components/bits/LightRays'))
  */
 export function LightRaysBackground({ initialDark = true }: { initialDark?: boolean }) {
   const dark = useIsDark(initialDark)
+  const [sky] = useCssColors('--brand-sky')
   return (
     <LightRays
       key={dark ? 'dark' : 'light'}
       raysOrigin="top-right"
-      raysColor="#5fb2ee"
+      raysColor={sky}
       lightMode={!dark}
+      // The atmosphere tint turns sky lavender in the shader's light mode.
+      atmosphere={dark ? undefined : 0}
       raysSpeed={0.6}
       lightSpread={0.9}
       rayLength={2.4}

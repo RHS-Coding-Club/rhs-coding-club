@@ -23,6 +23,7 @@ import type { ApplicationInput } from '#/lib/schemas/membership'
 import { cn } from '#/lib/utils'
 import { applyForMembership } from '#/server/membership'
 import { ChipGroup } from './chip-group'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 const EMPTY: ApplicationInput = {
   grade: '' as ApplicationInput['grade'],
@@ -49,6 +50,7 @@ export function ApplicationStepper({
   dark: boolean
   defaults?: Partial<ApplicationInput>
 }) {
+  const [sky] = useCssColors('--brand-sky')
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [values, setValues] = useState<ApplicationInput>({ ...EMPTY, ...defaults })
@@ -120,7 +122,7 @@ export function ApplicationStepper({
         linear
         showFooter={false}
         theme={dark ? 'dark' : 'light'}
-        accentColor="#5fb2ee"
+        accentColor={sky}
         style={STEPPER_VARS}
         width="100%"
         radius={28}

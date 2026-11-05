@@ -12,7 +12,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '#/components/ui/popover
 import { PostByline } from '#/components/blog/post-byline'
 import { fmtDate } from '#/lib/format'
 import { cn } from '#/lib/utils'
-import { useIsDark } from '#/hooks/use-is-dark'
 import { listPosts } from '#/server/blog'
 import type { PostListItem } from '#/services/blog'
 
@@ -53,7 +52,6 @@ function BlogPage() {
   const posts = Route.useLoaderData()
   const { tag } = Route.useSearch()
   const { theme } = Route.useRouteContext()
-  const dark = useIsDark(theme === 'dark')
 
   const tags = useMemo(() => tagCounts(posts), [posts])
   const wanted = tag?.toLowerCase()
@@ -69,11 +67,12 @@ function BlogPage() {
         background={<AeroShardsBackground initialDark={theme === 'dark'} />}
         title={
           <GradientText
-            colors={
-              dark
-                ? ['#5fb2ee', '#a9d4f5', '#3f86c9', '#5fb2ee']
-                : ['#1f4f8a', '#5fb2ee', '#174070', '#1f4f8a']
-            }
+            colors={[
+              'var(--text-gradient-1)',
+              'var(--text-gradient-2)',
+              'var(--text-gradient-3)',
+              'var(--text-gradient-1)',
+            ]}
             animationSpeed={10}
             direction="diagonal"
             // The gradient is clipped to the text box, so give the
@@ -339,21 +338,21 @@ function LeadPost({ post }: { post: PostListItem }) {
     <Link
       to="/blog/$slug"
       params={{ slug: post.slug }}
-      className="group bg-brand-navy focus-visible:ring-brand-sky/60 relative block overflow-hidden rounded-4xl text-[#e6edf5] outline-none focus-visible:ring-4"
+      className="group bg-brand-navy focus-visible:ring-brand-sky/60 relative block overflow-hidden rounded-4xl text-brand-frost outline-none focus-visible:ring-4"
     >
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[radial-gradient(60%_80%_at_100%_0%,rgba(95,178,238,0.45)_0%,transparent_60%),radial-gradient(50%_60%_at_0%_100%,rgba(16,24,38,0.6)_0%,transparent_70%)] transition-opacity duration-700 group-hover:opacity-80"
+        className="absolute inset-0 bg-[radial-gradient(60%_80%_at_100%_0%,color-mix(in_srgb,var(--brand-sky)_45%,transparent)_0%,transparent_60%),radial-gradient(50%_60%_at_0%_100%,color-mix(in_srgb,var(--brand-ink)_60%,transparent)_0%,transparent_70%)] transition-opacity duration-700 group-hover:opacity-80"
       />
       <div className="relative mx-auto grid max-w-6xl gap-10 px-(--gutter) py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-end">
         <div>
-          <p className="font-mono text-sm text-[#e6edf5]/80">
+          <p className="font-mono text-sm text-brand-frost/80">
             Latest · {fmtDate(post.publishedAt)}
           </p>
           <h2 className="mt-5 max-w-4xl text-[clamp(2.25rem,5vw,4.25rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-balance">
             {post.title}
           </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[#e6edf5]/80 sm:text-xl">
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-brand-frost/80 sm:text-xl">
             {post.summary}
           </p>
           <div className="mt-8 flex flex-wrap gap-2">
@@ -372,7 +371,7 @@ function LeadPost({ post }: { post: PostListItem }) {
             author={post.author}
             minutes={post.minutes}
             size="sm"
-            className="[&_p]:text-[#e6edf5]/80 [&_p>span]:text-[#e6edf5] [&_[data-slot=avatar-fallback]]:bg-white/15 [&_[data-slot=avatar-fallback]]:text-white"
+            className="[&_p]:text-brand-frost/80 [&_p>span]:text-brand-frost [&_[data-slot=avatar-fallback]]:bg-white/15 [&_[data-slot=avatar-fallback]]:text-white"
           />
           <span className="inline-flex items-center gap-1.5 font-medium">
             Read it

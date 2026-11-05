@@ -21,7 +21,7 @@ export function WindowTabs({ value }: { value: LeaderboardWindow }) {
   return (
     <nav
       aria-label="Leaderboard window"
-      className="inline-flex rounded-2xl bg-[#101826]/6 p-1 ring-1 ring-[#101826]/8 backdrop-blur-md dark:bg-white/8 dark:ring-white/10"
+      className="inline-flex rounded-2xl bg-ink/8 p-1 ring-1 ring-ink/10 backdrop-blur-md"
     >
       {tabs.map((t) => {
         const active = t.value === value
@@ -35,9 +35,7 @@ export function WindowTabs({ value }: { value: LeaderboardWindow }) {
             aria-current={active ? 'page' : undefined}
             className={cn(
               'focus-visible:ring-ring relative rounded-xl px-4 py-2 text-sm font-medium transition-colors outline-none focus-visible:ring-2',
-              active
-                ? 'text-[#101826] dark:text-white'
-                : 'text-[#101826]/60 hover:text-[#101826] dark:text-white/60 dark:hover:text-white',
+              active ? 'text-ink' : 'text-ink/60 hover:text-ink',
             )}
           >
             {active && (
@@ -57,18 +55,18 @@ export function WindowTabs({ value }: { value: LeaderboardWindow }) {
 
 const PLACE = {
   1: {
-    ring: 'ring-amber-400/70',
-    text: 'text-amber-500 dark:text-amber-300',
+    ring: 'ring-medal-gold/70',
+    text: 'text-medal-gold',
     label: '1st',
   },
   2: {
-    ring: 'ring-slate-300/80',
-    text: 'text-slate-500 dark:text-slate-300',
+    ring: 'ring-medal-silver/80',
+    text: 'text-medal-silver',
     label: '2nd',
   },
   3: {
-    ring: 'ring-orange-400/60',
-    text: 'text-orange-600 dark:text-orange-300',
+    ring: 'ring-medal-bronze/60',
+    text: 'text-medal-bronze',
     label: '3rd',
   },
 } as const
@@ -166,7 +164,9 @@ function ChampionCard({ row, dark, you }: { row: Row; dark: boolean; you: boolea
       onClick={() => void navigate({ to: '/members/$id', params: { id: row.userId } })}
       style={
         {
-          '--tc-shadow-color': dark ? 'rgba(0,0,0,0.6)' : 'rgba(31,79,138,0.35)',
+          '--tc-shadow-color': dark
+            ? 'rgba(0,0,0,0.6)'
+            : 'color-mix(in srgb, var(--brand-navy) 35%, transparent)',
         } as React.CSSProperties
       }
     >
@@ -177,12 +177,12 @@ function ChampionCard({ row, dark, you }: { row: Row; dark: boolean; you: boolea
       />
       <div className="relative flex h-full flex-col items-center justify-center px-6 text-center text-white">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 font-mono text-xs backdrop-blur">
-          <Crown className="size-3.5 text-amber-300" aria-hidden="true" />
+          <Crown className="size-3.5 text-medal-gold" aria-hidden="true" />
           1st{you && ' · You'}
         </span>
         <UserAvatar
           user={row}
-          className="mt-5 size-28 text-3xl text-[#101826] ring-4 ring-amber-300/90"
+          className="mt-5 size-28 text-3xl text-brand-ink ring-4 ring-medal-gold/90"
         />
         <p className="mt-5 max-w-full truncate text-2xl font-semibold tracking-tight">
           {row.name}
@@ -246,7 +246,7 @@ function RankRow({ row, you }: { row: Row; you: boolean }) {
         <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
           <span className="truncate font-medium">{row.name}</span>
           {you && (
-            <span className="bg-brand-sky/15 text-brand-navy rounded-full px-2 py-0.5 font-mono text-[11px] dark:text-sky-200">
+            <span className="bg-brand-sky/15 text-accent-foreground rounded-full px-2 py-0.5 font-mono text-[11px]">
               You
             </span>
           )}

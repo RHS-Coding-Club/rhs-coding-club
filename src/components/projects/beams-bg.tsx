@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { useReducedMotion } from 'motion/react'
 import { useIsDark } from '#/hooks/use-is-dark'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 // WebGL only ever loads in the browser (PageHero renders backgrounds client-only).
 const Beams = lazy(() => import('#/components/bits/Beams'))
@@ -13,12 +14,13 @@ const Beams = lazy(() => import('#/components/bits/Beams'))
 export function BeamsBackground({ initialDark }: { initialDark: boolean }) {
   const dark = useIsDark(initialDark)
   const reduced = useReducedMotion()
+  const [beam] = useCssColors('--art-beam')
 
   return (
     <div className="absolute inset-0">
       <Beams
         key={dark ? 'dark' : 'light'}
-        color={dark ? '#5fb2ee' : '#3f86c9'}
+        color={beam}
         lightMode={!dark}
         beamWidth={dark ? 120 : 110}
         rotation={28}

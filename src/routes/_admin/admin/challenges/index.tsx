@@ -243,8 +243,8 @@ function StateLabel({
 }) {
   const dot = {
     draft: 'bg-muted-foreground/50',
-    scheduled: 'bg-amber-500',
-    live: 'bg-emerald-500',
+    scheduled: 'bg-warning',
+    live: 'bg-success',
   }[state]
   return (
     <span className="inline-flex items-center gap-2 text-sm whitespace-nowrap">

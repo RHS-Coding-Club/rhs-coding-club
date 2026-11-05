@@ -64,9 +64,9 @@ export const Route = createFileRoute('/_admin/admin/applications')({
 })
 
 const STATUS_PILL = {
-  pending: 'bg-amber-500/12 text-amber-700 dark:text-amber-300',
-  approved: 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300',
-  rejected: 'bg-rose-500/12 text-rose-700 dark:text-rose-300',
+  pending: 'bg-warning/12 text-warning',
+  approved: 'bg-success/12 text-success',
+  rejected: 'bg-destructive/12 text-destructive',
 } as const
 
 function StatusPill({ status }: { status: keyof typeof STATUS_PILL }) {

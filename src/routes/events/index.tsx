@@ -199,8 +199,8 @@ function FilterChip({
       className={cn(
         'focus-visible:ring-ring/50 h-9 cursor-pointer rounded-full px-4 text-sm font-medium ring-1 backdrop-blur-sm transition-colors outline-none focus-visible:ring-3',
         active
-          ? 'bg-[#101826] text-white ring-[#101826] dark:bg-white dark:text-[#101826] dark:ring-white'
-          : 'bg-white/60 text-[#101826]/80 ring-[#101826]/15 hover:bg-white/90 hover:text-[#101826] dark:bg-white/5 dark:text-white/80 dark:ring-white/15 dark:hover:bg-white/10 dark:hover:text-white',
+          ? 'bg-ink text-background ring-ink'
+          : 'bg-white/60 text-ink/80 ring-ink/15 hover:bg-white/90 hover:text-ink dark:bg-white/5 dark:hover:bg-white/10',
       )}
     >
       {children}

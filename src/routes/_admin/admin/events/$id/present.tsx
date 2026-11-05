@@ -72,7 +72,7 @@ function PresentPage() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-stage text-[#101826] dark:text-white"
+      className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-stage text-ink"
       role="dialog"
       aria-modal="true"
       aria-label={`Check-in for ${data.event.title}`}
@@ -86,7 +86,7 @@ function PresentPage() {
       </div>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(243,246,251,0.95)_0%,rgba(243,246,251,0.7)_55%,rgba(243,246,251,0.4)_100%)] dark:bg-[linear-gradient(90deg,rgba(18,25,36,0.92)_0%,rgba(18,25,36,0.65)_55%,rgba(18,25,36,0.35)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--stage)_95%,transparent)_0%,color-mix(in_srgb,var(--stage)_70%,transparent)_55%,color-mix(in_srgb,var(--stage)_40%,transparent)_100%)] dark:bg-[linear-gradient(90deg,color-mix(in_srgb,var(--stage)_92%,transparent)_0%,color-mix(in_srgb,var(--stage)_65%,transparent)_55%,color-mix(in_srgb,var(--stage)_35%,transparent)_100%)]"
       />
 
       <header className="relative flex items-center justify-between gap-4 px-6 pt-5 sm:px-10">
@@ -137,7 +137,7 @@ function PresentPage() {
         </div>
 
         {live && (
-          <div className="justify-self-center rounded-[2rem] bg-white p-4 shadow-[0_40px_80px_-30px_rgba(16,24,38,0.45)] ring-1 ring-black/5 sm:p-5">
+          <div className="justify-self-center rounded-[2rem] bg-white p-4 shadow-[0_40px_80px_-30px_color-mix(in_srgb,var(--brand-ink)_45%,transparent)] ring-1 ring-black/5 sm:p-5">
             <QrCode
               value={data.checkInUrl!}
               label={`QR code to check in to ${data.event.title}`}
@@ -165,7 +165,7 @@ function CodeLetters({ code }: { code: string }) {
         <span
           key={i}
           aria-hidden="true"
-          className="grid h-[clamp(4rem,9vw,8.5rem)] w-[clamp(3rem,6.6vw,6.25rem)] place-items-center rounded-[clamp(0.75rem,1.4vw,1.5rem)] bg-white font-mono text-[clamp(2.5rem,6vw,5.75rem)] font-semibold text-[#101826] shadow-[0_18px_40px_-24px_rgba(16,24,38,0.5)] ring-1 ring-black/5 dark:bg-white/8 dark:text-white dark:ring-white/12"
+          className="grid h-[clamp(4rem,9vw,8.5rem)] w-[clamp(3rem,6.6vw,6.25rem)] place-items-center rounded-[clamp(0.75rem,1.4vw,1.5rem)] bg-white font-mono text-[clamp(2.5rem,6vw,5.75rem)] font-semibold text-ink shadow-[0_18px_40px_-24px_color-mix(in_srgb,var(--brand-ink)_50%,transparent)] ring-1 ring-black/5 dark:bg-white/8 dark:ring-white/12"
         >
           {ch}
         </span>

@@ -19,7 +19,7 @@ function Home() {
   const { theme } = Route.useRouteContext()
   return (
     <>
-      <Hero theme={theme} />
+      <Hero />
       <TechLoop />
       <Mission />
       <FeatureBento theme={theme} />

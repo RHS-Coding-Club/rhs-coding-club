@@ -59,13 +59,13 @@ export const Route = createFileRoute('/_admin/admin/github')({
 })
 
 const PILL: Record<RequestStatus, string> = {
-  pending: 'bg-amber-500/12 text-amber-700 dark:text-amber-300',
-  approved: 'bg-sky-500/12 text-sky-700 dark:text-sky-300',
-  'invite-sent': 'bg-sky-500/12 text-sky-700 dark:text-sky-300',
-  'already-invited': 'bg-sky-500/12 text-sky-700 dark:text-sky-300',
-  joined: 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300',
-  'already-member': 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300',
-  denied: 'bg-rose-500/12 text-rose-700 dark:text-rose-300',
+  pending: 'bg-warning/12 text-warning',
+  approved: 'bg-brand-sky/12 text-accent-foreground',
+  'invite-sent': 'bg-brand-sky/12 text-accent-foreground',
+  'already-invited': 'bg-brand-sky/12 text-accent-foreground',
+  joined: 'bg-success/12 text-success',
+  'already-member': 'bg-success/12 text-success',
+  denied: 'bg-destructive/12 text-destructive',
 }
 
 function AdminGithub() {
@@ -124,10 +124,10 @@ function AdminGithub() {
       {!tokenConfigured && (
         <div
           role="note"
-          className="mb-4 flex gap-3 rounded-lg border border-amber-500/30 bg-amber-500/8 px-4 py-3 text-sm"
+          className="mb-4 flex gap-3 rounded-lg border border-warning/30 bg-warning/8 px-4 py-3 text-sm"
         >
           <AlertTriangle
-            className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-300"
+            className="mt-0.5 size-4 shrink-0 text-warning"
             aria-hidden="true"
           />
           <p>

@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import type { CSSProperties } from 'react'
 import { Link, useRouter } from '@tanstack/react-router'
 import { SearchX } from 'lucide-react'
 import AnimatedList from '#/components/bits/AnimatedList'
@@ -11,6 +10,7 @@ import { memberProgress } from '#/lib/schemas/challenges'
 import type { DifficultyLevel, SubmissionStatusValue } from '#/lib/schemas/challenges'
 import { DifficultyPill, ProgressMark } from './meta'
 import { FilterPills } from './filter-pills'
+import { ANIMATED_LIST_VARS } from '#/components/bits-theme'
 
 export interface ArchiveChallenge {
   id: string
@@ -21,16 +21,6 @@ export interface ArchiveChallenge {
   weekNo: number
   solves: number
 }
-
-/** Animated List's surfaces mapped onto the site's blue-biased tokens. */
-const LIST_VARS = {
-  '--al-frame': 'var(--bits-glass)',
-  '--al-frame-edge': 'var(--bits-edge)',
-  '--al-frame-highlight': 'var(--bits-highlight)',
-  '--al-tile': 'var(--bits-tile)',
-  '--al-tile-edge': 'var(--bits-edge)',
-  '--al-tile-highlight': 'var(--bits-highlight)',
-} as CSSProperties
 
 type DifficultyFilter = 'all' | DifficultyLevel
 type SolvedFilter = 'all' | 'solved' | 'unsolved'
@@ -136,7 +126,7 @@ export function ChallengeArchive({
             key={`${difficulty}-${solved}`}
             items={items}
             theme={dark ? 'dark' : 'light'}
-            accentColor="#5fb2ee"
+            accentColor="var(--brand-sky)"
             width="100%"
             maxHeight={620}
             radius={18}
@@ -145,7 +135,7 @@ export function ChallengeArchive({
             animateOnce
             stagger={0.04}
             className="w-full!"
-            style={LIST_VARS}
+            style={ANIMATED_LIST_VARS}
             itemClassName="py-3! pr-4! pl-3! sm:py-3.5! sm:pr-5! sm:pl-4!"
             onItemSelect={(item) => {
               if (typeof item === 'string' || item.id == null) return

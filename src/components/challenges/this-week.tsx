@@ -7,6 +7,7 @@ import { fmtDate } from '#/lib/format'
 import type { DifficultyLevel, MemberProgress } from '#/lib/schemas/challenges'
 import { DifficultyPill, ProgressMark } from './meta'
 import { SamplePanel } from './code-view'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 export interface FeaturedChallenge {
   id: string
@@ -36,6 +37,7 @@ export function ThisWeekCard({
   progress: MemberProgress | null
   initialDark: boolean
 }) {
+  const [sky] = useCssColors('--brand-sky')
   const dark = useIsDark(initialDark)
   const hasSamples = Boolean(challenge.sampleInput || challenge.sampleOutput)
   const cta =
@@ -49,7 +51,7 @@ export function ThisWeekCard({
 
   return (
     <ElectricBorder
-      color="#5fb2ee"
+      color={sky}
       theme={dark ? 'dark' : 'light'}
       borderRadius={28}
       speed={0.7}
@@ -123,7 +125,7 @@ export function ThisWeekCard({
         ) : (
           <div
             aria-hidden="true"
-            className="hidden self-center font-mono text-sm leading-7 text-[#8b98a8] lg:block"
+            className="hidden self-center font-mono text-sm leading-7 text-code-muted lg:block"
           >
             <SamplePanel
               label="solution.py"

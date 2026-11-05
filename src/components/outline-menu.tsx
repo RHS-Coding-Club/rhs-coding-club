@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { useRouteContext } from '@tanstack/react-router'
 import { useLenis } from 'lenis/react'
 import BranchedMenu from '#/components/bits/BranchedMenu'
-import { useIsDark } from '#/hooks/use-is-dark'
 
 export interface OutlineSection {
   /** The element id to scroll to. */
@@ -39,8 +37,6 @@ export function OutlineMenu({
   startActive?: boolean
   className?: string
 }) {
-  const { theme } = useRouteContext({ from: '__root__' })
-  const dark = useIsDark(theme === 'dark')
   const lenis = useLenis()
   const [active, setActive] = useState(startActive ? (sections[0]?.id ?? '') : '')
 
@@ -93,7 +89,7 @@ export function OutlineMenu({
           else el.scrollIntoView({ block: 'start' })
         }}
         color="var(--foreground)"
-        accentColor={dark ? '#5fb2ee' : '#1f4f8a'}
+        accentColor="var(--art-line)"
         lineColor="var(--border)"
         width={260}
         fontSize={14}

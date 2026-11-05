@@ -6,9 +6,8 @@ import ShinyText from '#/components/bits/ShinyText'
 import Magnet from '#/components/bits/Magnet'
 import { SplitButton } from '#/components/split-button'
 import { EASE } from '#/components/motion'
-import { useIsDark } from '#/hooks/use-is-dark'
-import type { Theme } from '#/server/theme'
 import { AsciiBackground } from './ascii-bg'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 const ROTATING = ['friends', 'classmates', 'mentors', 'the club']
 
@@ -28,19 +27,19 @@ const rise = (delay: number) => ({
  * Text, the demo's Slide settings); everything else eases in. The join button
  * leans toward the cursor (Magnet).
  */
-export function Hero({ theme }: { theme: Theme }) {
-  const dark = useIsDark(theme === 'dark')
+export function Hero() {
+  const [ink, inkSoft] = useCssColors('--ink', '--ink-soft')
   return (
     <section className="relative mx-2.5 mt-2.5 min-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-4xl">
       <AsciiBackground />
       {/* Soft scrim in the ground color behind the headline so the glyph field never fights the copy. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_48%,rgba(243,246,251,0.75)_0%,rgba(243,246,251,0)_100%)] dark:bg-[radial-gradient(60%_50%_at_50%_48%,rgba(18,25,36,0.55)_0%,rgba(18,25,36,0)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_48%,color-mix(in_srgb,var(--stage)_75%,transparent)_0%,transparent_100%)] dark:bg-[radial-gradient(60%_50%_at_50%_48%,color-mix(in_srgb,var(--stage)_55%,transparent)_0%,transparent_100%)]"
       />
 
       <div className="pointer-events-none relative flex min-h-[calc(100dvh-1.25rem)] flex-col items-center justify-center px-6 pt-32 pb-24 text-center">
-        <h1 className="font-display text-[clamp(2.75rem,7.4vw,6.5rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-[#101826] dark:text-white">
+        <h1 className="font-display text-[clamp(2.75rem,7.4vw,6.5rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-ink">
           <motion.span {...rise(0.3)} className="block">
             Learn to code.
           </motion.span>
@@ -62,7 +61,8 @@ export function Hero({ theme }: { theme: Theme }) {
               splitBy="characters"
               blur={0}
               highlight
-              highlightColor="#5fb2ee"
+              highlightColor="var(--brand-sky)"
+              style={{ color: 'var(--on-sky)' }}
               auto
               loop
               pauseOnHover={false}
@@ -74,7 +74,7 @@ export function Hero({ theme }: { theme: Theme }) {
 
         <motion.p
           {...rise(0.75)}
-          className="mx-auto mt-6 max-w-2xl text-lg text-balance text-[#101826]/70 sm:text-xl dark:text-white/80"
+          className="mx-auto mt-6 max-w-2xl text-lg text-balance text-ink/80 sm:text-xl"
         >
           Weekly challenges, a points leaderboard, hackathons, and afternoons teaching
           kids to code. Open to every RHS student, no experience needed.
@@ -96,13 +96,13 @@ export function Hero({ theme }: { theme: Theme }) {
           >
             <ShinyText
               text="This week's challenge"
-              color={dark ? 'rgba(255,255,255,0.8)' : 'rgba(16,24,38,0.75)'}
-              shineColor={dark ? '#ffffff' : '#101826'}
+              color={inkSoft}
+              shineColor={ink}
               speed={3}
               delay={1.2}
             />
             <ArrowRight
-              className="size-4 text-[#101826]/75 transition-transform group-hover:translate-x-0.5 dark:text-white/80"
+              className="size-4 text-ink/80 transition-transform group-hover:translate-x-0.5"
               aria-hidden="true"
             />
           </Link>

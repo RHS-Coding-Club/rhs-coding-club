@@ -5,16 +5,15 @@ import { cn } from '#/lib/utils'
 
 /** Difficulty reads as a color family everywhere: green, amber, rose. */
 export const DIFFICULTY_TONE: Record<DifficultyLevel, string> = {
-  easy: 'text-emerald-700 bg-emerald-500/12 ring-emerald-600/20 dark:text-emerald-300 dark:bg-emerald-400/10 dark:ring-emerald-300/20',
-  medium:
-    'text-amber-700 bg-amber-500/14 ring-amber-600/20 dark:text-amber-300 dark:bg-amber-400/10 dark:ring-amber-300/20',
-  hard: 'text-rose-700 bg-rose-500/12 ring-rose-600/20 dark:text-rose-300 dark:bg-rose-400/10 dark:ring-rose-300/20',
+  easy: 'text-success bg-success/12 ring-success/20',
+  medium: 'text-warning bg-warning/14 ring-warning/20',
+  hard: 'text-destructive bg-destructive/12 ring-destructive/20',
 }
 
 export const DIFFICULTY_DOT: Record<DifficultyLevel, string> = {
-  easy: 'bg-emerald-500 dark:bg-emerald-400',
-  medium: 'bg-amber-500 dark:bg-amber-400',
-  hard: 'bg-rose-500 dark:bg-rose-400',
+  easy: 'bg-success',
+  medium: 'bg-warning',
+  hard: 'bg-destructive',
 }
 
 export function DifficultyPill({
@@ -44,8 +43,8 @@ export function DifficultyPill({
 const PROGRESS_TONE: Record<MemberProgress, string> = {
   'not-started': 'text-muted-foreground',
   pending: 'text-brand-sky',
-  passed: 'text-emerald-600 dark:text-emerald-300',
-  failed: 'text-amber-700 dark:text-amber-300',
+  passed: 'text-success',
+  failed: 'text-warning',
 }
 
 const PROGRESS_ICON = {
@@ -86,9 +85,9 @@ export function ProgressMark({
 /** Review status as officers see it. */
 export function ReviewStatusPill({ status }: { status: 'pending' | 'pass' | 'fail' }) {
   const tone = {
-    pending: 'text-brand-sky bg-sky-500/10 ring-sky-500/25',
-    pass: 'text-emerald-700 bg-emerald-500/12 ring-emerald-600/20 dark:text-emerald-300',
-    fail: 'text-amber-700 bg-amber-500/14 ring-amber-600/20 dark:text-amber-300',
+    pending: 'text-brand-sky bg-brand-sky/10 ring-brand-sky/25',
+    pass: 'text-success bg-success/12 ring-success/20',
+    fail: 'text-warning bg-warning/14 ring-warning/20',
   }[status]
   const label = { pending: 'Pending', pass: 'Passed', fail: 'Needs work' }[status]
   return (

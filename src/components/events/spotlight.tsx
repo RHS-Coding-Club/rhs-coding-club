@@ -125,20 +125,20 @@ export function NextEventSpotlight({
             </div>
           </div>
 
-          <div className="bg-brand-navy relative flex flex-col justify-between gap-10 overflow-hidden p-6 text-[#e6edf5] sm:p-10">
+          <div className="bg-brand-navy relative flex flex-col justify-between gap-10 overflow-hidden p-6 text-brand-frost sm:p-10">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-[#5fb2ee]/30 blur-3xl"
+              className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-brand-sky/30 blur-3xl"
             />
             {live ? (
               <div className="relative">
-                <p className="text-sm text-[#e6edf5]/80">
+                <p className="text-sm text-brand-frost/80">
                   It started at {fmtDate(event.startsAt, 'time')}
                 </p>
                 <p className="mt-3 text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
                   Happening now
                 </p>
-                <p className="mt-4 max-w-sm text-[#e6edf5]/80">
+                <p className="mt-4 max-w-sm text-brand-frost/80">
                   {event.checkInLive
                     ? 'Check-in is open. Scan the QR on the projector or type the code on the event page.'
                     : 'Head over. Check-in opens when an officer puts the code on the projector.'}
@@ -146,7 +146,7 @@ export function NextEventSpotlight({
               </div>
             ) : (
               <div className="relative">
-                <p className="mb-5 text-sm text-[#e6edf5]/80">Starts in</p>
+                <p className="mb-5 text-sm text-brand-frost/80">Starts in</p>
                 <Countdown
                   target={event.startsAt}
                   serverNow={serverNow}

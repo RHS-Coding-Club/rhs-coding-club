@@ -98,7 +98,7 @@ function CheckInPage() {
         </div>
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_60%_at_50%_50%,rgba(243,246,251,0.9)_0%,rgba(243,246,251,0.35)_70%,rgba(243,246,251,0)_100%)] dark:bg-[radial-gradient(55%_60%_at_50%_50%,rgba(18,25,36,0.85)_0%,rgba(18,25,36,0.35)_70%,rgba(18,25,36,0)_100%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_60%_at_50%_50%,color-mix(in_srgb,var(--stage)_90%,transparent)_0%,color-mix(in_srgb,var(--stage)_35%,transparent)_70%,transparent_100%)] dark:bg-[radial-gradient(55%_60%_at_50%_50%,color-mix(in_srgb,var(--stage)_85%,transparent)_0%,color-mix(in_srgb,var(--stage)_35%,transparent)_70%,transparent_100%)]"
         />
 
         <div className="bg-card/90 ring-border/70 relative w-full max-w-md rounded-4xl p-7 text-center shadow-(--bits-shadow) ring-1 backdrop-blur-md sm:p-9">
@@ -336,7 +336,7 @@ function Success({
           />
         </>
         <motion.div
-          className="bg-brand-sky relative grid size-24 place-items-center rounded-full text-[#0b0f15] shadow-[0_18px_40px_-12px_rgba(95,178,238,0.7)]"
+          className="bg-brand-sky relative grid size-24 place-items-center rounded-full text-on-sky shadow-[0_18px_40px_-12px_color-mix(in_srgb,var(--brand-sky)_70%,transparent)]"
           initial={{ scale: 0.4, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', bounce: 0.45, duration: 0.7 }}
@@ -392,7 +392,7 @@ function Success({
           {result.badges.map((b) => (
             <li
               key={b.id}
-              className="bg-brand-navy inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium text-[#e6edf5]"
+              className="bg-brand-navy inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium text-brand-frost"
             >
               <Award className="size-4" aria-hidden="true" />
               New badge: {b.name}

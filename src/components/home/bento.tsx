@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -16,6 +15,8 @@ import type { MagicBentoItem } from '#/components/bits/MagicBento'
 import { FadeUp } from '#/components/motion'
 import { useIsDark } from '#/hooks/use-is-dark'
 import type { Theme } from '#/server/theme'
+import { useCssColors } from '#/hooks/use-css-colors'
+import { MAGIC_BENTO_VARS } from '#/components/bits-theme'
 
 type Cell = MagicBentoItem & { to: LinkProps['to'] }
 
@@ -80,14 +81,6 @@ const CELLS: Cell[] = [
   },
 ]
 
-/** Magic Bento's surfaces mapped onto the site tokens. */
-const BENTO_VARS = {
-  '--mb-surface': 'var(--bits-surface)',
-  '--mb-edge': 'var(--bits-edge)',
-  '--mb-highlight': 'var(--bits-highlight)',
-  '--mb-tile': 'var(--bits-tile)',
-} as CSSProperties
-
 /**
  * React Bits Magic Bento: six things a member gets, each with live artwork
  * (points chart, weekly solves, a shared doc, the review pipeline, the tool
@@ -97,6 +90,7 @@ const BENTO_VARS = {
 export function FeatureBento({ theme }: { theme: Theme }) {
   const router = useRouter()
   const dark = useIsDark(theme === 'dark')
+  const [sky] = useCssColors('--brand-sky')
 
   return (
     <section
@@ -121,7 +115,7 @@ export function FeatureBento({ theme }: { theme: Theme }) {
         gap={12}
         radius={20}
         theme={dark ? 'dark' : 'light'}
-        glowColor="#5fb2ee"
+        glowColor={sky}
         spotlightRadius={300}
         enableSpotlight
         enableBorderGlow
@@ -137,7 +131,7 @@ export function FeatureBento({ theme }: { theme: Theme }) {
           // Let the click wave start before the route changes.
           window.setTimeout(() => void router.navigate({ to }), 260)
         }}
-        style={BENTO_VARS}
+        style={MAGIC_BENTO_VARS}
       />
     </section>
   )

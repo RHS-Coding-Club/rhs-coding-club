@@ -58,17 +58,15 @@ function LeaderboardPage() {
         }
         aside={
           board.ranked > 0 ? (
-            <dl className="flex gap-10 text-[#101826] dark:text-white">
+            <dl className="flex gap-10 text-ink">
               <div>
-                <dt className="text-sm text-[#101826]/60 dark:text-white/60">
-                  Members ranked
-                </dt>
+                <dt className="text-sm text-ink/60">Members ranked</dt>
                 <dd className="mt-1 text-4xl font-semibold tracking-[-0.04em] tabular-nums">
                   <CountUp to={board.ranked} duration={1.2} trigger="load" />
                 </dd>
               </div>
               <div>
-                <dt className="text-sm text-[#101826]/60 dark:text-white/60">
+                <dt className="text-sm text-ink/60">
                   Points {range === 'semester' ? 'this semester' : 'all time'}
                 </dt>
                 <dd className="mt-1 text-4xl font-semibold tracking-[-0.04em] tabular-nums">

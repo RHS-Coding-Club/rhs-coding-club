@@ -62,9 +62,9 @@ export const Route = createFileRoute('/_admin/admin/users')({
 
 const ROLE_PILL: Record<Role, string> = {
   guest: 'bg-muted text-muted-foreground',
-  member: 'bg-sky-500/12 text-sky-700 dark:text-sky-300',
-  officer: 'bg-violet-500/12 text-violet-700 dark:text-violet-300',
-  admin: 'bg-amber-500/14 text-amber-700 dark:text-amber-300',
+  member: 'bg-brand-sky/12 text-accent-foreground',
+  officer: 'bg-rarity-epic/12 text-rarity-epic',
+  admin: 'bg-warning/14 text-warning',
 }
 
 function RolePill({ role }: { role: Role }) {
