@@ -152,7 +152,7 @@ function UnsubscribePage() {
         key={status}
         size="md"
         background={
-          <div className="absolute inset-0 bg-[radial-gradient(55%_70%_at_88%_90%,rgba(95,178,238,0.32)_0%,transparent_70%)] dark:bg-[radial-gradient(55%_70%_at_88%_90%,rgba(31,79,138,0.6)_0%,transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(55%_70%_at_88%_90%,color-mix(in_srgb,var(--brand-sky)_32%,transparent)_0%,transparent_70%)] dark:bg-[radial-gradient(55%_70%_at_88%_90%,color-mix(in_srgb,var(--brand-navy)_60%,transparent)_0%,transparent_70%)]" />
         }
         eyebrow={
           <span className="inline-flex items-center gap-2">

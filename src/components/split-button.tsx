@@ -42,7 +42,7 @@ export function SplitButton({
       <span
         aria-hidden="true"
         className={cn(
-          'bg-brand-sky flex items-center justify-center text-[#0b0f15] transition-colors group-hover:bg-[#7ec1f2]',
+          'bg-brand-sky flex items-center justify-center text-on-sky transition-colors group-hover:bg-brand-sky-hover',
           lg ? 'w-12' : 'w-10',
         )}
       >

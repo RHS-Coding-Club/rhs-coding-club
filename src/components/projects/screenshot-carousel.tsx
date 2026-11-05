@@ -2,6 +2,7 @@ import { ClientOnly } from '@tanstack/react-router'
 import Carousel from '#/components/bits/Carousel'
 import { fileUrl } from '#/lib/files'
 import { useIsDark } from '#/hooks/use-is-dark'
+import { CAROUSEL_VARS } from '#/components/bits-theme'
 
 /**
  * Project screenshots on React Bits Carousel: drag or use the arrows, with a
@@ -48,6 +49,7 @@ export function ScreenshotCarousel({
         arrows
         loop
         theme={dark ? 'dark' : 'light'}
+        style={CAROUSEL_VARS}
         className="mx-auto"
       />
     </ClientOnly>

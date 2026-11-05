@@ -33,8 +33,8 @@ export function AuthLayout({
       <div className="relative flex min-h-dvh flex-col justify-center overflow-hidden px-6 py-24 sm:px-8">
         {/* Top shades: a faint sky glow falling from the top right corner. */}
         <div aria-hidden="true" className="absolute inset-0 -z-10 isolate contain-strict">
-          <div className="absolute top-0 right-0 h-[80rem] w-[35rem] -translate-y-[22rem] rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,rgba(95,178,238,0.14)_0,rgba(95,178,238,0.04)_50%,transparent_80%)]" />
-          <div className="absolute top-0 right-0 h-[80rem] w-[15rem] [translate:5%_-50%] rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,rgba(95,178,238,0.1)_0,rgba(95,178,238,0.02)_80%,transparent_100%)]" />
+          <div className="absolute top-0 right-0 h-[80rem] w-[35rem] -translate-y-[22rem] rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,color-mix(in_srgb,var(--brand-sky)_14%,transparent)_0,color-mix(in_srgb,var(--brand-sky)_4%,transparent)_50%,transparent_80%)]" />
+          <div className="absolute top-0 right-0 h-[80rem] w-[15rem] [translate:5%_-50%] rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_srgb,var(--brand-sky)_10%,transparent)_0,color-mix(in_srgb,var(--brand-sky)_2%,transparent)_80%,transparent_100%)]" />
         </div>
 
         <RaisedButton asChild variant="ghost" className="absolute top-6 left-4 sm:left-6">
@@ -73,8 +73,8 @@ function ClubPanel({ pulse }: { pulse: ClubPulse }) {
 
   return (
     <div className="relative hidden p-2.5 lg:block">
-      <aside className="bg-brand-navy sticky top-2.5 flex h-[calc(100dvh-1.25rem)] flex-col overflow-hidden rounded-4xl p-10 text-[#e6edf5]">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0b1a30]/90" />
+      <aside className="bg-brand-navy sticky top-2.5 flex h-[calc(100dvh-1.25rem)] flex-col overflow-hidden rounded-4xl p-10 text-brand-frost">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-brand-midnight/90" />
         <div className="text-brand-sky absolute inset-0">
           <FloatingPaths position={1} />
           <FloatingPaths position={-1} />
@@ -91,7 +91,7 @@ function ClubPanel({ pulse }: { pulse: ClubPulse }) {
               A new problem every week, lunch meetings in Mr. Derrick&apos;s room, and the
               H2O hackathon. Come build with us.
             </p>
-            <footer className="mt-5 flex flex-col gap-1 font-mono text-sm text-[#e6edf5]/80">
+            <footer className="mt-5 flex flex-col gap-1 font-mono text-sm text-brand-frost/80">
               {lines.map((l) => (
                 <span key={l} className="truncate">
                   ~ {l}

@@ -1,6 +1,5 @@
 import { ClientOnly } from '@tanstack/react-router'
 import StrokeText from '#/components/bits/StrokeText'
-import { useIsDark } from '#/hooks/use-is-dark'
 
 const WORD = 'Say hello'
 
@@ -11,8 +10,7 @@ const WORD = 'Say hello'
  * fallback holds the same box so nothing shifts when it mounts. The
  * screen-reader heading lives in the page hero, so this one is hidden.
  */
-export function ContactTitle({ initialDark }: { initialDark: boolean }) {
-  const dark = useIsDark(initialDark)
+export function ContactTitle() {
   return (
     <div aria-hidden="true" className="w-full max-w-3xl select-none">
       <ClientOnly
@@ -24,8 +22,8 @@ export function ContactTitle({ initialDark }: { initialDark: boolean }) {
       >
         <StrokeText
           text={WORD}
-          strokeColor={dark ? '#5fb2ee' : '#2a7fc4'}
-          fillColor={dark ? '#ffffff' : '#101826'}
+          strokeColor="var(--primary)"
+          fillColor="var(--ink)"
           strokeWidth={2}
           fontSize={160}
           fontWeight={700}

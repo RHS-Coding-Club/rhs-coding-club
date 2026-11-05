@@ -7,6 +7,7 @@ import { recipientsFor, sendEmails } from './email'
 import type { EmailMessage } from './email'
 import { escapeHtml, prefsFooter, renderEmail, siteUrl } from './email-templates'
 import { pointsWindowStart, rankMembers } from './points'
+import { BRAND, EMAIL } from '#/lib/static-palette'
 
 // The Monday digest: this week's challenge, events in the next seven days,
 // posts from the last seven, and the top five this semester. Sent to every
@@ -117,11 +118,11 @@ export function renderDigest(d: Digest, name: string) {
   const bodyHtml = sections
     .map(
       (s) =>
-        `<h2 style="margin:28px 0 10px;font-size:13px;letter-spacing:0.04em;text-transform:uppercase;color:#5b6676">${escapeHtml(s.title)}</h2>` +
+        `<h2 style="margin:28px 0 10px;font-size:13px;letter-spacing:0.04em;text-transform:uppercase;color:${EMAIL.muted}">${escapeHtml(s.title)}</h2>` +
         s.items
           .map(
             (i) =>
-              `<p style="margin:0 0 12px;font-size:15px;line-height:1.5;color:#101826"><a href="${escapeHtml(i.href)}" style="color:#1f4f8a;font-weight:600;text-decoration:none">${escapeHtml(i.text)}</a>${i.sub ? `<br><span style="color:#5b6676;font-size:14px">${escapeHtml(i.sub)}</span>` : ''}</p>`,
+              `<p style="margin:0 0 12px;font-size:15px;line-height:1.5;color:${BRAND.ink}"><a href="${escapeHtml(i.href)}" style="color:${BRAND.navy};font-weight:600;text-decoration:none">${escapeHtml(i.text)}</a>${i.sub ? `<br><span style="color:${EMAIL.muted};font-size:14px">${escapeHtml(i.sub)}</span>` : ''}</p>`,
           )
           .join(''),
     )

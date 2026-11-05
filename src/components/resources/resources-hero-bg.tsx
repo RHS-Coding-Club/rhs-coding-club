@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { useReducedMotion } from 'motion/react'
 import { useIsDark } from '#/hooks/use-is-dark'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 // ogl and the shader only ever load in the browser (PageHero renders the
 // background client-only, inside Suspense).
@@ -9,18 +10,19 @@ const Grainient = lazy(() => import('#/components/bits/Grainient'))
 /**
  * /resources hero: React Bits Grainient as a slow, grainy wash that settles
  * into the page ground on the left (where the copy sits). Dark mode melts
- * from the #121924 stage into navy and sky; light mode runs the shader's
+ * from the stage color into navy and sky; light mode runs the shader's
  * light mode on pale blues so the title stays ink on paper.
  */
 export function ResourcesHeroBackground({ initialDark }: { initialDark: boolean }) {
   const dark = useIsDark(initialDark)
   const reduced = useReducedMotion()
+  const [stage, wash, sky] = useCssColors('--stage', '--art-wash', '--brand-sky')
   return (
     <Grainient
       key={dark ? 'dark' : 'light'}
-      color1={dark ? '#121924' : '#f3f6fb'}
-      color2={dark ? '#1f4f8a' : '#9ccbf2'}
-      color3={dark ? '#5fb2ee' : '#5fb2ee'}
+      color1={stage}
+      color2={wash}
+      color3={sky}
       lightMode={!dark}
       timeSpeed={reduced ? 0 : 0.12}
       colorBalance={dark ? -0.15 : 0}

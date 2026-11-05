@@ -28,6 +28,7 @@ import {
 import { cn } from '#/lib/utils'
 import { submitSolution } from '#/server/challenges'
 import { ProgressMark } from './meta'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 export interface MySubmission {
   id: string
@@ -166,8 +167,8 @@ function MemberPanel({
           className={cn(
             'rounded-2xl px-4 py-3.5 text-sm ring-1 ring-inset',
             mine.status === 'pass'
-              ? 'bg-emerald-500/8 ring-emerald-500/20'
-              : 'bg-amber-500/8 ring-amber-500/25',
+              ? 'bg-success/8 ring-success/20'
+              : 'bg-warning/8 ring-warning/25',
           )}
         >
           <figcaption className="text-muted-foreground mb-1 text-xs">
@@ -284,6 +285,7 @@ function SubmitForm({
   onCancel?: () => void
   onDone: () => void
 }) {
+  const sparks = useCssColors('--brand-sky', '--brand-sky-soft', '--brand-navy')
   const router = useRouter()
   const submit = useServerFn(submitSolution)
   const [language, setLanguage] = useState(mine?.language ?? '')
@@ -441,7 +443,7 @@ function SubmitForm({
 
       <div className="flex gap-2">
         <ClickSpark
-          sparkColor={['#5fb2ee', '#9ccbf2', '#ffffff']}
+          sparkColor={sparks}
           sparkCount={10}
           sparkRadius={34}
           sparkSize={10}

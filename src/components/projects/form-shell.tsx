@@ -26,7 +26,7 @@ export function ProjectFormShell({
           <Link
             to={back.to}
             params={back.id ? { id: back.id } : undefined}
-            className="pointer-events-auto inline-flex items-center gap-1.5 transition-colors hover:text-[#101826] dark:hover:text-white"
+            className="pointer-events-auto inline-flex items-center gap-1.5 transition-colors hover:text-ink"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
             {back.label}

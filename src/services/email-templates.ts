@@ -1,4 +1,5 @@
 import { env } from 'cloudflare:workers'
+import { BRAND, EMAIL } from '#/lib/static-palette'
 
 // One email layout for every message: the club name, a heading, a few
 // paragraphs, an optional button, and a footer line. Domains build their
@@ -34,10 +35,10 @@ export function siteUrl(path = '/') {
   return new URL(path, env.APP_URL).toString()
 }
 
-const NAVY = '#1f4f8a'
-const SKY = '#5fb2ee'
-const INK = '#101826'
-const MUTED = '#5b6676'
+const NAVY = BRAND.navy
+const SKY = BRAND.sky
+const INK = BRAND.ink
+const MUTED = EMAIL.muted
 
 export function renderEmail(c: EmailContent): { html: string; text: string } {
   const paragraphs = c.paragraphs
@@ -47,7 +48,7 @@ export function renderEmail(c: EmailContent): { html: string; text: string } {
     )
     .join('')
   const cta = c.cta
-    ? `<p style="margin:28px 0 8px"><a href="${escapeHtml(c.cta.href)}" style="display:inline-block;background:${SKY};color:#0b0f15;text-decoration:none;font-weight:600;font-size:15px;padding:12px 22px;border-radius:12px">${escapeHtml(c.cta.label)}</a></p>`
+    ? `<p style="margin:28px 0 8px"><a href="${escapeHtml(c.cta.href)}" style="display:inline-block;background:${SKY};color:${BRAND.onSky};text-decoration:none;font-weight:600;font-size:15px;padding:12px 22px;border-radius:12px">${escapeHtml(c.cta.label)}</a></p>`
     : ''
   const footerLink = c.footerLink
     ? ` <a href="${escapeHtml(c.footerLink.href)}" style="color:${MUTED}">${escapeHtml(c.footerLink.label)}</a>`
@@ -57,12 +58,12 @@ export function renderEmail(c: EmailContent): { html: string; text: string } {
       ? `<p style="margin:20px 0 0;font-size:12px;line-height:1.5;color:${MUTED}">${escapeHtml(c.footer ?? '')}${footerLink}</p>`
       : ''
 
-  const html = `<!doctype html><html><body style="margin:0;background:#eef2f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+  const html = `<!doctype html><html><body style="margin:0;background:${EMAIL.ground};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
 <span style="display:none;max-height:0;overflow:hidden">${escapeHtml(c.preheader ?? '')}</span>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
 <tr><td style="padding:0 4px 16px;font-size:14px;font-weight:600;color:${NAVY}">RHS Coding Club</td></tr>
-<tr><td style="background:#ffffff;border-radius:20px;padding:32px 28px">
+<tr><td style="background:${EMAIL.card};border-radius:20px;padding:32px 28px">
 <h1 style="margin:0 0 20px;font-size:24px;line-height:1.25;letter-spacing:-0.02em;color:${INK}">${escapeHtml(c.heading)}</h1>
 ${paragraphs}${c.bodyHtml ?? ''}${cta}
 </td></tr>

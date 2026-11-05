@@ -106,8 +106,8 @@ function ChallengesPage() {
 function HeroStat({ term, value }: { term: string; value: number }) {
   return (
     <div>
-      <dt className="text-sm text-[#101826]/60 dark:text-white/60">{term}</dt>
-      <dd className="tabular mt-1 font-mono text-4xl font-medium tracking-tight text-[#101826] dark:text-white">
+      <dt className="text-sm text-ink/60">{term}</dt>
+      <dd className="tabular mt-1 font-mono text-4xl font-medium tracking-tight text-ink">
         {value}
       </dd>
     </div>

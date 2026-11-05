@@ -68,7 +68,7 @@ function ProjectPage() {
         eyebrow={
           <Link
             to="/projects"
-            className="pointer-events-auto inline-flex items-center gap-1.5 transition-colors hover:text-[#101826] dark:hover:text-white"
+            className="pointer-events-auto inline-flex items-center gap-1.5 transition-colors hover:text-ink"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
             All projects
@@ -231,11 +231,11 @@ function ProjectPage() {
             </dl>
           </aside>
 
-          <div className="bg-brand-navy rounded-3xl p-6 text-[#e6edf5]">
+          <div className="bg-brand-navy rounded-3xl p-6 text-brand-frost">
             <p className="text-lg font-semibold tracking-tight">
               Built at RHS Coding Club
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-[#e6edf5]/80">
+            <p className="mt-2 text-sm leading-relaxed text-brand-frost/80">
               Members build projects at lunch in Mr. Derrick&apos;s classroom and over the
               H2O hackathon weekend. Every approved project earns each teammate points.
             </p>
@@ -297,7 +297,7 @@ function StatusBanner({
         role="status"
         className={
           rejected
-            ? 'flex flex-wrap items-start gap-3 rounded-3xl bg-amber-500/12 px-5 py-4 text-amber-950 ring-1 ring-amber-500/30 dark:text-amber-100'
+            ? 'flex flex-wrap items-start gap-3 rounded-3xl bg-warning/12 px-5 py-4 text-warning ring-1 ring-warning/30'
             : 'bg-brand-sky/12 ring-brand-sky/30 flex flex-wrap items-start gap-3 rounded-3xl px-5 py-4 ring-1'
         }
       >

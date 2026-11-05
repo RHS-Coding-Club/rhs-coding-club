@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { ClientOnly } from '@tanstack/react-router'
 import { avatarUrl } from '#/lib/files'
 import { initialsPortrait } from './portrait'
+import { PROFILE_CARD_VARS } from '#/components/bits-theme'
 
 const ProfileCard = lazy(() => import('#/components/bits/ProfileCard'))
 
@@ -41,6 +42,8 @@ export function MemberProfileCard({
           title={title}
           handle={user.githubUsername ?? undefined}
           status="RHS Coding Club"
+          statusColor="var(--success)"
+          style={PROFILE_CARD_VARS}
           contactText={user.githubUsername ? 'GitHub' : ''}
           onContactClick={() => {
             if (user.githubUsername)

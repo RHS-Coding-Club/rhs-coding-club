@@ -54,8 +54,8 @@ export function LatestPosts({ posts }: { posts: HomeData['latestPosts'] }) {
             bandRadius={18}
             textColor="var(--foreground)"
             bgColor="transparent"
-            marqueeBgColor="#5fb2ee"
-            marqueeTextColor="#0b0f15"
+            marqueeBgColor="var(--brand-sky)"
+            marqueeTextColor="var(--on-sky)"
             borderColor="var(--border)"
             ariaLabel="Latest posts"
             onItemClick={(item, _index, event) => {

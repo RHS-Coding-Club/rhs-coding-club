@@ -156,7 +156,7 @@ export function RsvpSegments({
               size === 'sm' ? 'h-8 px-2.5 text-xs' : 'h-10 px-3.5 text-sm',
               active
                 ? c.value === 'yes'
-                  ? 'text-[#0b0f15]'
+                  ? 'text-on-sky'
                   : 'text-foreground'
                 : 'text-muted-foreground hover:text-foreground',
             )}

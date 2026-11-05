@@ -107,7 +107,7 @@ function RootLayout() {
       <SmoothScroll>
         <SparkRoot>
           <div className="flex min-h-dvh flex-col">
-            {!bare && <SiteHeader user={user} theme={theme} />}
+            {!bare && <SiteHeader user={user} />}
             <main className={isHome || bare ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
               <Outlet />
             </main>

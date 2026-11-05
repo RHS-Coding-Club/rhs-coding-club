@@ -3,6 +3,8 @@
 // Pure and deterministic (same project, same art) so it is unit-testable and
 // renders identically on every visit. Used as a data: URL image.
 
+import { BRAND } from '#/lib/static-palette'
+
 /** FNV-1a: a small stable hash so each project gets its own variation. */
 export function hashString(s: string) {
   let h = 0x811c9dc5
@@ -21,20 +23,74 @@ export function coverHeight(id: string) {
 }
 
 const DARK = [
-  { from: '#0f1a2b', to: '#1f4f8a', accent: '#5fb2ee', ink: '#e6edf5', line: '#5fb2ee' },
-  { from: '#121924', to: '#1b2f4d', accent: '#8ccaf4', ink: '#e6edf5', line: '#5fb2ee' },
-  { from: '#0b2440', to: '#123a66', accent: '#a9d4f5', ink: '#f3f6fb', line: '#a9d4f5' },
-  { from: '#5fb2ee', to: '#a9d4f5', accent: '#101826', ink: '#101826', line: '#1f4f8a' },
-  { from: '#101826', to: '#0e3b66', accent: '#5fb2ee', ink: '#e6edf5', line: '#1f4f8a' },
-] as const
+  {
+    from: '#0f1a2b',
+    to: BRAND.navy,
+    accent: BRAND.sky,
+    ink: BRAND.frost,
+    line: BRAND.sky,
+  },
+  {
+    from: '#121924',
+    to: '#1b2f4d',
+    accent: '#8ccaf4',
+    ink: BRAND.frost,
+    line: BRAND.sky,
+  },
+  {
+    from: '#0b2440',
+    to: '#123a66',
+    accent: BRAND.skyPale,
+    ink: '#f3f6fb',
+    line: BRAND.skyPale,
+  },
+  {
+    from: BRAND.sky,
+    to: BRAND.skyPale,
+    accent: BRAND.ink,
+    ink: BRAND.ink,
+    line: BRAND.navy,
+  },
+  {
+    from: BRAND.ink,
+    to: '#0e3b66',
+    accent: BRAND.sky,
+    ink: BRAND.frost,
+    line: BRAND.navy,
+  },
+]
 
 const LIGHT = [
-  { from: '#e6f1fb', to: '#bcdcf6', accent: '#1f4f8a', ink: '#101826', line: '#5fb2ee' },
-  { from: '#f3f6fb', to: '#d6e8f8', accent: '#1f4f8a', ink: '#101826', line: '#1f4f8a' },
-  { from: '#dcecfa', to: '#f3f6fb', accent: '#174070', ink: '#101826', line: '#5fb2ee' },
-  { from: '#1f4f8a', to: '#5fb2ee', accent: '#ffffff', ink: '#f3f6fb', line: '#a9d4f5' },
-  { from: '#eaf2fb', to: '#c7e2f8', accent: '#1f4f8a', ink: '#101826', line: '#1f4f8a' },
-] as const
+  { from: '#e6f1fb', to: '#bcdcf6', accent: BRAND.navy, ink: BRAND.ink, line: BRAND.sky },
+  {
+    from: '#f3f6fb',
+    to: '#d6e8f8',
+    accent: BRAND.navy,
+    ink: BRAND.ink,
+    line: BRAND.navy,
+  },
+  {
+    from: '#dcecfa',
+    to: '#f3f6fb',
+    accent: BRAND.navyDeep,
+    ink: BRAND.ink,
+    line: BRAND.sky,
+  },
+  {
+    from: BRAND.navy,
+    to: BRAND.sky,
+    accent: '#ffffff',
+    ink: '#f3f6fb',
+    line: BRAND.skyPale,
+  },
+  {
+    from: '#eaf2fb',
+    to: '#c7e2f8',
+    accent: BRAND.navy,
+    ink: BRAND.ink,
+    line: BRAND.navy,
+  },
+]
 
 const esc = (s: string) =>
   s.replace(

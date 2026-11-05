@@ -62,7 +62,7 @@ export function PageHero({
       {/* Scrim from the left so the copy always reads over the background. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(243,246,251,0.92)_0%,rgba(243,246,251,0.55)_45%,rgba(243,246,251,0)_80%)] dark:bg-[linear-gradient(90deg,rgba(18,25,36,0.85)_0%,rgba(18,25,36,0.45)_45%,rgba(18,25,36,0)_80%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--stage)_92%,transparent)_0%,color-mix(in_srgb,var(--stage)_55%,transparent)_45%,transparent_80%)] dark:bg-[linear-gradient(90deg,color-mix(in_srgb,var(--stage)_85%,transparent)_0%,color-mix(in_srgb,var(--stage)_45%,transparent)_45%,transparent_80%)]"
       />
       <div
         className={cn(
@@ -75,12 +75,9 @@ export function PageHero({
             'min-h-[calc(30rem+var(--header-offset))] content-end sm:min-h-[calc(36rem+var(--header-offset))]',
         )}
       >
-        <div className="max-w-3xl text-[#101826] dark:text-white">
+        <div className="max-w-3xl text-ink">
           {eyebrow && (
-            <motion.div
-              {...rise(0.05)}
-              className="mb-4 text-sm font-medium text-[#101826]/60 dark:text-white/60"
-            >
+            <motion.div {...rise(0.05)} className="mb-4 text-sm font-medium text-ink/60">
               {eyebrow}
             </motion.div>
           )}
@@ -90,7 +87,7 @@ export function PageHero({
           {description && (
             <motion.div
               {...rise(0.25)}
-              className="mt-5 max-w-2xl text-lg text-balance text-[#101826]/70 sm:text-xl dark:text-white/75"
+              className="mt-5 max-w-2xl text-lg text-balance text-ink/75 sm:text-xl"
             >
               {description}
             </motion.div>

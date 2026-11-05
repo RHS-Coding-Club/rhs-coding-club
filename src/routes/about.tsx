@@ -41,9 +41,9 @@ function AboutPage() {
       </section>
 
       <section className="mx-2.5">
-        <div className="bg-brand-navy rounded-4xl px-(--gutter) py-20 text-[#e6edf5] sm:py-28">
+        <div className="bg-brand-navy rounded-4xl px-(--gutter) py-20 text-brand-frost sm:py-28">
           <FadeUp className="mx-auto max-w-4xl">
-            <p className="text-sm text-[#e6edf5]/80">Our mission</p>
+            <p className="text-sm text-brand-frost/80">Our mission</p>
             <p className="mt-5 text-3xl leading-snug font-medium tracking-[-0.02em] text-balance sm:text-4xl sm:leading-snug">
               {club.missionStatement}
             </p>
@@ -83,7 +83,7 @@ function AboutPage() {
                 <FadeUp delay={(i % 3) * 0.08} className="h-full">
                   <SpotlightCard
                     theme={dark ? 'dark' : 'light'}
-                    spotlightColor="rgba(95, 178, 238, 0.9)"
+                    spotlightColor="color-mix(in srgb, var(--brand-sky) 90%, transparent)"
                     intensity={0.18}
                     className="h-full rounded-3xl! p-6"
                     style={

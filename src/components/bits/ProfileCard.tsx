@@ -15,6 +15,8 @@ interface ProfileCardProps {
   handle?: string
   status?: string
   statusColor?: string
+  /** Local: merged last, so the site can map the palette onto its tokens. */
+  style?: CSSProperties
   contactText?: string
   showUserInfo?: boolean
   onContactClick?: () => void
@@ -242,6 +244,7 @@ const ProfileCard = ({
   handle = 'javicodes',
   status = 'Online',
   statusColor = '#22c55e',
+  style,
   contactText = 'Contact',
   showUserInfo = true,
   onContactClick,
@@ -494,6 +497,7 @@ const ProfileCard = ({
           '--pc-pattern-size': iconUrl ? '180% auto' : '100% 100%',
           '--pc-holo-gain': iconUrl ? 1.25 : 0.75,
           '--pc-holo-detail': iconUrl && foil === 'dark' ? 1 : 0,
+          ...style,
         } as CSSProperties
       }
     >

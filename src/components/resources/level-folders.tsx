@@ -4,12 +4,13 @@ import Folder from '#/components/bits/Folder'
 import { LEVELS, LEVEL_BLURB, LEVEL_LABEL, resourceDomain } from '#/lib/schemas/resources'
 import type { Level } from '#/lib/schemas/resources'
 import { cn } from '#/lib/utils'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 /** Folder tint per level: light sky for beginners down to deep navy. */
 const LEVEL_COLOR: Record<Level, string> = {
-  beginner: '#5fb2ee',
-  intermediate: '#2a7fc4',
-  advanced: '#1f4f8a',
+  beginner: '--brand-sky',
+  intermediate: '--brand-blue',
+  advanced: '--brand-navy',
 }
 
 function useWide() {
@@ -104,6 +105,7 @@ function LevelFolder({
   dark: boolean
 }) {
   const wide = useWide()
+  const [tint, paper] = useCssColors(LEVEL_COLOR[level], '--paper')
   const items =
     papers.length > 0
       ? papers.slice(0, 3).map((p) => ({
@@ -114,8 +116,8 @@ function LevelFolder({
     <Folder
       label={LEVEL_LABEL[level]}
       items={items}
-      color={LEVEL_COLOR[level]}
-      paperColor={dark ? '#e8eef6' : '#ffffff'}
+      color={tint}
+      paperColor={paper}
       theme={dark ? 'dark' : 'light'}
       size={wide ? 1 : 0.46}
       open={open}

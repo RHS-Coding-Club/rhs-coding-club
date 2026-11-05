@@ -47,7 +47,7 @@ function ChallengePage() {
         eyebrow={
           <Link
             to="/challenges"
-            className="pointer-events-auto inline-flex items-center gap-1.5 transition-colors hover:text-[#101826] dark:hover:text-white"
+            className="pointer-events-auto inline-flex items-center gap-1.5 transition-colors hover:text-ink"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
             All challenges
@@ -68,7 +68,7 @@ function ChallengePage() {
         }
         description={challenge.description}
       >
-        <dl className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-[#101826]/70 dark:text-white/70">
+        <dl className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-ink/70">
           <div className="flex items-center gap-1.5">
             <dt className="sr-only">Week</dt>
             <dd className="text-brand-sky font-mono font-medium">
@@ -83,7 +83,7 @@ function ChallengePage() {
           </div>
           <div className="flex items-center gap-1.5">
             <dt className="sr-only">Points</dt>
-            <dd className="tabular font-mono font-medium text-[#101826] dark:text-white">
+            <dd className="tabular font-mono font-medium text-ink">
               {challenge.points} pts
             </dd>
           </div>
@@ -91,9 +91,7 @@ function ChallengePage() {
             <Users className="size-4" aria-hidden="true" />
             <dt className="sr-only">Solves</dt>
             <dd>
-              <span className="tabular font-mono font-medium text-[#101826] dark:text-white">
-                {solves}
-              </span>{' '}
+              <span className="tabular font-mono font-medium text-ink">{solves}</span>{' '}
               {solves === 1 ? 'solve' : 'solves'}
             </dd>
           </div>
@@ -109,7 +107,7 @@ function ChallengePage() {
       {preview && (
         <div
           role="status"
-          className="mx-2.5 mt-2.5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-amber-500/12 px-5 py-3 text-sm text-amber-800 ring-1 ring-amber-500/25 ring-inset dark:text-amber-200"
+          className="mx-2.5 mt-2.5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-warning/12 px-5 py-3 text-sm text-warning ring-1 ring-warning/25 ring-inset"
         >
           <span className="inline-flex items-center gap-2 font-medium">
             <Eye className="size-4" aria-hidden="true" />

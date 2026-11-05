@@ -60,9 +60,11 @@ Google, GitHub, and email/password. Password sign-ups must confirm their email b
 - Server functions grouped by domain in `src/server/*.ts`. One file per domain, exported `createServerFn`s, named as verbs (`listChallenges`, `reviewSubmission`).
 - Drizzle tables: camelCase keys, snake_case columns, text UUID ids from `helpers.id()`, `timestamp_ms` integers for dates, JSON text for string arrays.
 - Public pages open with `PageHero` (a React Bits background that reads in both themes). React Bits live in `src/components/bits` (vendored; local changes are commented). Buttons are `RaisedButton`; `SplitButton` only for "Join the club".
+- React Bits ship their demo's colors. Surface components (Carousel, ProfileCard, Stepper, and so on) need a map from `src/components/bits-theme.ts` as `style`; the `theme` prop alone leaves them purple-gray. Props that end up in CSS take `var(--token)`. Canvas and WebGL props need real values from `useCssColors` (`src/hooks/use-css-colors.ts`), and tokens read that way stay hex.
+- Email and `data:` images can't read CSS variables, so their colors come from `src/lib/static-palette.ts`; a unit test keeps it matching `styles.css`.
 - Motion: never branch markup on `useReducedMotion` (it breaks hydration); the root `MotionConfig reducedMotion="user"` handles it.
 - Shadcn components in `src/components/ui` are generated; don't hand-edit them beyond styling tokens. Add with `bunx shadcn add <name>`.
-- Tailwind only; brand tokens live in `src/styles.css`. Dark is the default theme. Display type is `font-display` (Instrument Serif), body is DM Sans, code and numeric labels are `font-mono`.
+- Tailwind only; every color lives in `src/styles.css`, so no hex, `rgba()`, or palette classes like `amber-500` in components (neutral black and white for shadows and image scrims are fine). Dark is the default theme. Display type is `font-display` (Instrument Serif), body is DM Sans, code and numeric labels are `font-mono`.
 - Tests: pure logic in `tests/unit`, anything touching D1 or Better Auth in `tests/integration` (runs inside workerd with a fresh migrated database per file), browser flows in `tests/e2e`.
 - Commits follow Conventional Commits. `main` is protected and squash-merge only, so PR titles must follow them too (CI checks this); `feat` and `fix` feed the release-please changelog.
 

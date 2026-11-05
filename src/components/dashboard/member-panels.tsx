@@ -186,7 +186,7 @@ export function StatsPanel({
       <ul className="divide-border/70 -my-2 flex flex-1 flex-col justify-between divide-y">
         {rows.map((r) => (
           <li key={r.label} className="flex items-center gap-4 py-4">
-            <span className="bg-brand-sky/12 text-brand-navy grid size-11 shrink-0 place-items-center rounded-2xl dark:text-sky-200">
+            <span className="bg-brand-sky/12 text-accent-foreground grid size-11 shrink-0 place-items-center rounded-2xl">
               <r.icon className="size-5" aria-hidden="true" />
             </span>
             <span className="text-muted-foreground flex-1 text-[15px]">{r.label}</span>
@@ -229,22 +229,22 @@ export function ChallengePanel({
       <Link
         to="/challenges/$id"
         params={{ id: challenge.id }}
-        className="group bg-brand-navy focus-visible:ring-brand-sky/60 relative flex h-full flex-col overflow-hidden rounded-3xl p-6 text-[#e6edf5] outline-none focus-visible:ring-4 sm:p-7"
+        className="group bg-brand-navy focus-visible:ring-brand-sky/60 relative flex h-full flex-col overflow-hidden rounded-3xl p-6 text-brand-frost outline-none focus-visible:ring-4 sm:p-7"
       >
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(70%_90%_at_100%_0%,rgba(95,178,238,0.45)_0%,transparent_60%)] transition-opacity duration-700 group-hover:opacity-75"
+          className="absolute inset-0 bg-[radial-gradient(70%_90%_at_100%_0%,color-mix(in_srgb,var(--brand-sky)_45%,transparent)_0%,transparent_60%)] transition-opacity duration-700 group-hover:opacity-75"
         />
         <div className="relative flex items-center justify-between gap-3">
           <h2 className="text-lg font-semibold tracking-[-0.02em]">
             This week&apos;s challenge
           </h2>
           <ArrowUpRight
-            className="size-5 text-[#e6edf5]/80 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            className="size-5 text-brand-frost/80 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
             aria-hidden="true"
           />
         </div>
-        <p className="relative mt-6 font-mono text-sm text-[#e6edf5]/80">
+        <p className="relative mt-6 font-mono text-sm text-brand-frost/80">
           Week {challenge.weekNo} ·{' '}
           <span className="capitalize">{challenge.difficulty}</span> · {challenge.points}{' '}
           pts
@@ -252,7 +252,7 @@ export function ChallengePanel({
         <p className="relative mt-2 text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.05] font-semibold tracking-[-0.04em] text-balance">
           {challenge.title}
         </p>
-        <p className="relative mt-3 line-clamp-2 text-[15px] leading-relaxed text-[#e6edf5]/80">
+        <p className="relative mt-3 line-clamp-2 text-[15px] leading-relaxed text-brand-frost/80">
           {challenge.description}
         </p>
         <div className="relative mt-auto flex flex-wrap items-center justify-between gap-3 pt-8">
@@ -262,7 +262,7 @@ export function ChallengePanel({
               {state.label}
             </span>
           ) : (
-            <span className="text-sm text-[#e6edf5]/80">Not submitted yet</span>
+            <span className="text-sm text-brand-frost/80">Not submitted yet</span>
           )}
           <span className="inline-flex items-center gap-1.5 font-medium">
             {challenge.submission ? 'View it' : 'Solve it'}
@@ -365,7 +365,7 @@ function DateBlock({ date, large }: { date: Date; large?: boolean }) {
         large ? 'size-16' : 'size-11',
       )}
     >
-      <span className="text-brand-navy font-mono text-[10px] uppercase dark:text-sky-200">
+      <span className="text-accent-foreground font-mono text-[10px] uppercase">
         {month}
       </span>
       <span
@@ -453,9 +453,9 @@ export function ActivityPanel({
 }
 
 const PROJECT_STATUS = {
-  approved: { label: 'In the showcase', tone: 'bg-emerald-500' },
-  pending: { label: 'In review', tone: 'bg-amber-500' },
-  rejected: { label: 'Sent back', tone: 'bg-rose-500' },
+  approved: { label: 'In the showcase', tone: 'bg-success' },
+  pending: { label: 'In review', tone: 'bg-warning' },
+  rejected: { label: 'Sent back', tone: 'bg-destructive' },
 } as const
 
 export function ProjectsPanel({

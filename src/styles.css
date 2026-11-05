@@ -14,10 +14,27 @@
 
 :root {
   /* brand */
-  --brand-sky: #5fb2ee;
+  --brand-ink: #101826;
+  --brand-midnight: #0b1a30;
+  --brand-navy-deep: #174070;
   --brand-navy: #1f4f8a;
+  --brand-blue: #2a7fc4;
+  --brand-sky: #5fb2ee;
+  --brand-sky-hover: #7ec1f2;
+  --brand-sky-soft: #9ccbf2;
+  --brand-sky-pale: #a9d4f5;
   --brand-frost: #e6edf5;
-  --brand-gradient: linear-gradient(160deg, #1f4f8a 0%, #5fb2ee 100%);
+  --brand-gradient: linear-gradient(160deg, var(--brand-navy) 0%, var(--brand-sky) 100%);
+  /* text on a sky-blue fill, in both themes */
+  --on-sky: #0b0f15;
+  /* the loud red: unread counts and the destructive reset tool */
+  --alert: #e5484d;
+
+  /* code blocks sit on the dark ground in both themes */
+  --code-bg: #0b0f15;
+  --code-fg: #e6edf5;
+  --code-muted: #8b98a8;
+  --code-edge: rgba(255, 255, 255, 0.07);
 
   /* light theme (alternate) */
   --background: #f4f7fb;
@@ -58,6 +75,40 @@
   --sidebar-ring: #2a7fc4;
   --radius: 0.5rem;
 
+  /* strongest text: page titles and anything sitting on a shader hero */
+  --ink: #101826;
+  --ink-soft: rgba(16, 24, 38, 0.75);
+  /* the sheet of paper inside a folder */
+  --paper: #ffffff;
+
+  --rarity-common: #64748b;
+  --rarity-rare: #2a7fc4;
+  --rarity-epic: #7c3aed;
+  --rarity-legendary: #b7791f;
+  --medal-gold: #f59e0b;
+  --medal-silver: #64748b;
+  --medal-bronze: #ea580c;
+
+  /*
+    Art: colors handed to the canvas and WebGL React Bits backgrounds. Read
+    through useCssColors. Keep these as hex: several shaders parse hex only,
+    so no color-mix() here.
+  */
+  --art-line: #1f4f8a;
+  --art-accent: #5fb2ee;
+  --art-highlight: #e6edf5;
+  --art-beam: #3f86c9;
+  --art-wash: #9ccbf2;
+  --art-dot: #b8c7da;
+  --art-ramp-1: #1f4f8a;
+  --art-ramp-2: #2a7fc4;
+  --art-ramp-3: #5fb2ee;
+  --art-ramp-4: #9ccbf2;
+  /* the animated gradient titles on /blog and /resources */
+  --text-gradient-1: #1f4f8a;
+  --text-gradient-2: #5fb2ee;
+  --text-gradient-3: #174070;
+
   /* Surfaces for the vendored React Bits components (nav, bento, card stack). */
   --bits-glass: rgba(255, 255, 255, 0.78);
   --bits-surface: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
@@ -67,6 +118,7 @@
     0 4px 10px -5px rgba(16, 24, 38, 0.2);
   --bits-edge: rgba(16, 24, 38, 0.08);
   --bits-highlight: rgba(255, 255, 255, 0.95);
+  --bits-tile-shadow: 0 4px 10px -5px rgba(16, 24, 38, 0.2);
   --bits-shadow:
     0 24px 48px -24px rgba(16, 24, 38, 0.28), 0 6px 16px -10px rgba(16, 24, 38, 0.16);
 }
@@ -108,6 +160,32 @@
   --sidebar-border: #1f2937;
   --sidebar-ring: #5fb2ee;
 
+  --ink: #ffffff;
+  --ink-soft: rgba(255, 255, 255, 0.8);
+  --paper: #e8eef6;
+
+  --rarity-common: #94a3b8;
+  --rarity-rare: #5fb2ee;
+  --rarity-epic: #a78bfa;
+  --rarity-legendary: #f2b84b;
+  --medal-gold: #fcd34d;
+  --medal-silver: #cbd5e1;
+  --medal-bronze: #fdba74;
+
+  --art-line: #5fb2ee;
+  --art-accent: #a9d4f5;
+  --art-highlight: #a9d4f5;
+  --art-beam: #5fb2ee;
+  --art-wash: #1f4f8a;
+  --art-dot: #34435a;
+  --art-ramp-1: #2a7fc4;
+  --art-ramp-2: #5fb2ee;
+  --art-ramp-3: #9ccbf2;
+  --art-ramp-4: #e6edf5;
+  --text-gradient-1: #5fb2ee;
+  --text-gradient-2: #a9d4f5;
+  --text-gradient-3: #2a7fc4;
+
   --bits-glass: rgba(16, 23, 34, 0.72);
   --bits-surface: linear-gradient(180deg, #141c28 0%, #0f151e 100%);
   --bits-tile: linear-gradient(180deg, #1c2736 0%, #151e2a 100%);
@@ -116,6 +194,7 @@
     0 4px 10px -4px rgba(0, 0, 0, 0.6);
   --bits-edge: rgba(255, 255, 255, 0.07);
   --bits-highlight: rgba(255, 255, 255, 0.06);
+  --bits-tile-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.6);
   --bits-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.8), 0 6px 16px -8px rgba(0, 0, 0, 0.5);
 }
 
@@ -125,9 +204,30 @@
   --font-serif: ui-serif, Georgia, 'Times New Roman', serif;
   --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --color-brand-sky: var(--brand-sky);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-midnight: var(--brand-midnight);
+  --color-brand-navy-deep: var(--brand-navy-deep);
   --color-brand-navy: var(--brand-navy);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-sky: var(--brand-sky);
+  --color-brand-sky-hover: var(--brand-sky-hover);
+  --color-brand-sky-soft: var(--brand-sky-soft);
+  --color-brand-sky-pale: var(--brand-sky-pale);
   --color-brand-frost: var(--brand-frost);
+  --color-on-sky: var(--on-sky);
+  --color-alert: var(--alert);
+  --color-ink: var(--ink);
+  --color-code-bg: var(--code-bg);
+  --color-code-fg: var(--code-fg);
+  --color-code-muted: var(--code-muted);
+  --color-code-edge: var(--code-edge);
+  --color-rarity-common: var(--rarity-common);
+  --color-rarity-rare: var(--rarity-rare);
+  --color-rarity-epic: var(--rarity-epic);
+  --color-rarity-legendary: var(--rarity-legendary);
+  --color-medal-gold: var(--medal-gold);
+  --color-medal-silver: var(--medal-silver);
+  --color-medal-bronze: var(--medal-bronze);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -483,9 +583,9 @@ html.lenis body {
     padding: 1.1em 1.25em;
     border-radius: 1rem;
     overflow-x: auto;
-    background: #0b0f15;
-    color: #e6edf5;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+    background: var(--code-bg);
+    color: var(--code-fg);
+    box-shadow: inset 0 0 0 1px var(--code-edge);
   }
   .rich-text p.is-editor-empty:first-child::before {
     content: attr(data-placeholder);
@@ -508,7 +608,7 @@ html.lenis body {
   .hljs-selector-tag,
   .hljs-built_in,
   .hljs-meta .hljs-keyword {
-    color: #5fb2ee;
+    color: var(--brand-sky);
   }
   .hljs-string,
   .hljs-attr,

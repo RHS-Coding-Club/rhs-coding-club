@@ -111,7 +111,7 @@ function ProjectsPage() {
           </>
         }
         aside={
-          <dl className="flex gap-10 text-[#101826] dark:text-white">
+          <dl className="flex gap-10 text-ink">
             <Stat value={projects.length} label="Approved projects" />
             <Stat value={builders} label="Members credited" />
           </dl>
@@ -289,7 +289,7 @@ function ProjectsPage() {
 function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col-reverse">
-      <dt className="mt-1 text-sm text-[#101826]/60 dark:text-white/60">{label}</dt>
+      <dt className="mt-1 text-sm text-ink/60">{label}</dt>
       <dd className="font-mono text-4xl font-medium tracking-tight sm:text-5xl">
         {value}
       </dd>

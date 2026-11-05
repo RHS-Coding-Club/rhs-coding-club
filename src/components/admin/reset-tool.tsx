@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 import ElectricBorder from '#/components/bits/ElectricBorder'
 import SpotlightCard from '#/components/bits/SpotlightCard'
 import Stepper, { Step } from '#/components/bits/Stepper'
-import { STEPPER_VARS } from '#/components/bits-theme'
+import { SPOTLIGHT_VARS, STEPPER_VARS } from '#/components/bits-theme'
 import { RaisedButton } from '#/components/raised-button'
 import { Checkbox } from '#/components/ui/checkbox'
 import { Input } from '#/components/ui/input'
@@ -30,6 +30,7 @@ import type { ResetAction } from '#/lib/schemas/reset'
 import { cn } from '#/lib/utils'
 import { downloadBackup, resetData } from '#/server/reset'
 import type { ResetResult } from '#/services/reset'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 type Counts = Record<ResetAction, number>
 type PresetId = (typeof RESET_PRESETS)[number]['id']
@@ -41,11 +42,6 @@ const PRESET_ICON: Record<PresetId, typeof RotateCcw> = {
   content: ShieldAlert,
   full: Flame,
 }
-
-const SPOTLIGHT_VARS = {
-  '--spotlight-card-surface': 'var(--bits-surface)',
-  '--spotlight-card-border': 'var(--bits-edge)',
-} as React.CSSProperties
 
 const same = (a: Set<ResetAction>, b: readonly ResetAction[]) =>
   a.size === b.length && b.every((x) => a.has(x))
@@ -64,6 +60,7 @@ export function ResetTool({
   counts: Counts
   initialDark: boolean
 }) {
+  const [sky, alert] = useCssColors('--brand-sky', '--alert')
   const router = useRouter()
   const dark = useIsDark(initialDark)
   const backup = useServerFn(downloadBackup)
@@ -144,7 +141,7 @@ export function ResetTool({
       linear
       showFooter={false}
       theme={dark ? 'dark' : 'light'}
-      accentColor="#5fb2ee"
+      accentColor={sky}
       style={STEPPER_VARS}
       width="100%"
       radius={28}
@@ -170,14 +167,14 @@ export function ResetTool({
                     theme={dark ? 'dark' : 'light'}
                     spotlightColor={
                       p.id === 'full'
-                        ? 'rgba(229, 72, 77, 0.9)'
-                        : 'rgba(95, 178, 238, 0.9)'
+                        ? 'color-mix(in srgb, var(--alert) 90%, transparent)'
+                        : 'color-mix(in srgb, var(--brand-sky) 90%, transparent)'
                     }
                     intensity={0.16}
                     className={cn(
                       'h-full rounded-3xl! p-5 transition-shadow',
                       active && 'ring-brand-sky ring-2',
-                      active && p.id === 'full' && 'ring-[#e5484d]',
+                      active && p.id === 'full' && 'ring-alert',
                     )}
                     style={SPOTLIGHT_VARS}
                   >
@@ -186,8 +183,8 @@ export function ResetTool({
                         className={cn(
                           'grid size-10 place-items-center rounded-2xl',
                           p.id === 'full'
-                            ? 'bg-[#e5484d]/15 text-[#e5484d]'
-                            : 'bg-brand-sky/12 text-brand-navy dark:text-sky-200',
+                            ? 'bg-alert/15 text-alert'
+                            : 'bg-brand-sky/12 text-accent-foreground',
                         )}
                       >
                         <Icon className="size-5" aria-hidden="true" />
@@ -196,7 +193,7 @@ export function ResetTool({
                         <CheckCircle2
                           className={cn(
                             'size-5',
-                            p.id === 'full' ? 'text-[#e5484d]' : 'text-brand-sky',
+                            p.id === 'full' ? 'text-alert' : 'text-brand-sky',
                           )}
                           aria-hidden="true"
                         />
@@ -215,7 +212,7 @@ export function ResetTool({
                 <li key={p.id}>
                   {p.id === 'full' ? (
                     <ElectricBorder
-                      color="#e5484d"
+                      color={alert}
                       theme={dark ? 'dark' : 'light'}
                       borderRadius={24}
                       speed={0.6}
@@ -276,7 +273,7 @@ export function ResetTool({
                             <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
                               <span className="text-sm font-medium">{info.label}</span>
                               {!info.destructive && (
-                                <span className="rounded-full bg-emerald-500/12 px-2 py-0.5 text-[11px] text-emerald-700 dark:text-emerald-300">
+                                <span className="rounded-full bg-success/12 px-2 py-0.5 text-[11px] text-success">
                                   Keeps data
                                 </span>
                               )}
@@ -379,15 +376,13 @@ export function ResetTool({
         <div
           className={cn(
             'flex items-start gap-3 rounded-3xl p-5 ring-1',
-            destructive
-              ? 'bg-[#e5484d]/8 ring-[#e5484d]/30'
-              : 'bg-brand-sky/8 ring-brand-sky/25',
+            destructive ? 'bg-alert/8 ring-alert/30' : 'bg-brand-sky/8 ring-brand-sky/25',
           )}
         >
           <ShieldAlert
             className={cn(
               'mt-0.5 size-5 shrink-0',
-              destructive ? 'text-[#e5484d]' : 'text-brand-sky',
+              destructive ? 'text-alert' : 'text-brand-sky',
             )}
             aria-hidden="true"
           />
@@ -418,7 +413,8 @@ export function ResetTool({
             loading={running}
             loadingText="Resetting…"
             className={cn(
-              destructive && '[--primary-foreground:#fff] [--primary:#e5484d]',
+              destructive &&
+                '[--primary-foreground:var(--destructive-foreground)] [--primary:var(--alert)]',
             )}
           >
             <RotateCcw />
@@ -444,7 +440,7 @@ function Done({ result, onAgain }: { result: ResetResult; onAgain: () => void })
       className="ring-border/70 rounded-3xl p-8 ring-1"
       style={{ background: 'var(--bits-surface)' }}
     >
-      <CheckCircle2 className="size-8 text-emerald-500" aria-hidden="true" />
+      <CheckCircle2 className="size-8 text-success" aria-hidden="true" />
       <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em]">Reset complete</h2>
       <ul className="text-muted-foreground mt-4 flex flex-col gap-1.5 text-sm">
         {result.ran.map((a) => (

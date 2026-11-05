@@ -1,16 +1,15 @@
-import { ClientOnly, Link, useRouteContext } from '@tanstack/react-router'
+import { ClientOnly, Link } from '@tanstack/react-router'
 import FuzzyText from '#/components/bits/FuzzyText'
 import { RaisedButton } from '#/components/raised-button'
-import { useIsDark } from '#/hooks/use-is-dark'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 /**
  * 404: React Bits Fuzzy Text, as in its demo: a big sky "404" with "not
  * found" under it in ink, both shivering harder under the cursor. The
- * canvas can't read CSS colors, so the ink follows the theme by hand.
+ * canvas can't read CSS variables, so useCssColors hands it the values.
  */
 export function NotFound() {
-  const { theme } = useRouteContext({ from: '__root__' })
-  const dark = useIsDark(theme === 'dark')
+  const [primary, foreground] = useCssColors('--primary', '--foreground')
   return (
     <section className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-(--gutter) py-24 text-center">
       <h1 className="sr-only">Page not found</h1>
@@ -25,7 +24,7 @@ export function NotFound() {
           <FuzzyText
             fontSize="clamp(7rem, 22vw, 12rem)"
             fontWeight={800}
-            color={dark ? '#5fb2ee' : '#2a7fc4'}
+            color={primary}
             baseIntensity={0.18}
             hoverIntensity={0.5}
             enableHover
@@ -45,7 +44,7 @@ export function NotFound() {
           <FuzzyText
             fontSize="clamp(2.75rem, 8vw, 4.5rem)"
             fontWeight={800}
-            color={dark ? '#e6edf5' : '#101826'}
+            color={foreground}
             baseIntensity={0.14}
             hoverIntensity={0.45}
             enableHover

@@ -38,7 +38,7 @@ export const Route = createFileRoute('/contact')({
 
 function ContactPage() {
   const { club, social } = Route.useLoaderData()
-  const { user, theme } = Route.useRouteContext()
+  const { user } = Route.useRouteContext()
 
   const socials: { label: string; href: string; icon: LucideIcon }[] = [
     social.instagram && { label: 'Instagram', href: social.instagram, icon: Instagram },
@@ -53,12 +53,12 @@ function ContactPage() {
       <PageHero
         size="sm"
         background={
-          <div className="absolute inset-0 bg-[radial-gradient(60%_80%_at_85%_100%,rgba(95,178,238,0.35)_0%,transparent_70%)] dark:bg-[radial-gradient(60%_80%_at_85%_100%,rgba(31,79,138,0.55)_0%,transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(60%_80%_at_85%_100%,color-mix(in_srgb,var(--brand-sky)_35%,transparent)_0%,transparent_70%)] dark:bg-[radial-gradient(60%_80%_at_85%_100%,color-mix(in_srgb,var(--brand-navy)_55%,transparent)_0%,transparent_70%)]" />
         }
         title={<span className="sr-only">Contact the RHS Coding Club</span>}
       >
-        <ContactTitle initialDark={theme === 'dark'} />
-        <p className="mt-4 max-w-2xl text-lg text-balance text-[#101826]/70 sm:text-xl dark:text-white/75">
+        <ContactTitle />
+        <p className="mt-4 max-w-2xl text-lg text-balance text-ink/75 sm:text-xl">
           Parents, teachers, sponsors, future members: the officers read every message.
         </p>
       </PageHero>

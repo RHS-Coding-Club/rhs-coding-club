@@ -8,8 +8,7 @@ import type { SessionUser } from '#/server/auth'
 import { Logo } from '#/components/logo'
 import { AccountMenu } from '#/components/account-menu'
 import { RaisedButton } from '#/components/raised-button'
-import { useIsDark } from '#/hooks/use-is-dark'
-import type { Theme } from '#/server/theme'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 /**
  * Three cards, one per area of the site. Compete and Community are tinted in
@@ -19,8 +18,8 @@ const ITEMS: CardNavItem[] = [
   {
     label: 'Compete',
     description: 'A new problem every week and a board that keeps score.',
-    bgColor: '#1f4f8a',
-    textColor: '#e6edf5',
+    bgColor: 'var(--brand-navy)',
+    textColor: 'var(--brand-frost)',
     links: [
       { label: 'Challenges', href: '/challenges' },
       { label: 'Leaderboard', href: '/leaderboard' },
@@ -29,8 +28,8 @@ const ITEMS: CardNavItem[] = [
   {
     label: 'Community',
     description: 'Meetings, hackathons, and what members have shipped.',
-    bgColor: '#5fb2ee',
-    textColor: '#0b0f15',
+    bgColor: 'var(--brand-sky)',
+    textColor: 'var(--on-sky)',
     links: [
       { label: 'Events', href: '/events' },
       { label: 'Projects', href: '/projects' },
@@ -82,14 +81,13 @@ RouterLink.displayName = 'RouterLink'
  * React Bits Card Nav, floating at the top of every page: menu toggle left,
  * club mark center, account actions right. The bar opens into three cards.
  */
-export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: Theme }) {
-  const dark = useIsDark(theme === 'dark')
+export function SiteHeader({ user }: { user: SessionUser | null }) {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-3 z-50 px-3 sm:top-4">
       <div className="pointer-events-auto">
         <CardNav
           items={user ? ITEMS : GUEST_ITEMS}
-          logo={<NavMark dark={dark} />}
+          logo={<NavMark />}
           logoAlt="RHS Coding Club home"
           logoHref="/"
           linkComponent={RouterLink}
@@ -114,8 +112,8 @@ export function SiteHeader({ user, theme }: { user: SessionUser | null; theme: T
  * letter and the corner handles around it have room and never clip. White
  * on the dark bar, the site's ink on the light one.
  */
-function NavMark({ dark }: { dark: boolean }) {
-  const ink = dark ? '#ffffff' : '#101826'
+function NavMark() {
+  const [ink] = useCssColors('--ink')
   const wide = useMediaQuery('(min-width: 640px)')
   const press = useRef<{ x: number; y: number } | null>(null)
 

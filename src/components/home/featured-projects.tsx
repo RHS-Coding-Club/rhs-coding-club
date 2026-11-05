@@ -5,6 +5,7 @@ import type { HomeData } from '#/services/home'
 import { FadeUp } from '#/components/motion'
 import { useIsDark } from '#/hooks/use-is-dark'
 import type { Theme } from '#/server/theme'
+import { CARD_SWAP_VARS } from '#/components/bits-theme'
 
 type Project = HomeData['featuredProjects'][number]
 
@@ -64,10 +65,7 @@ export function FeaturedProjects({
               theme={dark ? 'dark' : 'light'}
             >
               {projects.map((p) => (
-                <Card
-                  key={p.id}
-                  style={{ background: 'var(--bits-tile)', color: 'var(--foreground)' }}
-                >
+                <Card key={p.id} style={CARD_SWAP_VARS}>
                   <ProjectCard project={p} />
                 </Card>
               ))}
@@ -91,7 +89,7 @@ function ProjectCard({ project }: { project: Project }) {
             className="pointer-events-none absolute inset-0 h-full w-full object-cover select-none"
           />
         ) : (
-          <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_20%_20%,#5fb2ee_0%,transparent_60%),radial-gradient(60%_70%_at_85%_90%,#1f4f8a_0%,transparent_65%)]">
+          <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_20%_20%,var(--brand-sky)_0%,transparent_60%),radial-gradient(60%_70%_at_85%_90%,#1f4f8a_0%,transparent_65%)]">
             <FolderGit2
               className="absolute right-4 bottom-4 size-7 text-white/70"
               aria-hidden="true"

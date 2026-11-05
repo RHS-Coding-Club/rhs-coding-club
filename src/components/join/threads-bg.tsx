@@ -1,16 +1,18 @@
 import { lazy } from 'react'
 import { useIsDark } from '#/hooks/use-is-dark'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 const Threads = lazy(() => import('#/components/bits/Threads'))
 
 /** React Bits Threads: a loose bundle of lines that parts around the cursor. */
 export function ThreadsBackground({ initialDark = true }: { initialDark?: boolean }) {
   const dark = useIsDark(initialDark)
+  const [line, accent] = useCssColors('--art-line', '--art-accent')
   return (
     <Threads
       key={dark ? 'dark' : 'light'}
-      color={dark ? '#5fb2ee' : '#1f4f8a'}
-      accentColor={dark ? '#a9d4f5' : '#5fb2ee'}
+      color={line}
+      accentColor={accent}
       amplitude={1}
       distance={0.2}
       lineCount={28}

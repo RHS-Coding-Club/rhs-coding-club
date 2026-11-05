@@ -263,10 +263,8 @@ function StatusPill({ status }: { status: QueueProject['status'] }) {
       className={cn(
         'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium capitalize ring-1',
         status === 'pending' && 'bg-brand-sky/12 text-foreground ring-brand-sky/40',
-        status === 'approved' &&
-          'bg-emerald-500/12 text-emerald-700 ring-emerald-500/30 dark:text-emerald-300',
-        status === 'rejected' &&
-          'bg-amber-500/12 text-amber-800 ring-amber-500/30 dark:text-amber-200',
+        status === 'approved' && 'bg-success/12 text-success ring-success/30',
+        status === 'rejected' && 'bg-warning/12 text-warning ring-warning/30',
       )}
     >
       <span
@@ -274,8 +272,8 @@ function StatusPill({ status }: { status: QueueProject['status'] }) {
         className={cn(
           'size-1.5 rounded-full',
           status === 'pending' && 'bg-brand-sky',
-          status === 'approved' && 'bg-emerald-500',
-          status === 'rejected' && 'bg-amber-500',
+          status === 'approved' && 'bg-success',
+          status === 'rejected' && 'bg-warning',
         )}
       />
       {status}
@@ -428,7 +426,7 @@ function ReviewPanel({
         </div>
 
         {p.status === 'rejected' && p.rejectionReason && (
-          <div className="rounded-lg bg-amber-500/10 p-3 text-sm ring-1 ring-amber-500/25">
+          <div className="rounded-lg bg-warning/10 p-3 text-sm ring-1 ring-warning/25">
             <p className="font-medium">Rejection note</p>
             <p className="text-muted-foreground mt-1">{p.rejectionReason}</p>
           </div>

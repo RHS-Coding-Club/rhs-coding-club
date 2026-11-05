@@ -210,7 +210,7 @@ export function EventFormDialog({
                     className={cn(
                       'focus-visible:ring-ring/50 h-8 cursor-pointer rounded-full px-3 text-sm ring-1 transition-colors outline-none focus-visible:ring-3',
                       on
-                        ? 'bg-brand-sky ring-brand-sky font-medium text-[#0b0f15]'
+                        ? 'bg-brand-sky ring-brand-sky font-medium text-on-sky'
                         : 'text-muted-foreground ring-border hover:text-foreground',
                     )}
                   >

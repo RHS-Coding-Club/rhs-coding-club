@@ -4,6 +4,7 @@ import { LEVEL_LABEL, resourceDomain } from '#/lib/schemas/resources'
 import type { Level } from '#/lib/schemas/resources'
 import { cn } from '#/lib/utils'
 import { safeHref } from '#/lib/rich-text'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 export interface ResourceCardData {
   id: string
@@ -17,9 +18,9 @@ export interface ResourceCardData {
 }
 
 const LEVEL_DOT: Record<Level, string> = {
-  beginner: 'bg-[#5fb2ee]',
-  intermediate: 'bg-[#2a7fc4]',
-  advanced: 'bg-[#1f4f8a] dark:bg-[#9ccbf2]',
+  beginner: 'bg-brand-sky',
+  intermediate: 'bg-brand-blue',
+  advanced: 'bg-brand-navy dark:bg-brand-sky-soft',
 }
 
 /**
@@ -40,6 +41,7 @@ export function ResourceCard({
   onTag: (tag: string) => void
   busy?: boolean
 }) {
+  const sparks = useCssColors('--brand-sky', '--brand-sky-soft', '--brand-navy')
   const r = resource
   const domain = resourceDomain(r.url)
   return (
@@ -62,7 +64,7 @@ export function ResourceCard({
         </div>
         {canSave && (
           <ClickSpark
-            sparkColor={['#5fb2ee', '#9ccbf2', '#2a7fc4']}
+            sparkColor={sparks}
             sparkCount={10}
             sparkRadius={22}
             sparkSize={7}

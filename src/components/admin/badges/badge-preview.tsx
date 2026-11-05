@@ -78,7 +78,7 @@ export function BadgePreview({
         aria-hidden="true"
         className="absolute inset-x-0 top-0 h-28 opacity-60"
         style={{
-          background: `radial-gradient(60% 100% at 50% 0%, ${RARITY_COLOR[rarity]}33, transparent)`,
+          background: `radial-gradient(60% 100% at 50% 0%, color-mix(in srgb, ${RARITY_COLOR[rarity]} 20%, transparent), transparent)`,
         }}
       />
       <div className="relative flex flex-col items-center">

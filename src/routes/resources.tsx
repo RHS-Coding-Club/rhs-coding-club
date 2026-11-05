@@ -54,8 +54,12 @@ export const Route = createFileRoute('/resources')({
   component: ResourcesPage,
 })
 
-const GRADIENT_DARK = ['#9ccbf2', '#5fb2ee', '#e6edf5', '#5fb2ee']
-const GRADIENT_LIGHT = ['#1f4f8a', '#2a7fc4', '#5fb2ee', '#1f4f8a']
+const TITLE_GRADIENT = [
+  'var(--text-gradient-1)',
+  'var(--text-gradient-2)',
+  'var(--text-gradient-3)',
+  'var(--text-gradient-1)',
+]
 
 function ResourcesPage() {
   const { resources: loaded } = Route.useLoaderData()
@@ -144,11 +148,7 @@ function ResourcesPage() {
         title={
           <>
             The links we{' '}
-            <GradientText
-              colors={dark ? GRADIENT_DARK : GRADIENT_LIGHT}
-              animationSpeed={9}
-              className="inline"
-            >
+            <GradientText colors={TITLE_GRADIENT} animationSpeed={9} className="inline">
               actually use
             </GradientText>
             .
@@ -266,7 +266,7 @@ function ResourcesPage() {
                     className={cn(
                       'focus-visible:ring-ring/50 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-xs transition-colors outline-none focus-visible:ring-3',
                       on
-                        ? 'bg-brand-sky text-[#0b0f15]'
+                        ? 'bg-brand-sky text-on-sky'
                         : 'bg-muted text-muted-foreground hover:text-foreground',
                     )}
                   >
@@ -282,7 +282,7 @@ function ResourcesPage() {
                   type="button"
                   aria-pressed
                   onClick={() => setTag(null)}
-                  className="bg-brand-sky inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-xs text-[#0b0f15]"
+                  className="bg-brand-sky inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-xs text-on-sky"
                 >
                   #{tag}
                   <X className="size-3" aria-hidden="true" />
@@ -376,10 +376,10 @@ function ResourcesPage() {
 function Stat({ n, label }: { n: number; label: string }) {
   return (
     <div>
-      <p className="tabular text-4xl font-semibold tracking-[-0.04em] text-[#101826] sm:text-5xl dark:text-white">
+      <p className="tabular text-4xl font-semibold tracking-[-0.04em] text-ink sm:text-5xl">
         {n}
       </p>
-      <p className="text-sm text-[#101826]/60 dark:text-white/60">{label}</p>
+      <p className="text-sm text-ink/60">{label}</p>
     </div>
   )
 }

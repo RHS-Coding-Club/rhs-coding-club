@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import { useIsDark } from '#/hooks/use-is-dark'
+import { useCssColors } from '#/hooks/use-css-colors'
 
 const DotGrid = lazy(() => import('#/components/bits/DotGrid'))
 
@@ -9,13 +10,14 @@ const DotGrid = lazy(() => import('#/components/bits/DotGrid'))
  */
 export function DotGridBackground({ initialDark = true }: { initialDark?: boolean }) {
   const dark = useIsDark(initialDark)
+  const [dot, line] = useCssColors('--art-dot', '--art-line')
   return (
     <DotGrid
       key={dark ? 'dark' : 'light'}
       dotSize={4}
       gap={22}
-      baseColor={dark ? '#363c4d' : '#c3d1e3'}
-      activeColor={dark ? '#5fb2ee' : '#1f4f8a'}
+      baseColor={dot}
+      activeColor={line}
       proximity={150}
       shockRadius={260}
       shockStrength={4}

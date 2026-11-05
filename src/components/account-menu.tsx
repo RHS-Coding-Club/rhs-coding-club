@@ -30,12 +30,12 @@ import {
 const ROLE: Record<Role, { label: string; tone: string }> = {
   guest: {
     label: 'Awaiting approval',
-    tone: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+    tone: 'bg-warning/15 text-warning',
   },
-  member: { label: 'Member', tone: 'bg-brand-sky/15 text-brand-navy dark:text-sky-200' },
+  member: { label: 'Member', tone: 'bg-brand-sky/15 text-accent-foreground' },
   officer: {
     label: 'Officer',
-    tone: 'bg-brand-sky/25 text-brand-navy dark:text-sky-100',
+    tone: 'bg-brand-sky/25 text-accent-foreground',
   },
   admin: { label: 'Admin', tone: 'bg-foreground text-background' },
 }
@@ -81,7 +81,7 @@ export function AccountMenu({ user }: { user: SessionUser }) {
         <div className="relative overflow-hidden rounded-2xl p-4">
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-[radial-gradient(90%_120%_at_100%_0%,rgba(95,178,238,0.35)_0%,transparent_60%)] dark:bg-[radial-gradient(90%_120%_at_100%_0%,rgba(95,178,238,0.25)_0%,transparent_60%)]"
+            className="absolute inset-0 bg-[radial-gradient(90%_120%_at_100%_0%,color-mix(in_srgb,var(--brand-sky)_35%,transparent)_0%,transparent_60%)] dark:bg-[radial-gradient(90%_120%_at_100%_0%,color-mix(in_srgb,var(--brand-sky)_25%,transparent)_0%,transparent_60%)]"
           />
           <div className="relative flex items-center gap-3">
             <Avatar className="size-12 rounded-2xl">
