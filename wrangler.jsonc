@@ -60,6 +60,11 @@
     { "binding": "BACKUPS", "bucket_name": "rhs-coding-club-backups" },
   ],
 
+  // Resizes uploads for the /files route (src/services/files.ts). The free
+  // plan allows 5,000 unique transformations a month, and each copy is kept in
+  // FILES after it's made, so a size is only transformed once.
+  "images": { "binding": "IMAGES" },
+
   // Background jobs (src/services/cron.ts): hourly announcements, reminders,
   // and GitHub invite sync; the weekly digest on Monday mornings; a daily check
   // for whether a backup is due.

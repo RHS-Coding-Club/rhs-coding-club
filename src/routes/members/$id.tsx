@@ -225,7 +225,7 @@ function ProjectList({ rows }: { rows: MemberProfile['projects'] }) {
             <span className="bg-muted relative size-20 shrink-0 overflow-hidden rounded-2xl">
               {pr.imageKeys[0] ? (
                 <img
-                  src={fileUrl(pr.imageKeys[0])}
+                  src={fileUrl(pr.imageKeys[0], 256)}
                   alt=""
                   className="size-full object-cover"
                   loading="lazy"

@@ -142,6 +142,7 @@ function ProjectPage() {
                 initialDark={initialDark}
                 width={1200}
                 height={480}
+                sizes="(min-width: 1280px) 1200px, 100vw"
                 className="object-left"
               />
             </div>

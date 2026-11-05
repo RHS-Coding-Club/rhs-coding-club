@@ -30,7 +30,7 @@ export function ScreenshotsField({
           className="group bg-muted ring-border/70 relative aspect-video overflow-hidden rounded-2xl ring-1"
         >
           <img
-            src={fileUrl(key)}
+            src={fileUrl(key, 640)}
             alt=""
             className="absolute inset-0 size-full object-cover"
           />

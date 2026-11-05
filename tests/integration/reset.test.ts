@@ -7,6 +7,7 @@ import { exportBackup, resetCounts, runReset } from '#/services/reset'
 import { getLeaderboard } from '#/services/members'
 import { pointsWindowStart } from '#/services/points'
 import { getSetting } from '#/services/settings'
+import { withVariants } from '#/services/files'
 
 const db = getDb()
 // Mid-October: the fall semester started Aug 1.
@@ -260,7 +261,9 @@ describe('file cleanup', () => {
     })
     const { bucket, deleted } = fakeBucket()
     const res = await runReset(db, bucket, { actions: ['guests'], actorId: ACTOR }, now)
-    expect(deleted).toEqual([ownAvatar])
+    // The avatar goes with its resized copies; the shared screenshot stays.
+    expect(deleted).toEqual(withVariants([ownAvatar]))
+    expect(deleted.some((key) => key.endsWith(shot))).toBe(false)
     expect(res.filesRemoved).toBe(1)
   })
 

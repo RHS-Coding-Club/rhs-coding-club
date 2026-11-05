@@ -17,14 +17,12 @@ import { SmoothScroll } from '#/components/smooth-scroll'
 import { SparkRoot } from '#/components/spark'
 import { Toaster } from '#/components/ui/sonner'
 import appCss from '#/styles.css?url'
+import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url'
 
 export interface RouterContext {
   queryClient: QueryClient
   user: SessionUser | null
 }
-
-const FONTS =
-  'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap'
 
 const DESCRIPTION =
   'The most active club at RHS. Coding challenges, community service, hackathons, and projects.'
@@ -53,12 +51,17 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { name: 'twitter:card', content: 'summary_large_image' },
     ],
     links: [
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
-      { rel: 'stylesheet', href: FONTS },
+      // Body text's font, fetched alongside the stylesheet rather than after it.
+      {
+        rel: 'preload',
+        href: geistLatin,
+        as: 'font',
+        type: 'font/woff2',
+        crossOrigin: 'anonymous',
+      },
       { rel: 'stylesheet', href: appCss },
       { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
-      { rel: 'icon', href: '/logo.png', type: 'image/png' },
+      { rel: 'icon', href: '/icon-64.png', type: 'image/png', sizes: '64x64' },
       { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
       { rel: 'manifest', href: '/manifest.json' },
     ],

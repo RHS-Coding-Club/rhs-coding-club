@@ -34,7 +34,7 @@ export function BadgeMedal({
     >
       {imageKey ? (
         <img
-          src={fileUrl(imageKey)}
+          src={fileUrl(imageKey, 256)}
           alt=""
           className="size-full object-cover p-[12%]"
           style={{ borderRadius: '9999px' }}

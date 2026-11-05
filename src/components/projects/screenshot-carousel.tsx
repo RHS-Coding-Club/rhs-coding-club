@@ -1,6 +1,6 @@
 import { ClientOnly } from '@tanstack/react-router'
 import Carousel from '#/components/bits/Carousel'
-import { fileUrl } from '#/lib/files'
+import { fileSrcSet, fileUrl } from '#/lib/files'
 import { useIsDark } from '#/hooks/use-is-dark'
 import { CAROUSEL_VARS } from '#/components/bits-theme'
 
@@ -20,7 +20,7 @@ export function ScreenshotCarousel({
   const dark = useIsDark(initialDark)
   const items = imageKeys.map((key, i) => ({
     id: key,
-    image: fileUrl(key),
+    image: fileUrl(key, 1920),
     alt: `${title}, screenshot ${i + 1} of ${imageKeys.length}`,
   }))
 
@@ -28,6 +28,8 @@ export function ScreenshotCarousel({
     <div className="bg-muted relative aspect-[16/10] overflow-hidden rounded-4xl">
       <img
         src={items[0]?.image}
+        srcSet={fileSrcSet(imageKeys[0])}
+        sizes="(min-width: 1200px) 1152px, 100vw"
         alt={items[0]?.alt ?? ''}
         className="absolute inset-0 size-full object-cover"
       />
