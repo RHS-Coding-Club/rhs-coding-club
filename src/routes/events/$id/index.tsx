@@ -7,7 +7,7 @@ import { getEvent } from '#/server/events'
 import type { CheckInResult } from '#/services/events'
 import { checkInWindow, eventPhase, fmtEventWhen, fmtTimeRange } from '#/lib/events'
 import { fmtDate } from '#/lib/format'
-import { fileUrl } from '#/lib/files'
+import { fileSrcSet, fileUrl } from '#/lib/files'
 import { hasRole } from '#/lib/roles'
 import { PageHero } from '#/components/page-hero'
 import { FadeUp } from '#/components/motion'
@@ -237,7 +237,9 @@ function EventPage() {
         <article className="flex min-w-0 flex-col gap-12 lg:col-start-1 lg:row-start-1">
           {event.coverKey && (
             <img
-              src={fileUrl(event.coverKey)}
+              src={fileUrl(event.coverKey, 1280)}
+              srcSet={fileSrcSet(event.coverKey, [640, 960, 1280, 1920])}
+              sizes="100vw"
               alt=""
               className="aspect-video w-full rounded-3xl object-cover lg:hidden"
             />
@@ -338,7 +340,7 @@ function Cover({
   return (
     <div className="hidden lg:block">
       <TiltedCard
-        imageSrc={fileUrl(event.coverKey)}
+        imageSrc={fileUrl(event.coverKey, 640)}
         altText={event.coverKey ? event.title : ''}
         containerHeight="300px"
         containerWidth="300px"

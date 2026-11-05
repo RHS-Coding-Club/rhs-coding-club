@@ -1,9 +1,21 @@
 import { motion } from 'motion/react'
 import type { Variants } from 'motion/react'
-import type { ComponentProps } from 'react'
+import type { CSSProperties, ComponentProps } from 'react'
 
 /** The template's easing everywhere: a soft ease-out quart. */
 export const EASE = [0.23, 1, 0.32, 1] as const
+
+/**
+ * Style for a `rise-in` element (src/entrance.css): fades and rises into place
+ * from the first paint, with no JavaScript, for copy above the fold.
+ */
+export function riseIn(delay: number, distance = 16, duration = 0.8): CSSProperties {
+  return {
+    '--rise-delay': `${delay}s`,
+    '--rise-distance': `${distance}px`,
+    '--rise-duration': `${duration}s`,
+  } as CSSProperties
+}
 
 /** Hero entrance: rise, sharpen, and fade in. */
 export const blurUp: Variants = {

@@ -1,6 +1,12 @@
 'use client'
 
-import { useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type HTMLAttributes,
+} from 'react'
 
 export type GradientASCIIShape = 'horizon' | 'pinch' | 'rise' | 'eclipse'
 
@@ -406,30 +412,47 @@ const toLab = ([r, g, b]: number[]): number[] => {
   ]
 }
 
-const compile = (gl: WebGL2RenderingContext, type: number, source: string) => {
-  const shader = gl.createShader(type)
-  if (!shader) return null
-  gl.shaderSource(shader, source)
-  gl.compileShader(shader)
-  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader
-  gl.deleteShader(shader)
-  return null
+// Local change: upstream compiles and links each program and reads its status
+// straight away, which stalls the main thread until the GPU driver is done
+// (most of a second with a cold shader cache, on the home page's first paint).
+// Here every compile starts first, `linked` polls KHR_parallel_shader_compile
+// once a frame, and the status is only read (in `link`) once it's ready.
+const OPTIONS: WebGLContextAttributes = {
+  alpha: true,
+  premultipliedAlpha: true,
+  antialias: false,
+  depth: false,
+  stencil: false,
 }
 
-const link = (gl: WebGL2RenderingContext, fragmentSource: string): Program | null => {
-  const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX)
-  const fragment = compile(gl, gl.FRAGMENT_SHADER, fragmentSource)
+const startLink = (gl: WebGL2RenderingContext, fragmentSource: string) => {
   const program = gl.createProgram()
-  if (!vertex || !fragment || !program) return null
-  gl.attachShader(program, vertex)
-  gl.attachShader(program, fragment)
+  ;[
+    [gl.VERTEX_SHADER, VERTEX],
+    [gl.FRAGMENT_SHADER, fragmentSource],
+  ].forEach(([type, source]) => {
+    const shader = gl.createShader(type as number)
+    if (!shader) return
+    gl.shaderSource(shader, source as string)
+    gl.compileShader(shader)
+    gl.attachShader(program, shader)
+    // Flagged now, freed with the program.
+    gl.deleteShader(shader)
+  })
   gl.linkProgram(program)
-  gl.deleteShader(vertex)
-  gl.deleteShader(fragment)
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    gl.deleteProgram(program)
-    return null
-  }
+  return program
+}
+
+const linked = (
+  gl: WebGL2RenderingContext,
+  parallel: KHR_parallel_shader_compile | null,
+  program: WebGLProgram,
+) =>
+  !parallel ||
+  (gl.getProgramParameter(program, parallel.COMPLETION_STATUS_KHR) as boolean)
+
+const link = (gl: WebGL2RenderingContext, program: WebGLProgram): Program | null => {
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null
   const uniforms: Record<string, WebGLUniformLocation | null> = {}
   const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS)
   for (let i = 0; i < count; i++) {
@@ -562,6 +585,7 @@ const GradientASCII = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wakeRef = useRef<(() => void) | null>(null)
+  const [programs, setPrograms] = useState<Program[] | null>(null)
   const palette = (
     Array.isArray(colors) && colors.length ? colors : DEFAULT_COLORS
   ).slice(0, MAX_COLORS)
@@ -593,23 +617,38 @@ const GradientASCII = ({
   const settingsRef = useRef(settings)
   settingsRef.current = settings
 
+  // Local change: compiles the programs without blocking (see `startLink`),
+  // then hands them to the effect below. They live as long as the component.
+  useEffect(() => {
+    const gl = canvasRef.current?.getContext('webgl2', OPTIONS)
+    if (!gl) return undefined
+    const parallel = gl.getExtension('KHR_parallel_shader_compile')
+    const pending = [FIELD, HALO, BLUR, COMPOSITE].map((source) => startLink(gl, source))
+    let poll = 0
+    const check = () => {
+      poll = 0
+      if (!pending.every((program) => linked(gl, parallel, program))) {
+        poll = requestAnimationFrame(check)
+        return
+      }
+      const ready = pending.map((program) => link(gl, program))
+      if (ready.every(Boolean)) setPrograms(ready as Program[])
+    }
+    check()
+    return () => {
+      cancelAnimationFrame(poll)
+      setPrograms(null)
+      pending.forEach((program) => gl.deleteProgram(program))
+    }
+  }, [])
+
   useEffect(() => {
     const container = containerRef.current
     const canvas = canvasRef.current
-    const gl = canvas?.getContext('webgl2', {
-      alpha: true,
-      premultipliedAlpha: true,
-      antialias: false,
-      depth: false,
-      stencil: false,
-    })
-    if (!container || !canvas || !gl) return undefined
+    const gl = canvas?.getContext('webgl2', OPTIONS)
+    if (!container || !canvas || !gl || !programs) return undefined
 
-    const field = link(gl, FIELD)
-    const halo = link(gl, HALO)
-    const blur = link(gl, BLUR)
-    const composite = link(gl, COMPOSITE)
-    if (!field || !halo || !blur || !composite) return undefined
+    const [field, halo, blur, composite] = programs
     const vao = gl.createVertexArray()
     const fieldTarget = createTarget(gl, 2)
     const haloA = createTarget(gl, 1)
@@ -942,13 +981,13 @@ const GradientASCII = ({
       })
       if (atlas) gl.deleteTexture(atlas.texture)
       gl.deleteVertexArray(vao)
-      ;[field, halo, blur, composite].forEach((item) => gl.deleteProgram(item.program))
+      // Local change: the programs belong to the compile effect above.
       // Local change: upstream calls WEBGL_lose_context.loseContext() here. React's
       // development double-mount re-runs this effect on the same <canvas>, and a
       // lost context never draws again, so the GPU resources above are freed and
       // the context is left alive for the next mount.
     }
-  }, [])
+  }, [programs])
 
   useEffect(() => {
     wakeRef.current?.()

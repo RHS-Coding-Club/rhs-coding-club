@@ -29,7 +29,8 @@ export function ProjectGrid({
   const items = useMemo<MasonryItem[]>(
     () =>
       projects.map((p) => {
-        const shot = fileUrl(p.imageKeys[0])
+        // Columns stay under about 656px wide (two 320px columns plus the gap).
+        const shot = fileUrl(p.imageKeys[0], 1280)
         const caption = [p.tech.slice(0, 3).join(' · '), teamNames(p.team)]
           .filter(Boolean)
           .join('  ·  by ')

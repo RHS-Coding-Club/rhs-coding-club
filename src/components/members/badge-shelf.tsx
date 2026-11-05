@@ -86,7 +86,7 @@ function Tile({ badge: b }: { badge: ShelfBadge }) {
         }}
       >
         {b.imageKey ? (
-          <img src={fileUrl(b.imageKey)} alt="" className="size-full object-cover" />
+          <img src={fileUrl(b.imageKey, 128)} alt="" className="size-full object-cover" />
         ) : (
           <Award className="size-5" aria-hidden="true" />
         )}

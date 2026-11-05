@@ -1,0 +1,33 @@
+/*
+  Hero entrances in CSS, so the first screen of a page fades in from the
+  first paint instead of waiting for React to hydrate (which held the largest
+  paint back by the whole script download on slow phones). Same rise, length,
+  and curve the Motion versions had (EASE in src/components/motion.tsx); set
+  them with `riseIn()` from that file. `backwards` holds the start state only
+  during the delay, so nothing lingers on `transform` for Motion's layout
+  animations afterwards. Reduced motion keeps the fade and drops the rise,
+  as the root MotionConfig does.
+*/
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise-distance, 16px));
+  }
+}
+
+@keyframes rise-in-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.rise-in {
+  animation: rise-in var(--rise-duration, 0.8s) cubic-bezier(0.23, 1, 0.32, 1)
+    var(--rise-delay, 0s) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in {
+    animation-name: rise-in-fade;
+  }
+}

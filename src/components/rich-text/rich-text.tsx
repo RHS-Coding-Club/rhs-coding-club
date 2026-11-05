@@ -9,6 +9,7 @@ import {
   safeSrc,
 } from '#/lib/rich-text'
 import type { RichNode } from '#/lib/rich-text'
+import { fileSrcSet, keyFromFileUrl } from '#/lib/files'
 import { cn } from '#/lib/utils'
 import { lowlight } from './lowlight'
 
@@ -100,6 +101,9 @@ function renderNode(node: RichNode, key: number, ctx: Ctx): ReactNode {
         <img
           key={key}
           src={src}
+          // Uploads come resized to the column; prose never runs past 48rem.
+          srcSet={fileSrcSet(keyFromFileUrl(src))}
+          sizes="(min-width: 48rem) 48rem, 100vw"
           alt={typeof node.attrs?.alt === 'string' ? node.attrs.alt : ''}
           loading="lazy"
         />

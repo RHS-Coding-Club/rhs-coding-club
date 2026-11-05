@@ -5,7 +5,7 @@ import RotatingText from '#/components/bits/RotatingText'
 import ShinyText from '#/components/bits/ShinyText'
 import Magnet from '#/components/bits/Magnet'
 import { SplitButton } from '#/components/split-button'
-import { EASE } from '#/components/motion'
+import { riseIn } from '#/components/motion'
 import { AsciiBackground } from './ascii-bg'
 import { useCssColors } from '#/hooks/use-css-colors'
 
@@ -14,12 +14,8 @@ const ROTATING = ['friends', 'classmates', 'mentors', 'the club']
 /** Spring "Ship with" uses to make room as the highlight pill resizes (from the React Bits demo). */
 const PILL_SPRING = { type: 'spring', damping: 30, stiffness: 400 } as const
 
-/** Ease-in for every line that does not rotate: fade and rise into place, one after another. */
-const rise = (delay: number) => ({
-  initial: { opacity: 0, y: 18 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.9, ease: EASE, delay },
-})
+/** Every line fades and rises into place, one after another, from the first paint. */
+const rise = (delay: number) => riseIn(delay, 18, 0.9)
 
 /**
  * Full-bleed hero card over React Bits Gradient ASCII. The last word of the
@@ -40,13 +36,13 @@ export function Hero() {
 
       <div className="pointer-events-none relative flex min-h-[calc(100dvh-1.25rem)] flex-col items-center justify-center px-6 pt-32 pb-24 text-center">
         <h1 className="font-display text-[clamp(2.75rem,7.4vw,6.5rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-ink">
-          <motion.span {...rise(0.3)} className="block">
+          <span style={rise(0.3)} className="rise-in block">
             Learn to code.
-          </motion.span>
+          </span>
           <motion.span
-            {...rise(0.45)}
+            style={rise(0.45)}
             layout
-            className="flex flex-wrap items-center justify-center gap-x-[0.24em]"
+            className="rise-in flex flex-wrap items-center justify-center gap-x-[0.24em]"
           >
             <motion.span layout transition={PILL_SPRING}>
               Ship with
@@ -72,17 +68,17 @@ export function Hero() {
           </motion.span>
         </h1>
 
-        <motion.p
-          {...rise(0.75)}
-          className="mx-auto mt-6 max-w-2xl text-lg text-balance text-ink/80 sm:text-xl"
+        <p
+          style={rise(0.75)}
+          className="rise-in mx-auto mt-6 max-w-2xl text-lg text-balance text-ink/80 sm:text-xl"
         >
           Weekly challenges, a points leaderboard, hackathons, and afternoons teaching
           kids to code. Open to every RHS student, no experience needed.
-        </motion.p>
+        </p>
 
-        <motion.div
-          {...rise(0.9)}
-          className="pointer-events-auto mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-4"
+        <div
+          style={rise(0.9)}
+          className="rise-in pointer-events-auto mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-4"
         >
           <Magnet padding={60} magnetStrength={3} maxOffset={14}>
             <SplitButton to="/signup" size="lg">
@@ -106,7 +102,7 @@ export function Hero() {
               aria-hidden="true"
             />
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

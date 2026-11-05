@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { CalendarDays, Github, Instagram, MapPin } from 'lucide-react'
+import { fileUrl } from '#/lib/files'
 import BlurText from '#/components/bits/BlurText'
 import SpotlightCard from '#/components/bits/SpotlightCard'
 import Magnet from '#/components/bits/Magnet'
@@ -95,10 +96,7 @@ function AboutPage() {
                   >
                     <div className="flex items-center gap-4">
                       <Avatar className="size-14">
-                        <AvatarImage
-                          src={o.imageKey ? `/files/${o.imageKey}` : undefined}
-                          alt=""
-                        />
+                        <AvatarImage src={fileUrl(o.imageKey, 128)} alt="" />
                         <AvatarFallback>{initials(o.name)}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">

@@ -25,7 +25,8 @@ export function MemberProfileCard({
   title: string
   dark: boolean
 }) {
-  const photo = avatarUrl(user) ?? initialsPortrait(user.name)
+  // The card is 340px wide; 960 stays sharp on high-density screens.
+  const photo = avatarUrl(user, 960) ?? initialsPortrait(user.name)
   const fallback = (
     <div
       aria-hidden="true"

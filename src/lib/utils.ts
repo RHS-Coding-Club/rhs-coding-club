@@ -1,7 +1,4 @@
-import type { ClassValue } from 'clsx'
-import { clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+// The generated ui/ components import `cn` from the `cn` package (shadcn's
+// replacement for clsx + tailwind-merge). App code shares it, so the client
+// ships one class merger instead of two.
+export { cn } from 'cn'

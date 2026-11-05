@@ -1,4 +1,4 @@
-import { fileUrl } from '#/lib/files'
+import { fileSrcSet, fileUrl } from '#/lib/files'
 import { initials } from '#/lib/format'
 import { cn } from '#/lib/utils'
 import { useIsDark } from '#/hooks/use-is-dark'
@@ -13,6 +13,7 @@ export function ProjectCover({
   initialDark,
   width,
   height,
+  sizes = '(min-width: 768px) 50vw, 100vw',
   className,
 }: {
   project: {
@@ -28,12 +29,17 @@ export function ProjectCover({
   /** Generated-cover size (600 wide by default); match the frame's aspect ratio. */
   width?: number
   height?: number
+  /** How wide the frame renders, so the browser picks a screenshot size to match. */
+  sizes?: string
   className?: string
 }) {
   const dark = useIsDark(initialDark)
-  const shot = fileUrl(project.imageKeys[0])
+  const key = project.imageKeys[0]
+  const shot = fileUrl(key, 1280)
   return (
     <img
+      srcSet={fileSrcSet(key)}
+      sizes={key ? sizes : undefined}
       src={
         shot ??
         projectCoverUrl({

@@ -186,6 +186,7 @@ function AdminProjects() {
                           project={p}
                           initialDark={theme === 'dark'}
                           height={430}
+                          sizes="12rem"
                         />
                       </span>
                       <span className="min-w-0">
@@ -355,7 +356,7 @@ function ReviewPanel({
                   className="bg-muted relative block aspect-video overflow-hidden rounded-lg"
                 >
                   <img
-                    src={fileUrl(key)}
+                    src={fileUrl(key, i === 0 ? 1280 : 640)}
                     alt={`Screenshot ${i + 1}`}
                     className="absolute inset-0 size-full object-cover"
                   />

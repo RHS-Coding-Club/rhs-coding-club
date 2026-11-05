@@ -75,7 +75,7 @@ export function ImageUpload({
       >
         {value ? (
           <img
-            src={fileUrl(value)}
+            src={fileUrl(value, 1280)}
             alt=""
             className="absolute inset-0 size-full object-cover"
           />

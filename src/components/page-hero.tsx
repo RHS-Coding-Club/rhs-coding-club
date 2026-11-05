@@ -1,9 +1,8 @@
 import { Suspense } from 'react'
 import type { ReactNode } from 'react'
 import { ClientOnly } from '@tanstack/react-router'
-import { motion } from 'motion/react'
 import { cn } from '#/lib/utils'
-import { EASE } from '#/components/motion'
+import { riseIn } from '#/components/motion'
 
 /**
  * The header every inner page opens with: an edge-to-edge band whose React Bits
@@ -40,14 +39,6 @@ export function PageHero({
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }) {
-  // Same markup with reduced motion on; the root MotionConfig turns the rise
-  // into a plain fade.
-  const rise = (delay: number) => ({
-    initial: { opacity: 0, y: 16 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, ease: EASE, delay },
-  })
-
   return (
     <section
       className={cn('relative -mt-(--header-offset) overflow-hidden bg-stage', className)}
@@ -77,39 +68,42 @@ export function PageHero({
       >
         <div className="max-w-3xl text-ink">
           {eyebrow && (
-            <motion.div {...rise(0.05)} className="mb-4 text-sm font-medium text-ink/60">
+            <div
+              style={riseIn(0.05)}
+              className="rise-in mb-4 text-sm font-medium text-ink/60"
+            >
               {eyebrow}
-            </motion.div>
+            </div>
           )}
           <h1 className="text-[clamp(2.75rem,6.5vw,5.25rem)] leading-[1.02] font-semibold tracking-[-0.045em]">
             {title}
           </h1>
           {description && (
-            <motion.div
-              {...rise(0.25)}
-              className="mt-5 max-w-2xl text-lg text-balance text-ink/75 sm:text-xl"
+            <div
+              style={riseIn(0.25)}
+              className="rise-in mt-5 max-w-2xl text-lg text-balance text-ink/75 sm:text-xl"
             >
               {description}
-            </motion.div>
+            </div>
           )}
           {actions && (
-            <motion.div
-              {...rise(0.4)}
-              className="pointer-events-auto mt-8 flex flex-wrap items-center gap-3"
+            <div
+              style={riseIn(0.4)}
+              className="rise-in pointer-events-auto mt-8 flex flex-wrap items-center gap-3"
             >
               {actions}
-            </motion.div>
+            </div>
           )}
           {children && (
-            <motion.div {...rise(0.5)} className="pointer-events-auto mt-8">
+            <div style={riseIn(0.5)} className="rise-in pointer-events-auto mt-8">
               {children}
-            </motion.div>
+            </div>
           )}
         </div>
         {aside && (
-          <motion.div {...rise(0.35)} className="pointer-events-auto">
+          <div style={riseIn(0.35)} className="rise-in pointer-events-auto">
             {aside}
-          </motion.div>
+          </div>
         )}
       </div>
     </section>

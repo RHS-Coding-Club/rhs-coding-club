@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, FolderGit2 } from 'lucide-react'
+import { fileUrl } from '#/lib/files'
 import CardSwap, { Card } from '#/components/bits/CardSwap'
 import type { HomeData } from '#/services/home'
 import { FadeUp } from '#/components/motion'
@@ -83,7 +84,7 @@ function ProjectCard({ project }: { project: Project }) {
       <div className="bg-brand-navy relative min-h-0 flex-1 overflow-hidden rounded-[16px]">
         {project.imageKeys[0] ? (
           <img
-            src={`/files/${project.imageKeys[0]}`}
+            src={fileUrl(project.imageKeys[0], 960)}
             alt=""
             draggable={false}
             className="pointer-events-none absolute inset-0 h-full w-full object-cover select-none"

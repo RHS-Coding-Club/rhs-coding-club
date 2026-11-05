@@ -198,7 +198,7 @@ function AdminOfficers() {
                 </RaisedButton>
               </div>
               <Avatar className="size-11">
-                <AvatarImage src={fileUrl(o.imageKey)} alt="" />
+                <AvatarImage src={fileUrl(o.imageKey, 128)} alt="" />
                 <AvatarFallback>{initials(o.name)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">

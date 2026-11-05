@@ -8,7 +8,7 @@ import { schema } from '#/db'
 import { RESET_ACTIONS } from '#/lib/schemas/reset'
 import type { ResetAction } from '#/lib/schemas/reset'
 import { unreferencedKeys } from './file-refs'
-import { isValidKey } from './files'
+import { isValidKey, withVariants } from './files'
 import { pointsWindowStart } from './points'
 import { setSetting } from './settings'
 
@@ -322,10 +322,11 @@ export async function runReset(
   const orphaned = bucket ? await unreferencedKeys(db, files) : []
   let filesRemoved = 0
   if (bucket && orphaned.length) {
-    for (let i = 0; i < orphaned.length; i += 1000) {
-      const chunk = orphaned.slice(i, i + 1000)
+    // R2 deletes at most 1,000 keys a call; each upload brings its resized copies.
+    for (let i = 0; i < orphaned.length; i += 100) {
+      const chunk = orphaned.slice(i, i + 100)
       try {
-        await bucket.delete(chunk)
+        await bucket.delete(withVariants(chunk))
         filesRemoved += chunk.length
       } catch (err) {
         console.warn('[reset] could not remove some files', err)
