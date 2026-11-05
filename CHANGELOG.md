@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.1](https://github.com/RHS-Coding-Club/rhs-coding-club/compare/v1.2.0...v1.2.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* take every color from the theme tokens in styles.css ([#113](https://github.com/RHS-Coding-Club/rhs-coding-club/issues/113)) ([1b3f711](https://github.com/RHS-Coding-Club/rhs-coding-club/commit/1b3f71192de50738ca89d2c18c208e5b9ef98cf4))
+
+
+### Performance Improvements
+
+* serve resized images, self-host fonts, and paint heroes before hydration ([#115](https://github.com/RHS-Coding-Club/rhs-coding-club/issues/115)) ([20d995c](https://github.com/RHS-Coding-Club/rhs-coding-club/commit/20d995c0991d7fcd4cda256cab3e8c6626cc90cf))
+
 ## [1.2.0](https://github.com/RHS-Coding-Club/rhs-coding-club/compare/v1.1.0...v1.2.0) (2026-11-02)
 
 
