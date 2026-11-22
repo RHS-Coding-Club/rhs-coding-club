@@ -1,5 +1,5 @@
 import { Link, createFileRoute, getRouteApi } from '@tanstack/react-router'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from '#/components/icons/arrow-up-right'
 import { AdminPageHeader } from '#/components/admin/admin-page-header'
 import { ADMIN_NAV } from '#/components/admin/admin-nav'
 import { hasRole } from '#/lib/roles'

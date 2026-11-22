@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import { cva } from 'class-variance-authority'
 import type { VariantProps } from 'class-variance-authority'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { LoaderCircle } from 'lucide-react'
+import { LoaderCircle } from '#/components/icons/loader-circle'
 import { Slot } from 'radix-ui'
 import { cn } from '#/lib/utils'
 

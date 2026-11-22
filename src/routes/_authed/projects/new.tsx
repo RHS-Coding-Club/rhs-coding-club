@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { UserPlus } from 'lucide-react'
+import { UserPlus } from '#/components/icons/user-plus'
 import { EmptyState } from '#/components/empty-state'
 import { RaisedButton } from '#/components/raised-button'
 import { ProjectForm } from '#/components/projects/project-form'

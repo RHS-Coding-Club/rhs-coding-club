@@ -1,24 +1,22 @@
 import { Link } from '@tanstack/react-router'
-import {
-  Award,
-  BookOpen,
-  Bot,
-  CalendarDays,
-  Code2,
-  DatabaseBackup,
-  FileText,
-  FolderGit2,
-  Github,
-  Inbox,
-  LayoutDashboard,
-  Library,
-  Mail,
-  RotateCcw,
-  Settings,
-  ShieldCheck,
-  UserCheck,
-  Users,
-} from 'lucide-react'
+import { Award } from '#/components/icons/award'
+import { BookOpen } from '#/components/icons/book-open'
+import { Bot } from '#/components/icons/bot'
+import { CalendarDays } from '#/components/icons/calendar-days'
+import { CodeXml } from '#/components/icons/code-xml'
+import { DatabaseBackup } from '#/components/icons/database-backup'
+import { FileText } from '#/components/icons/file-text'
+import { FolderGit2 } from '#/components/icons/folder-git-2'
+import { Github } from '#/components/icons/github'
+import { Inbox } from '#/components/icons/inbox'
+import { LayoutDashboard } from '#/components/icons/layout-dashboard'
+import { Library } from '#/components/icons/library'
+import { Mail } from '#/components/icons/mail'
+import { RotateCcw } from '#/components/icons/rotate-ccw'
+import { Settings } from '#/components/icons/settings'
+import { ShieldCheck } from '#/components/icons/shield-check'
+import { UserCheck } from '#/components/icons/user-check'
+import { Users } from '#/components/icons/users'
 import { hasRole } from '#/lib/roles'
 import type { Role } from '#/lib/roles'
 import { cn } from '#/lib/utils'
@@ -34,7 +32,7 @@ export const ADMIN_NAV = [
   {
     to: '/admin/submissions',
     label: 'Submissions',
-    icon: Code2,
+    icon: CodeXml,
     queue: 'pendingSubmissions',
   },
   { to: '/admin/challenges', label: 'Challenges', icon: FileText },

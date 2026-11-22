@@ -1,4 +1,4 @@
-import { Award } from 'lucide-react'
+import { Award } from '#/components/icons/award'
 import type { BadgeRarity } from '#/db/schema'
 import StarBorder from '#/components/bits/StarBorder'
 import { fileUrl } from '#/lib/files'

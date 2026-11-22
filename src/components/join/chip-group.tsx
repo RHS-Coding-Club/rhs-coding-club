@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { Check } from 'lucide-react'
+import { Check } from '#/components/icons/check'
 import { cn } from '#/lib/utils'
 
 /** A multi-select as toggle chips (each a button with aria-pressed). */

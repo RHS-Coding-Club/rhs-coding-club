@@ -1,16 +1,14 @@
 import { useEffect, useId, useState } from 'react'
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
-import {
-  ArrowLeft,
-  Copy,
-  ExternalLink,
-  Pencil,
-  Presentation,
-  RefreshCw,
-  Search,
-  UserCheck,
-  UserMinus,
-} from 'lucide-react'
+import { ArrowLeft } from '#/components/icons/arrow-left'
+import { Copy } from '#/components/icons/copy'
+import { ExternalLink } from '#/components/icons/external-link'
+import { Pencil } from '#/components/icons/pencil'
+import { Presentation } from '#/components/icons/presentation'
+import { RefreshCw } from '#/components/icons/refresh-cw'
+import { Search } from '#/components/icons/search'
+import { UserCheck } from '#/components/icons/user-check'
+import { UserMinus } from '#/components/icons/user-minus'
 import { toast } from 'sonner'
 import {
   getAttendance,

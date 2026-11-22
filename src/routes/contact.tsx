@@ -1,15 +1,13 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import {
-  ArrowRight,
-  CalendarDays,
-  Github,
-  Instagram,
-  Link2,
-  MapPin,
-  MessageCircle,
-  Youtube,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { ArrowRight } from '#/components/icons/arrow-right'
+import { CalendarDays } from '#/components/icons/calendar-days'
+import { Github } from '#/components/icons/github'
+import { Instagram } from '#/components/icons/instagram'
+import { Link2 } from '#/components/icons/link-2'
+import { MapPin } from '#/components/icons/map-pin'
+import { MessageCircle } from '#/components/icons/message-circle'
+import { Youtube } from '#/components/icons/youtube'
+import type { IconComponent } from '#/components/icons/create-icon'
 import { PageHero } from '#/components/page-hero'
 import { FadeUp } from '#/components/motion'
 import { ContactForm } from '#/components/contact/contact-form'
@@ -40,13 +38,13 @@ function ContactPage() {
   const { club, social } = Route.useLoaderData()
   const { user } = Route.useRouteContext()
 
-  const socials: { label: string; href: string; icon: LucideIcon }[] = [
+  const socials: { label: string; href: string; icon: IconComponent }[] = [
     social.instagram && { label: 'Instagram', href: social.instagram, icon: Instagram },
     social.github && { label: 'GitHub', href: social.github, icon: Github },
     social.discord && { label: 'Discord', href: social.discord, icon: MessageCircle },
     social.youtube && { label: 'YouTube', href: social.youtube, icon: Youtube },
     ...social.customLinks.map((l) => ({ label: l.label, href: l.url, icon: Link2 })),
-  ].filter((s): s is { label: string; href: string; icon: LucideIcon } => Boolean(s))
+  ].filter((s): s is { label: string; href: string; icon: IconComponent } => Boolean(s))
 
   return (
     <>
@@ -138,7 +136,7 @@ function Fact({
   term,
   value,
 }: {
-  icon: LucideIcon
+  icon: IconComponent
   term: string
   value: string
 }) {

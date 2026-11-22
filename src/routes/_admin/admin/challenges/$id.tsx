@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, createFileRoute, notFound, useRouter } from '@tanstack/react-router'
-import { Eye, Trash2 } from 'lucide-react'
+import { Eye } from '#/components/icons/eye'
+import { Trash2 } from '#/components/icons/trash-2'
 import { AdminPageHeader } from '#/components/admin/admin-page-header'
 import { RaisedButton } from '#/components/raised-button'
 import { ChallengeForm } from '#/components/challenges/challenge-form'

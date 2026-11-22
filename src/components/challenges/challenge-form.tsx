@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
-import { Info } from 'lucide-react'
+import { Info } from '#/components/icons/info'
 import { toast } from 'sonner'
 import { RichTextEditor } from '#/components/rich-text/editor'
 import { RaisedButton } from '#/components/raised-button'

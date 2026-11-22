@@ -1,14 +1,12 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { ClientOnly, Link, createFileRoute, redirect } from '@tanstack/react-router'
-import {
-  Award,
-  CircleCheck,
-  Clock,
-  Lock,
-  LoaderCircle,
-  ShieldAlert,
-  XCircle,
-} from 'lucide-react'
+import { Award } from '#/components/icons/award'
+import { CircleCheck } from '#/components/icons/circle-check'
+import { CircleX } from '#/components/icons/circle-x'
+import { Clock } from '#/components/icons/clock'
+import { LoaderCircle } from '#/components/icons/loader-circle'
+import { Lock } from '#/components/icons/lock'
+import { ShieldAlert } from '#/components/icons/shield-alert'
 import { motion, useReducedMotion } from 'motion/react'
 import { z } from 'zod'
 import Counter from '#/components/bits/Counter'
@@ -200,7 +198,7 @@ function Result({
   if (result.status === 'not-found') {
     return (
       <Problem
-        icon={<XCircle />}
+        icon={<CircleX />}
         title="Event not found"
         body="That event no longer exists."
       >

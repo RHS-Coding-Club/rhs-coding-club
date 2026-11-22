@@ -1,4 +1,5 @@
-import { Check, X } from 'lucide-react'
+import { Check } from '#/components/icons/check'
+import { X } from '#/components/icons/x'
 import { fmtDate } from '#/lib/format'
 import { requestTimeline } from '#/lib/schemas/github'
 import type { RequestStatus, TimelineStep } from '#/lib/schemas/github'

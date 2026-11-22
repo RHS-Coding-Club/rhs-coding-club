@@ -1,4 +1,6 @@
-import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { ChevronLeft } from '#/components/icons/chevron-left'
+import { ChevronRight } from '#/components/icons/chevron-right'
+import { X } from '#/components/icons/x'
 import { ImageUpload } from '#/components/image-upload'
 import { fileUrl } from '#/lib/files'
 

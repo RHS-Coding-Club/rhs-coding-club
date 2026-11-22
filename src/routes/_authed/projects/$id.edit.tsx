@@ -1,5 +1,5 @@
 import { Link, createFileRoute, notFound } from '@tanstack/react-router'
-import { Lock } from 'lucide-react'
+import { Lock } from '#/components/icons/lock'
 import { EmptyState } from '#/components/empty-state'
 import { RaisedButton } from '#/components/raised-button'
 import { ProjectForm } from '#/components/projects/project-form'

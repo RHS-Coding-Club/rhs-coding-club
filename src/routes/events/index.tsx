@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { CalendarDays, CalendarPlus, Download } from 'lucide-react'
+import { CalendarDays } from '#/components/icons/calendar-days'
+import { CalendarPlus } from '#/components/icons/calendar-plus'
+import { Download } from '#/components/icons/download'
 import { z } from 'zod'
 import { listEvents } from '#/server/events'
 import { EVENT_TAGS, tagLabel, webcalUrl } from '#/lib/events'

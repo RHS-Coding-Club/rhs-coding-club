@@ -1,4 +1,7 @@
-import { CheckCircle2, Circle, CircleDashed, RotateCcw } from 'lucide-react'
+import { Circle } from '#/components/icons/circle'
+import { CircleCheck } from '#/components/icons/circle-check'
+import { CircleDashed } from '#/components/icons/circle-dashed'
+import { RotateCcw } from '#/components/icons/rotate-ccw'
 import { DIFFICULTY_LABEL, PROGRESS_LABEL } from '#/lib/schemas/challenges'
 import type { DifficultyLevel, MemberProgress } from '#/lib/schemas/challenges'
 import { cn } from '#/lib/utils'
@@ -50,7 +53,7 @@ const PROGRESS_TONE: Record<MemberProgress, string> = {
 const PROGRESS_ICON = {
   'not-started': Circle,
   pending: CircleDashed,
-  passed: CheckCircle2,
+  passed: CircleCheck,
   failed: RotateCcw,
 } as const
 

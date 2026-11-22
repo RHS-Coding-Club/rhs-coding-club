@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
-import { ArrowDownRight } from 'lucide-react'
+import { ArrowDownRight } from '#/components/icons/arrow-down-right'
 import { cn } from '#/lib/utils'
 
 /**

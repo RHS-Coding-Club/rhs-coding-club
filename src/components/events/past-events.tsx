@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
-import { CircleCheck, Users } from 'lucide-react'
+import { CircleCheck } from '#/components/icons/circle-check'
+import { Users } from '#/components/icons/users'
 import type { EventCardData } from '#/services/events'
 import { monthLabel, tagLabel } from '#/lib/events'
 import { fmtDate } from '#/lib/format'

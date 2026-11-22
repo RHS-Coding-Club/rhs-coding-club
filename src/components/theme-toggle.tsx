@@ -1,5 +1,6 @@
 import { useServerFn } from '@tanstack/react-start'
-import { Moon, Sun } from 'lucide-react'
+import { Moon } from '#/components/icons/moon'
+import { Sun } from '#/components/icons/sun'
 import { setTheme } from '#/server/theme'
 import { RaisedButton } from '#/components/raised-button'
 import { useIsDark } from '#/hooks/use-is-dark'

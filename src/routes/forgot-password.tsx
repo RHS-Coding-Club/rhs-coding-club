@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { AtSign, MailCheck } from 'lucide-react'
+import { AtSign } from '#/components/icons/at-sign'
+import { MailCheck } from '#/components/icons/mail-check'
 import { requestPasswordReset } from '#/lib/auth-client'
 import { AuthLayout } from '#/components/auth/auth-layout'
 import { AuthField } from '#/components/auth/auth-field'

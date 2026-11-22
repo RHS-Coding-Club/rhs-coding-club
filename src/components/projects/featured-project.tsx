@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowUpRight, Github, Globe } from 'lucide-react'
+import { ArrowUpRight } from '#/components/icons/arrow-up-right'
+import { Github } from '#/components/icons/github'
+import { Globe } from '#/components/icons/globe'
 import SpotlightCard from '#/components/bits/SpotlightCard'
 import { RaisedButton } from '#/components/raised-button'
 import { useIsDark } from '#/hooks/use-is-dark'

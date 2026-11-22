@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowUpRight, FolderGit2 } from 'lucide-react'
+import { ArrowUpRight } from '#/components/icons/arrow-up-right'
+import { FolderGit2 } from '#/components/icons/folder-git-2'
 import { fileUrl } from '#/lib/files'
 import CardSwap, { Card } from '#/components/bits/CardSwap'
 import type { HomeData } from '#/services/home'

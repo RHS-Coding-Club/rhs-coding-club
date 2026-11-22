@@ -1,14 +1,12 @@
 import { Link, createFileRoute, notFound } from '@tanstack/react-router'
-import {
-  ArrowLeft,
-  CalendarDays,
-  Clock3,
-  Github,
-  Globe,
-  MapPin,
-  Pencil,
-  TriangleAlert,
-} from 'lucide-react'
+import { ArrowLeft } from '#/components/icons/arrow-left'
+import { CalendarDays } from '#/components/icons/calendar-days'
+import { Clock3 } from '#/components/icons/clock-3'
+import { Github } from '#/components/icons/github'
+import { Globe } from '#/components/icons/globe'
+import { MapPin } from '#/components/icons/map-pin'
+import { Pencil } from '#/components/icons/pencil'
+import { TriangleAlert } from '#/components/icons/triangle-alert'
 import { PageHero } from '#/components/page-hero'
 import { FadeUp } from '#/components/motion'
 import { RaisedButton } from '#/components/raised-button'

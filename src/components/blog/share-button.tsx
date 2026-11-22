@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Check, Share2 } from 'lucide-react'
+import { Check } from '#/components/icons/check'
+import { Share2 } from '#/components/icons/share-2'
 import { toast } from 'sonner'
 import { RaisedButton } from '#/components/raised-button'
 

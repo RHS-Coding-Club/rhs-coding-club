@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
-import { LockKeyhole, TriangleAlert } from 'lucide-react'
+import { LockKeyhole } from '#/components/icons/lock-keyhole'
+import { TriangleAlert } from '#/components/icons/triangle-alert'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { resetPassword } from '#/lib/auth-client'

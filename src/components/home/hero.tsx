@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { motion } from 'motion/react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight } from '#/components/icons/arrow-right'
 import RotatingText from '#/components/bits/RotatingText'
 import ShinyText from '#/components/bits/ShinyText'
 import Magnet from '#/components/bits/Magnet'

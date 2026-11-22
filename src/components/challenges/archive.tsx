@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useRouter } from '@tanstack/react-router'
-import { SearchX } from 'lucide-react'
+import { SearchX } from '#/components/icons/search-x'
 import AnimatedList from '#/components/bits/AnimatedList'
 import type { AnimatedListEntry } from '#/components/bits/AnimatedList'
 import { EmptyState } from '#/components/empty-state'

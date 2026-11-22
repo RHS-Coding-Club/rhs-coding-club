@@ -1,5 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Code2, Trophy, UserRound } from 'lucide-react'
+import { CodeXml } from '#/components/icons/code-xml'
+import { Trophy } from '#/components/icons/trophy'
+import { UserRound } from '#/components/icons/user-round'
 import SplitText from '#/components/bits/SplitText'
 import { GuestStatus } from '#/components/dashboard/guest-status'
 import {
@@ -125,7 +127,7 @@ function MemberActions({ d, userId }: { d: MemberDash; userId: string }) {
       {open ? (
         <RaisedButton asChild size="lg">
           <Link to="/challenges/$id" params={{ id: open.id }}>
-            <Code2 />
+            <CodeXml />
             Solve week {open.weekNo}
           </Link>
         </RaisedButton>

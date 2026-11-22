@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
-import { ImagePlus, LoaderCircle, X } from 'lucide-react'
+import { ImagePlus } from '#/components/icons/image-plus'
+import { LoaderCircle } from '#/components/icons/loader-circle'
+import { X } from '#/components/icons/x'
 import { toast } from 'sonner'
 import { fileUrl } from '#/lib/files'
 import { cn } from '#/lib/utils'

@@ -1,15 +1,13 @@
 import { useState } from 'react'
 import { Link, createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
-import {
-  CalendarDays,
-  ClipboardCheck,
-  ExternalLink,
-  MoreHorizontal,
-  Pencil,
-  Plus,
-  Presentation,
-  Trash2,
-} from 'lucide-react'
+import { CalendarDays } from '#/components/icons/calendar-days'
+import { ClipboardCheck } from '#/components/icons/clipboard-check'
+import { Ellipsis } from '#/components/icons/ellipsis'
+import { ExternalLink } from '#/components/icons/external-link'
+import { Pencil } from '#/components/icons/pencil'
+import { Plus } from '#/components/icons/plus'
+import { Presentation } from '#/components/icons/presentation'
+import { Trash2 } from '#/components/icons/trash-2'
 import { toast } from 'sonner'
 import { deleteEvent, getEventForm, listAdminEvents } from '#/server/events'
 import type { AdminEventRow } from '#/services/events'
@@ -189,7 +187,7 @@ function AdminEvents() {
                           aria-label={`Actions for ${e.title}`}
                           loading={loadingEdit === e.id}
                         >
-                          <MoreHorizontal aria-hidden="true" />
+                          <Ellipsis aria-hidden="true" />
                         </RaisedButton>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="min-w-48">

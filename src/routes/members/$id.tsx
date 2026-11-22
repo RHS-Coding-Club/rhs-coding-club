@@ -1,5 +1,9 @@
 import { Link, createFileRoute, notFound } from '@tanstack/react-router'
-import { ArrowUpRight, Award, Code2, FolderGit2, Github } from 'lucide-react'
+import { ArrowUpRight } from '#/components/icons/arrow-up-right'
+import { Award } from '#/components/icons/award'
+import { CodeXml } from '#/components/icons/code-xml'
+import { FolderGit2 } from '#/components/icons/folder-git-2'
+import { Github } from '#/components/icons/github'
 import { EmptyState } from '#/components/empty-state'
 import { BadgeShelf } from '#/components/members/badge-shelf'
 import { DotGridBackground } from '#/components/members/dot-grid-bg'
@@ -122,7 +126,7 @@ function MemberPage() {
       <div className="mx-auto grid max-w-6xl gap-x-10 px-(--gutter) lg:grid-cols-2">
         <Section id="solved" title="Solved challenges" count={p.solved.length} bare>
           {p.solved.length === 0 ? (
-            <EmptyState icon={<Code2 />} title="Nothing solved yet." />
+            <EmptyState icon={<CodeXml />} title="Nothing solved yet." />
           ) : (
             <SolvedList rows={p.solved} />
           )}

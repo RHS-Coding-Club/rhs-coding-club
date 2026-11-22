@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
 import { useServerFn } from '@tanstack/react-start'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { CheckCircle2, Send } from 'lucide-react'
+import { CircleCheck } from '#/components/icons/circle-check'
+import { Send } from '#/components/icons/send'
 import { MESSAGE_MAX, MESSAGE_MIN, contactSchema } from '#/lib/schemas/contact'
 import { fieldErrors, serverErrorMessage } from '#/lib/schemas/community'
 import type { FieldErrors } from '#/lib/schemas/community'
@@ -97,7 +98,7 @@ export function ContactForm({
             role="status"
             className="flex min-h-[28rem] flex-col items-start justify-center"
           >
-            <CheckCircle2 className="text-brand-sky size-10" aria-hidden="true" />
+            <CircleCheck className="text-brand-sky size-10" aria-hidden="true" />
             <h2 className="mt-5 text-3xl font-semibold tracking-[-0.03em]">
               Message sent.
             </h2>

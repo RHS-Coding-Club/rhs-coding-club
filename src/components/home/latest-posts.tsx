@@ -1,5 +1,5 @@
 import { Link, useRouter } from '@tanstack/react-router'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from '#/components/icons/arrow-up-right'
 import FlowingMenu from '#/components/bits/FlowingMenu'
 import type { HomeData } from '#/services/home'
 import { fmtDate } from '#/lib/format'
