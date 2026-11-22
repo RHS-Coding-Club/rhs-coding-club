@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/RHS-Coding-Club/rhs-coding-club/compare/v1.2.1...v1.3.0) (2026-11-22)
+
+
+### Features
+
+* animate the site's icons ([#120](https://github.com/RHS-Coding-Club/rhs-coding-club/issues/120)) ([a611d3f](https://github.com/RHS-Coding-Club/rhs-coding-club/commit/a611d3f8064188909b428fe5c283311d5f5f7a70))
+
 ## [1.2.1](https://github.com/RHS-Coding-Club/rhs-coding-club/compare/v1.2.0...v1.2.1) (2026-11-05)
 
 
