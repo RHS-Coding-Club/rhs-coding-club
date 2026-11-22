@@ -32,7 +32,6 @@ const SEPARATOR = '|'
  * `var(--token)` directly.
  */
 export function useCssColors(...tokens: string[]): string[] {
-  const key = tokens.join(SEPARATOR)
   const snapshot = useSyncExternalStore(
     subscribe,
     () => {
@@ -43,5 +42,5 @@ export function useCssColors(...tokens: string[]): string[] {
     },
     () => tokens.map((token) => `var(${token})`).join(SEPARATOR),
   )
-  return useMemo(() => snapshot.split(SEPARATOR), [snapshot, key])
+  return useMemo(() => snapshot.split(SEPARATOR), [snapshot])
 }

@@ -311,7 +311,7 @@ function ResourcesPage() {
                   onClick={() => {
                     setQuery('')
                     setSavedOnly(false)
-                    navigate({ search: {}, replace: true, resetScroll: false })
+                    void navigate({ search: {}, replace: true, resetScroll: false })
                   }}
                 >
                   Clear filters

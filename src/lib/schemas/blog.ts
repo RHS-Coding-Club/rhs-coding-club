@@ -74,7 +74,7 @@ export function xmlEscape(s: string) {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&apos;')
       // Control characters are not allowed in XML 1.0 at all.
-      // eslint-disable-next-line no-control-regex
+      // oxlint-disable-next-line no-control-regex
       .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
   )
 }
