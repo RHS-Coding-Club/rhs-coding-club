@@ -22,7 +22,7 @@ Built with TanStack Start and deployed to Cloudflare Workers. Data lives in D1 (
 | Email     | Gmail SMTP (`worker-mailer`)                        |
 | UI        | Tailwind CSS v4, Shadcn UI, AnimateIcons (copied)   |
 | Tests     | Vitest (unit + Workers integration), Playwright e2e |
-| Tooling   | bun, ESLint, Prettier, GitHub Actions               |
+| Tooling   | bun, oxlint, Prettier, GitHub Actions               |
 
 ## Getting started
 
@@ -56,7 +56,7 @@ Google and GitHub login need OAuth apps whose callback URLs are `{APP_URL}/api/a
 | `bun run build`            | Production build                                      |
 | `bun run deploy`           | Build and `wrangler deploy`                           |
 | `bun run type-check`       | `tsc --noEmit`                                        |
-| `bun run lint` / `format`  | ESLint / Prettier                                     |
+| `bun run lint` / `format`  | oxlint / Prettier                                     |
 | `bun run db:generate`      | Generate a migration from `src/db/schema`             |
 | `bun run db:migrate`       | Apply migrations to local D1                          |
 | `bun run db:migrate:prod`  | Apply migrations to the production D1                 |

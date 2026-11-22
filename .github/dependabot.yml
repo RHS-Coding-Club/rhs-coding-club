@@ -9,6 +9,12 @@ updates:
     commit-message:
       prefix: chore(deps)
     labels: [dependencies]
+    # React Bits' AeroShards (the /blog hero) passes raw WGSL strings, which
+    # vgpu 0.4 and later may reject (0.6 does). Drop this once its registry
+    # entry asks for a newer vgpu.
+    ignore:
+      - dependency-name: vgpu
+        versions: ['>=0.4.0']
     groups:
       minor-and-patch:
         update-types: [minor, patch]
