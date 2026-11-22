@@ -1,15 +1,13 @@
 import { useState } from 'react'
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
-import {
-  ExternalLink,
-  MoreHorizontal,
-  NotebookPen,
-  Pencil,
-  Plus,
-  Rocket,
-  Trash2,
-  Undo2,
-} from 'lucide-react'
+import { Ellipsis } from '#/components/icons/ellipsis'
+import { ExternalLink } from '#/components/icons/external-link'
+import { NotebookPen } from '#/components/icons/notebook-pen'
+import { Pencil } from '#/components/icons/pencil'
+import { Plus } from '#/components/icons/plus'
+import { Rocket } from '#/components/icons/rocket'
+import { Trash2 } from '#/components/icons/trash-2'
+import { Undo2 } from '#/components/icons/undo-2'
 import { toast } from 'sonner'
 import { AdminPageHeader } from '#/components/admin/admin-page-header'
 import { EmptyState } from '#/components/empty-state'
@@ -221,7 +219,7 @@ function AdminBlog() {
                             aria-label={`More actions for ${p.title}`}
                             disabled={busy === p.id}
                           >
-                            <MoreHorizontal />
+                            <Ellipsis />
                           </RaisedButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">

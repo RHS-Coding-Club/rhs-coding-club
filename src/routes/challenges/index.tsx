@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Code2 } from 'lucide-react'
+import { CodeXml } from '#/components/icons/code-xml'
 import DecryptedText from '#/components/bits/DecryptedText'
 import { PageHero } from '#/components/page-hero'
 import { EmptyState } from '#/components/empty-state'
@@ -83,7 +83,7 @@ function ChallengesPage() {
         </section>
       ) : (
         <section className="mx-auto max-w-6xl px-(--gutter) pt-16 sm:pt-24">
-          <EmptyState icon={<Code2 />} title="The first challenge drops soon.">
+          <EmptyState icon={<CodeXml />} title="The first challenge drops soon.">
             Officers post a new problem every week. Check back after the next meeting.
           </EmptyState>
         </section>

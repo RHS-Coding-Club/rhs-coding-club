@@ -1,5 +1,9 @@
 import { Link } from '@tanstack/react-router'
-import { Check, CircleHelp, Clock, MapPin, Radio } from 'lucide-react'
+import { Check } from '#/components/icons/check'
+import { CircleQuestionMark } from '#/components/icons/circle-question-mark'
+import { Clock } from '#/components/icons/clock'
+import { MapPin } from '#/components/icons/map-pin'
+import { Radio } from '#/components/icons/radio'
 import GlareHover from '#/components/bits/GlareHover'
 import type { EventCardData } from '#/services/events'
 import { fmtTimeRange } from '#/lib/events'
@@ -95,7 +99,7 @@ export function ViewerBadge({ status }: { status: 'yes' | 'maybe' | 'no' | null 
   if (status === 'maybe') {
     return (
       <span className="bg-muted text-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
-        <CircleHelp className="size-3.5" aria-hidden="true" />
+        <CircleQuestionMark className="size-3.5" aria-hidden="true" />
         Maybe
       </span>
     )

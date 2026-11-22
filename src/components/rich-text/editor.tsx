@@ -5,25 +5,23 @@ import StarterKit from '@tiptap/starter-kit'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import Image from '@tiptap/extension-image'
 import { Placeholder } from '@tiptap/extensions'
-import {
-  Bold,
-  Code,
-  Heading2,
-  Heading3,
-  ImagePlus,
-  Italic,
-  Link2,
-  List,
-  ListOrdered,
-  LoaderCircle,
-  Minus,
-  Quote,
-  Redo2,
-  SquareCode,
-  Strikethrough,
-  Underline,
-  Undo2,
-} from 'lucide-react'
+import { Bold } from '#/components/icons/bold'
+import { Code } from '#/components/icons/code'
+import { Heading2 } from '#/components/icons/heading-2'
+import { Heading3 } from '#/components/icons/heading-3'
+import { ImagePlus } from '#/components/icons/image-plus'
+import { Italic } from '#/components/icons/italic'
+import { Link2 } from '#/components/icons/link-2'
+import { List } from '#/components/icons/list'
+import { ListOrdered } from '#/components/icons/list-ordered'
+import { LoaderCircle } from '#/components/icons/loader-circle'
+import { Minus } from '#/components/icons/minus'
+import { Quote } from '#/components/icons/quote'
+import { Redo2 } from '#/components/icons/redo-2'
+import { SquareCode } from '#/components/icons/square-code'
+import { Strikethrough } from '#/components/icons/strikethrough'
+import { Underline } from '#/components/icons/underline'
+import { Undo2 } from '#/components/icons/undo-2'
 import { toast } from 'sonner'
 import { EMPTY_DOC_JSON, parseRichText, safeHref } from '#/lib/rich-text'
 import { cn } from '#/lib/utils'

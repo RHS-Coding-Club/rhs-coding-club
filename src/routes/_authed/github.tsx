@@ -2,8 +2,12 @@ import { lazy, useState } from 'react'
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { toast } from 'sonner'
-import { ArrowUpRight, FolderGit2, GitPullRequest, Github, Users } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { ArrowUpRight } from '#/components/icons/arrow-up-right'
+import { FolderGit2 } from '#/components/icons/folder-git-2'
+import { GitPullRequest } from '#/components/icons/git-pull-request'
+import { Github } from '#/components/icons/github'
+import { Users } from '#/components/icons/users'
+import type { IconComponent } from '#/components/icons/create-icon'
 import { PageHero } from '#/components/page-hero'
 import { FadeUp } from '#/components/motion'
 import { RaisedButton } from '#/components/raised-button'
@@ -36,7 +40,7 @@ export const Route = createFileRoute('/_authed/github')({
   component: GithubPage,
 })
 
-const PERKS: { icon: LucideIcon; title: string; body: string }[] = [
+const PERKS: { icon: IconComponent; title: string; body: string }[] = [
   {
     icon: FolderGit2,
     title: 'Push to club repos',

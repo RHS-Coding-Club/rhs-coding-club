@@ -20,7 +20,7 @@ Built with TanStack Start and deployed to Cloudflare Workers. Data lives in D1 (
 | Auth      | Better Auth (Google, GitHub, email/password)        |
 | Files     | Cloudflare R2                                       |
 | Email     | Gmail SMTP (`worker-mailer`)                        |
-| UI        | Tailwind CSS v4, Shadcn UI, lucide icons            |
+| UI        | Tailwind CSS v4, Shadcn UI, AnimateIcons (copied)   |
 | Tests     | Vitest (unit + Workers integration), Playwright e2e |
 | Tooling   | bun, oxlint, Prettier, GitHub Actions               |
 

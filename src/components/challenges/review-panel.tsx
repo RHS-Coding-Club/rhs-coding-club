@@ -1,14 +1,12 @@
 import { useId, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
-import {
-  Check,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-  RotateCcw,
-  Undo2,
-} from 'lucide-react'
+import { Check } from '#/components/icons/check'
+import { ChevronDown } from '#/components/icons/chevron-down'
+import { ChevronUp } from '#/components/icons/chevron-up'
+import { ExternalLink } from '#/components/icons/external-link'
+import { RotateCcw } from '#/components/icons/rotate-ccw'
+import { Undo2 } from '#/components/icons/undo-2'
 import { toast } from 'sonner'
 import { RaisedButton } from '#/components/raised-button'
 import { UserAvatar } from '#/components/user-avatar'

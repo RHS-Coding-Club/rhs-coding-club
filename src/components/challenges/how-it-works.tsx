@@ -1,4 +1,6 @@
-import { CheckCheck, Link2, Trophy } from 'lucide-react'
+import { CheckCheck } from '#/components/icons/check-check'
+import { Link2 } from '#/components/icons/link-2'
+import { Trophy } from '#/components/icons/trophy'
 import { FadeUp } from '#/components/motion'
 import { DIFFICULTY_DOT } from './meta'
 

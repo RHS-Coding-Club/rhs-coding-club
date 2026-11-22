@@ -1,4 +1,4 @@
-import { Award } from 'lucide-react'
+import { Award } from '#/components/icons/award'
 import Counter from '#/components/bits/Counter'
 import type { HomeData } from '#/services/home'
 import { fmtDate, initials } from '#/lib/format'

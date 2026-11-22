@@ -1,12 +1,10 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import {
-  CalendarCheck,
-  Code2,
-  Clock3,
-  FolderGit2,
-  PartyPopper,
-  Trophy,
-} from 'lucide-react'
+import { CalendarCheck } from '#/components/icons/calendar-check'
+import { Clock3 } from '#/components/icons/clock-3'
+import { CodeXml } from '#/components/icons/code-xml'
+import { FolderGit2 } from '#/components/icons/folder-git-2'
+import { PartyPopper } from '#/components/icons/party-popper'
+import { Trophy } from '#/components/icons/trophy'
 import { ApplicationStepper } from '#/components/join/application-stepper'
 import { ThreadsBackground } from '#/components/join/threads-bg'
 import { FadeUp } from '#/components/motion'
@@ -137,7 +135,7 @@ function JoinPage() {
 
 const PERKS = [
   {
-    icon: Code2,
+    icon: CodeXml,
     title: 'A problem every week',
     body: 'Easy to hard, any language. Officers review every solution.',
   },

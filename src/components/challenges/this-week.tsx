@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowRight, Users } from 'lucide-react'
+import { ArrowRight } from '#/components/icons/arrow-right'
+import { Users } from '#/components/icons/users'
 import ElectricBorder from '#/components/bits/ElectricBorder'
 import { RaisedButton } from '#/components/raised-button'
 import { useIsDark } from '#/hooks/use-is-dark'

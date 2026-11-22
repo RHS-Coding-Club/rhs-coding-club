@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft } from '#/components/icons/chevron-left'
 import { FadeUp } from '#/components/motion'
 import { Logo } from '#/components/logo'
 import { RaisedButton } from '#/components/raised-button'

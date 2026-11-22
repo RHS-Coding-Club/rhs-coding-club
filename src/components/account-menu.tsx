@@ -1,16 +1,14 @@
 import { Link, useRouter } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
-import {
-  Code2,
-  FolderPlus,
-  LayoutDashboard,
-  LogOut,
-  ShieldCheck,
-  Sparkles,
-  UserCog,
-  UserRound,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { CodeXml } from '#/components/icons/code-xml'
+import { FolderPlus } from '#/components/icons/folder-plus'
+import { LayoutDashboard } from '#/components/icons/layout-dashboard'
+import { LogOut } from '#/components/icons/log-out'
+import { ShieldCheck } from '#/components/icons/shield-check'
+import { Sparkles } from '#/components/icons/sparkles'
+import { UserCog } from '#/components/icons/user-cog'
+import { UserRound } from '#/components/icons/user-round'
+import type { IconComponent } from '#/components/icons/create-icon'
 import { signOut } from '#/lib/auth-client'
 import { avatarUrl } from '#/lib/files'
 import { initials } from '#/lib/format'
@@ -123,7 +121,7 @@ export function AccountMenu({ user }: { user: SessionUser }) {
           ) : isMember ? (
             <Tile to="/projects/new" icon={FolderPlus} label="New project" />
           ) : (
-            <Tile to="/challenges" icon={Code2} label="Challenges" />
+            <Tile to="/challenges" icon={CodeXml} label="Challenges" />
           )}
         </DropdownMenuGroup>
 
@@ -148,7 +146,7 @@ function Tile({
 }: {
   to: LinkProps['to']
   params?: LinkProps['params']
-  icon: LucideIcon
+  icon: IconComponent
   label: string
 }) {
   return (

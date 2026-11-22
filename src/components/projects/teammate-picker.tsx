@@ -1,5 +1,7 @@
 import { useEffect, useId, useState } from 'react'
-import { LoaderCircle, Search, X } from 'lucide-react'
+import { LoaderCircle } from '#/components/icons/loader-circle'
+import { Search } from '#/components/icons/search'
+import { X } from '#/components/icons/x'
 import { UserAvatar } from '#/components/user-avatar'
 import { cn } from '#/lib/utils'
 import { searchTeammates } from '#/server/projects'

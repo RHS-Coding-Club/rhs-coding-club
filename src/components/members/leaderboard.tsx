@@ -1,6 +1,10 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
-import { Calendar, Code2, Crown, FolderGit2, Sparkles } from 'lucide-react'
+import { Calendar } from '#/components/icons/calendar'
+import { CodeXml } from '#/components/icons/code-xml'
+import { Crown } from '#/components/icons/crown'
+import { FolderGit2 } from '#/components/icons/folder-git-2'
+import { Sparkles } from '#/components/icons/sparkles'
 import CountUp from '#/components/bits/CountUp'
 import TiltedCard from '#/components/bits/TiltedCard'
 import { FadeUp, EASE } from '#/components/motion'
@@ -267,7 +271,7 @@ function RankRow({ row, you }: { row: Row; you: boolean }) {
 export function HowPoints({ values }: { values: Leaderboard['values'] }) {
   const items = [
     {
-      icon: Code2,
+      icon: CodeXml,
       title: 'Weekly challenges',
       body: `Easy ${values.easy}, medium ${values.medium}, hard ${values.hard}. Points land when an officer passes your solution.`,
     },

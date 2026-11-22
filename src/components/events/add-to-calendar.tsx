@@ -1,4 +1,7 @@
-import { CalendarPlus, ChevronDown, Download, ExternalLink } from 'lucide-react'
+import { CalendarPlus } from '#/components/icons/calendar-plus'
+import { ChevronDown } from '#/components/icons/chevron-down'
+import { Download } from '#/components/icons/download'
+import { ExternalLink } from '#/components/icons/external-link'
 import { googleCalendarUrl } from '#/lib/events'
 import { RaisedButton } from '#/components/raised-button'
 import {

@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { toast } from 'sonner'
-import { AlertTriangle, Check, ExternalLink, Github, RotateCw, X } from 'lucide-react'
+import { Check } from '#/components/icons/check'
+import { ExternalLink } from '#/components/icons/external-link'
+import { Github } from '#/components/icons/github'
+import { RotateCw } from '#/components/icons/rotate-cw'
+import { TriangleAlert } from '#/components/icons/triangle-alert'
+import { X } from '#/components/icons/x'
 import { z } from 'zod'
 import { AdminPageHeader } from '#/components/admin/admin-page-header'
 import { EmptyState } from '#/components/empty-state'
@@ -126,7 +131,7 @@ function AdminGithub() {
           role="note"
           className="mb-4 flex gap-3 rounded-lg border border-warning/30 bg-warning/8 px-4 py-3 text-sm"
         >
-          <AlertTriangle
+          <TriangleAlert
             className="mt-0.5 size-4 shrink-0 text-warning"
             aria-hidden="true"
           />

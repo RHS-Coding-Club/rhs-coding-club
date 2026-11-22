@@ -1,4 +1,4 @@
-import { Award } from 'lucide-react'
+import { Award } from '#/components/icons/award'
 import { fileUrl } from '#/lib/files'
 import { RARITY_COLOR, RARITY_LABEL, criteriaSummary } from '#/lib/schemas/badges'
 import type { Criteria, Rarity } from '#/lib/schemas/badges'

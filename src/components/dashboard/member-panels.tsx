@@ -1,19 +1,17 @@
 import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import { motion } from 'motion/react'
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Award,
-  CalendarCheck2,
-  CalendarDays,
-  CircleCheck,
-  CircleDashed,
-  CircleX,
-  Code2,
-  FolderGit2,
-  MapPin,
-} from 'lucide-react'
+import { ArrowRight } from '#/components/icons/arrow-right'
+import { ArrowUpRight } from '#/components/icons/arrow-up-right'
+import { Award } from '#/components/icons/award'
+import { CalendarCheck2 } from '#/components/icons/calendar-check-2'
+import { CalendarDays } from '#/components/icons/calendar-days'
+import { CircleCheck } from '#/components/icons/circle-check'
+import { CircleDashed } from '#/components/icons/circle-dashed'
+import { CircleX } from '#/components/icons/circle-x'
+import { CodeXml } from '#/components/icons/code-xml'
+import { FolderGit2 } from '#/components/icons/folder-git-2'
+import { MapPin } from '#/components/icons/map-pin'
 import CountUp from '#/components/bits/CountUp'
 import { FadeUp, EASE } from '#/components/motion'
 import { RaisedButton } from '#/components/raised-button'
@@ -177,7 +175,7 @@ export function StatsPanel({
   delay?: number
 }) {
   const rows = [
-    { icon: Code2, n: stats.challenges, label: 'Challenges passed' },
+    { icon: CodeXml, n: stats.challenges, label: 'Challenges passed' },
     { icon: CalendarCheck2, n: stats.events, label: 'Events attended' },
     { icon: FolderGit2, n: stats.projects, label: 'Projects shipped' },
   ]

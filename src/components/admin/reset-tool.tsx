@@ -1,15 +1,13 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
-import {
-  CheckCircle2,
-  Download,
-  Flame,
-  RotateCcw,
-  ShieldAlert,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
+import { CircleCheck } from '#/components/icons/circle-check'
+import { Download } from '#/components/icons/download'
+import { Flame } from '#/components/icons/flame'
+import { RotateCcw } from '#/components/icons/rotate-ccw'
+import { ShieldAlert } from '#/components/icons/shield-alert'
+import { ShieldCheck } from '#/components/icons/shield-check'
+import { Sparkles } from '#/components/icons/sparkles'
 import { toast } from 'sonner'
 import ElectricBorder from '#/components/bits/ElectricBorder'
 import SpotlightCard from '#/components/bits/SpotlightCard'
@@ -190,7 +188,7 @@ export function ResetTool({
                         <Icon className="size-5" aria-hidden="true" />
                       </span>
                       {active && (
-                        <CheckCircle2
+                        <CircleCheck
                           className={cn(
                             'size-5',
                             p.id === 'full' ? 'text-alert' : 'text-brand-sky',
@@ -345,7 +343,7 @@ export function ResetTool({
             loading={downloading}
             loadingText="Preparing…"
           >
-            {backedUp ? <CheckCircle2 /> : <Download />}
+            {backedUp ? <CircleCheck /> : <Download />}
             {backedUp ? 'Downloaded' : 'Download backup'}
           </RaisedButton>
         </div>
@@ -440,7 +438,7 @@ function Done({ result, onAgain }: { result: ResetResult; onAgain: () => void })
       className="ring-border/70 rounded-3xl p-8 ring-1"
       style={{ background: 'var(--bits-surface)' }}
     >
-      <CheckCircle2 className="size-8 text-success" aria-hidden="true" />
+      <CircleCheck className="size-8 text-success" aria-hidden="true" />
       <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em]">Reset complete</h2>
       <ul className="text-muted-foreground mt-4 flex flex-col gap-1.5 text-sm">
         {result.ran.map((a) => (

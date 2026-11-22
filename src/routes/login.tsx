@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, createFileRoute, redirect, useRouter } from '@tanstack/react-router'
-import { AtSign, LockKeyhole } from 'lucide-react'
+import { AtSign } from '#/components/icons/at-sign'
+import { LockKeyhole } from '#/components/icons/lock-keyhole'
 import { z } from 'zod'
 import { signIn } from '#/lib/auth-client'
 import { safeRedirect } from '#/lib/format'

@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Trophy } from 'lucide-react'
+import { Trophy } from '#/components/icons/trophy'
 import { z } from 'zod'
 import CountUp from '#/components/bits/CountUp'
 import { EmptyState } from '#/components/empty-state'

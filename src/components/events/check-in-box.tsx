@@ -1,5 +1,5 @@
 import { useId, useRef, useState } from 'react'
-import { QrCode } from 'lucide-react'
+import { QrCode } from '#/components/icons/qr-code'
 import { checkInToEvent } from '#/server/events'
 import type { CheckInResult } from '#/services/events'
 import { fmtDate } from '#/lib/format'

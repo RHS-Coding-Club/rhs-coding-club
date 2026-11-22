@@ -1,7 +1,10 @@
 import { useId, useOptimistic, useRef, useTransition } from 'react'
 import type { KeyboardEvent } from 'react'
 import { Link, useRouter } from '@tanstack/react-router'
-import { Check, CircleHelp, LogIn, X } from 'lucide-react'
+import { Check } from '#/components/icons/check'
+import { CircleQuestionMark } from '#/components/icons/circle-question-mark'
+import { LogIn } from '#/components/icons/log-in'
+import { X } from '#/components/icons/x'
 import { motion, useReducedMotion } from 'motion/react'
 import { toast } from 'sonner'
 import { rsvpToEvent } from '#/server/events'
@@ -15,7 +18,7 @@ import type { Face } from './parts'
 const CHOICES: { value: RsvpChoice; label: string; short: string; icon: typeof Check }[] =
   [
     { value: 'yes', label: 'Going', short: 'Going', icon: Check },
-    { value: 'maybe', label: 'Maybe', short: 'Maybe', icon: CircleHelp },
+    { value: 'maybe', label: 'Maybe', short: 'Maybe', icon: CircleQuestionMark },
     { value: 'no', label: "Can't make it", short: "Can't", icon: X },
   ]
 

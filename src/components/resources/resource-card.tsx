@@ -1,4 +1,7 @@
-import { ArrowUpRight, Bookmark, BookmarkCheck, Clock } from 'lucide-react'
+import { ArrowUpRight } from '#/components/icons/arrow-up-right'
+import { Bookmark } from '#/components/icons/bookmark'
+import { BookmarkCheck } from '#/components/icons/bookmark-check'
+import { Clock } from '#/components/icons/clock'
 import ClickSpark from '#/components/bits/ClickSpark'
 import { LEVEL_LABEL, resourceDomain } from '#/lib/schemas/resources'
 import type { Level } from '#/lib/schemas/resources'

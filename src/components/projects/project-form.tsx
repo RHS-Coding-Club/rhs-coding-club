@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { Trash2 } from 'lucide-react'
+import { Trash2 } from '#/components/icons/trash-2'
 import { toast } from 'sonner'
 import { RaisedButton } from '#/components/raised-button'
 import { Input } from '#/components/ui/input'

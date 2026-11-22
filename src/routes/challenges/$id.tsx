@@ -1,5 +1,7 @@
 import { Link, createFileRoute, notFound } from '@tanstack/react-router'
-import { ArrowLeft, Eye, Users } from 'lucide-react'
+import { ArrowLeft } from '#/components/icons/arrow-left'
+import { Eye } from '#/components/icons/eye'
+import { Users } from '#/components/icons/users'
 import SplitText from '#/components/bits/SplitText'
 import { PageHero } from '#/components/page-hero'
 import { FadeUp } from '#/components/motion'

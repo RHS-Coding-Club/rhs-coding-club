@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Code2, Search } from 'lucide-react'
+import { CodeXml } from '#/components/icons/code-xml'
+import { Search } from '#/components/icons/search'
 import { z } from 'zod'
 import { AdminPageHeader } from '#/components/admin/admin-page-header'
 import { EmptyState } from '#/components/empty-state'
@@ -236,7 +237,7 @@ function AdminSubmissions() {
       </div>
 
       {visible.length === 0 ? (
-        <EmptyState icon={<Code2 />} title="No submissions here.">
+        <EmptyState icon={<CodeXml />} title="No submissions here.">
           {query
             ? 'Nobody by that name in this view.'
             : status === 'pending'

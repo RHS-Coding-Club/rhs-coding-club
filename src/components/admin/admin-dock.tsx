@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
-import { Ellipsis, Moon, Sun } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { Ellipsis } from '#/components/icons/ellipsis'
+import { Moon } from '#/components/icons/moon'
+import { Sun } from '#/components/icons/sun'
+import type { IconComponent } from '#/components/icons/create-icon'
 import Dock from '#/components/bits/Dock'
 import type { DockItemData } from '#/components/bits/Dock'
 import { ADMIN_NAV, AdminNav } from '#/components/admin/admin-nav'
@@ -63,7 +65,7 @@ const COMPACT: NavItem['to'][] = [
 const ACTIVE_TILE =
   '[--dock-tile:linear-gradient(180deg,var(--brand-blue)_0%,var(--brand-navy)_100%)] [--dock-tile-edge:color-mix(in_srgb,var(--brand-sky)_50%,transparent)] [--dock-ink:var(--brand-frost)]'
 
-const icon = (Icon: LucideIcon) => <Icon className="size-[45%]" strokeWidth={1.8} />
+const icon = (Icon: IconComponent) => <Icon className="size-[45%]" strokeWidth={1.8} />
 
 /**
  * The admin panel's navigation: React Bits Dock, pinned to the bottom of

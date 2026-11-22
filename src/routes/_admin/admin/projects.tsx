@@ -1,17 +1,15 @@
 import { useMemo, useState } from 'react'
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
-import {
-  Check,
-  ExternalLink,
-  FolderGit2,
-  Github,
-  Globe,
-  Pencil,
-  Search,
-  Star,
-  Undo2,
-  X,
-} from 'lucide-react'
+import { Check } from '#/components/icons/check'
+import { ExternalLink } from '#/components/icons/external-link'
+import { FolderGit2 } from '#/components/icons/folder-git-2'
+import { Github } from '#/components/icons/github'
+import { Globe } from '#/components/icons/globe'
+import { Pencil } from '#/components/icons/pencil'
+import { Search } from '#/components/icons/search'
+import { Star } from '#/components/icons/star'
+import { Undo2 } from '#/components/icons/undo-2'
+import { X } from '#/components/icons/x'
 import { toast } from 'sonner'
 import { AdminPageHeader } from '#/components/admin/admin-page-header'
 import { EmptyState } from '#/components/empty-state'

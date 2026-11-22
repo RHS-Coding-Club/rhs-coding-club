@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { X } from '#/components/icons/x'
 import { SKILLS_MAX, SKILL_MAX_LENGTH, cleanSkills } from '#/lib/schemas/account'
 import { Input } from '#/components/ui/input'
 

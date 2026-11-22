@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from '#/components/icons/arrow-left'
 import { PageHero } from '#/components/page-hero'
 import { BeamsBackground } from './beams-bg'
 
