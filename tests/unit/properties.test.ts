@@ -94,6 +94,18 @@ describe('safeSrc', () => {
       { numRuns: 5000 },
     )
   })
+
+  it('refuses paths that climb out of /files/', () => {
+    for (const raw of [
+      '/files/..',
+      '/files/../admin',
+      '/files/%2e%2e/admin',
+      '/files\\..',
+    ]) {
+      expect(safeSrc(raw)).toBeNull()
+    }
+    expect(safeSrc('/files/uploads/a.png')).toBe('/files/uploads/a.png')
+  })
 })
 
 describe('safeRedirect', () => {
