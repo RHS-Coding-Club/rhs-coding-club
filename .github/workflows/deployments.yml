@@ -1,0 +1,90 @@
+name: Deployments
+
+# Workers Builds deploys the site but only reports a check run, so GitHub's
+# Production and Preview environments would otherwise show nothing (or the old
+# Vercel links). This records each successful Workers build as a GitHub
+# deployment that links to the live Worker or the branch's Preview.
+
+on:
+  check_run:
+    types: [completed]
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+env:
+  WORKER_HOST: rhs.riponhighcodingclub.workers.dev
+  PREVIEW_SUFFIX: -rhs.riponhighcodingclub.workers.dev
+
+jobs:
+  record:
+    name: Record deployment
+    if: >-
+      github.event_name == 'check_run' &&
+      github.event.check_run.app.slug == 'cloudflare-workers-and-pages' &&
+      github.event.check_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+    steps:
+      - name: Create the deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.check_run.head_sha }}
+          BRANCH: ${{ github.event.check_run.check_suite.head_branch }}
+          DETAILS_URL: ${{ github.event.check_run.details_url }}
+        run: |
+          set -euo pipefail
+          # Preview builds link to .../previews/<preview-name>/builds/<id>.
+          if [[ "$DETAILS_URL" =~ /previews/([a-z0-9-]+)/builds/ ]]; then
+            preview="${BASH_REMATCH[1]}"
+            environment=Preview
+            url="https://${preview}${PREVIEW_SUFFIX}"
+            production=false
+          elif [[ "$BRANCH" == main ]]; then
+            preview=""
+            environment=Production
+            url="https://${WORKER_HOST}"
+            production=true
+          else
+            echo "Not a production or Preview build; nothing to record."
+            exit 0
+          fi
+
+          id=$(jq -n \
+            --arg ref "$SHA" --arg env "$environment" --arg preview "$preview" --arg branch "$BRANCH" \
+            --argjson production "$production" \
+            '{ref: $ref, environment: $env, auto_merge: false, required_contexts: [],
+              production_environment: $production, transient_environment: ($production | not),
+              description: "Cloudflare Workers", payload: {preview: $preview, branch: $branch}}' \
+            | gh api "repos/$GITHUB_REPOSITORY/deployments" --input - --jq .id)
+
+          # auto_inactive retires the earlier Production deployment. Previews are
+          # transient, so one PR's Preview never retires another's.
+          jq -n --arg url "$url" --arg log "$DETAILS_URL" \
+            '{state: "success", environment_url: $url, log_url: $log, auto_inactive: true}' \
+            | gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" --input - > /dev/null
+          echo "Recorded $environment deployment $id: $url"
+
+  retire:
+    name: Retire Preview
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+    steps:
+      - name: Mark the branch's Preview deployments inactive
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          gh api --paginate "repos/$GITHUB_REPOSITORY/deployments?environment=Preview&per_page=100" \
+            | jq -r --arg branch "$BRANCH" '.[] | select(.payload.branch? == $branch) | .id' \
+            | while read -r id; do
+                gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" \
+                  -f state=inactive -f description="Pull request closed" > /dev/null
+                echo "Retired deployment $id"
+              done
