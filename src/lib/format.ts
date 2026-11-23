@@ -62,17 +62,24 @@ export function fmtDate(
 const SITE = 'https://site.invalid'
 
 /**
- * True for a path on this site. Browsers drop tabs and newlines from a URL
- * and read a backslash as `/`, so `/\evil.com` and `/<tab>/evil.com` both go
- * to another site. This checks where the browser would actually go.
+ * The path a browser would load for a value meant as a path on this site, or
+ * null if it would leave the site. Browsers drop tabs and newlines from a URL,
+ * read a backslash as `/`, and resolve `..`, so `/\evil.com` and
+ * `/<tab>/evil.com` go to another site and `/files/../admin` is `/admin`.
  */
-export function isSitePath(value: string): boolean {
-  if (!value.startsWith('/')) return false
+export function sitePathname(value: string): string | null {
+  if (!value.startsWith('/')) return null
   try {
-    return new URL(value, SITE).origin === SITE
+    const url = new URL(value, SITE)
+    return url.origin === SITE ? url.pathname : null
   } catch {
-    return false
+    return null
   }
+}
+
+/** True for a path on this site (see `sitePathname`). */
+export function isSitePath(value: string): boolean {
+  return sitePathname(value) !== null
 }
 
 /** A `?redirect=` value, only if it's a path on this site (never another origin). */

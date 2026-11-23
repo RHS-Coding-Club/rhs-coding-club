@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { isSitePath, slugify } from '#/lib/format'
+import { isSitePath, sitePathname, slugify } from '#/lib/format'
 import { BRAND, EMAIL } from '#/lib/static-palette'
 
 // Rich text (blog posts, challenge prompts, newsletter issues) is stored as
@@ -111,7 +111,8 @@ export function safeHref(href: unknown): string | null {
 export function safeSrc(src: unknown): string | null {
   if (typeof src !== 'string') return null
   const v = src.trim()
-  if (v.startsWith('/files/')) return v
+  // Check the path the browser loads, so `/files/../admin` doesn't count.
+  if (v.startsWith('/')) return sitePathname(v)?.startsWith('/files/') ? v : null
   return /^https:\/\//i.test(v) ? v : null
 }
 
