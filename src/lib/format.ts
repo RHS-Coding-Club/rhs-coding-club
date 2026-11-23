@@ -59,12 +59,23 @@ export function fmtDate(
   return style === 'datetime' ? text.replace(/, (\d+:\d+ [AP]M)$/, ' · $1') : text
 }
 
+const SITE = 'https://site.invalid'
+
+/**
+ * True for a path on this site. Browsers drop tabs and newlines from a URL
+ * and read a backslash as `/`, so `/\evil.com` and `/<tab>/evil.com` both go
+ * to another site. This checks where the browser would actually go.
+ */
+export function isSitePath(value: string): boolean {
+  if (!value.startsWith('/')) return false
+  try {
+    return new URL(value, SITE).origin === SITE
+  } catch {
+    return false
+  }
+}
+
 /** A `?redirect=` value, only if it's a path on this site (never another origin). */
 export function safeRedirect(value: string | undefined, fallback = '/dashboard'): string {
-  return value &&
-    value.startsWith('/') &&
-    !value.startsWith('//') &&
-    !value.startsWith('/\\')
-    ? value
-    : fallback
+  return value && isSitePath(value) ? value : fallback
 }
