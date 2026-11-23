@@ -3,9 +3,8 @@ import { z } from 'zod'
 import { env } from 'cloudflare:workers'
 import { schema } from '#/db'
 import type { Db } from '#/db'
-import { docToMarkdown } from '#/lib/markdown'
-import { parseRichText } from '#/lib/rich-text'
 import { hasRole } from '#/lib/roles'
+import { present } from './present'
 import { TOOLS } from './tools'
 import type { McpTool, McpUser } from './types'
 
@@ -64,24 +63,6 @@ export function listToolsFor(user: Pick<McpUser, 'role'>): ToolListing[] {
       openWorldHint: t.name === 'upload_image',
     },
   }))
-}
-
-/** Rich-text documents become Markdown, and addresses go unless the tool needs them. */
-function present(value: unknown, revealEmails: boolean): unknown {
-  if (Array.isArray(value)) return value.map((v) => present(v, revealEmails))
-  if (value instanceof Date) return value.toISOString()
-  if (value === null || typeof value !== 'object') return value
-  const out: Record<string, unknown> = {}
-  for (const [key, v] of Object.entries(value)) {
-    if (!revealEmails && /email/i.test(key) && typeof v === 'string' && v.includes('@'))
-      continue
-    if (typeof v === 'string' && v.startsWith('{"type":"doc"')) {
-      out[key] = docToMarkdown(parseRichText(v))
-      continue
-    }
-    out[key] = present(v, revealEmails)
-  }
-  return out
 }
 
 function errorMessage(error: unknown) {

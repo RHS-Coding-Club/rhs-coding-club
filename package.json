@@ -89,6 +89,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
     "drizzle-kit": "^0.31.11",
+    "fast-check": "^4.11.0",
     "oxlint": "^1.94.0",
     "oxlint-tsgolint": "^7.0.2008",
     "prettier": "^3.10.1",

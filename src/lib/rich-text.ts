@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { slugify } from '#/lib/format'
+import { isSitePath, slugify } from '#/lib/format'
 import { BRAND, EMAIL } from '#/lib/static-palette'
 
 // Rich text (blog posts, challenge prompts, newsletter issues) is stored as
@@ -103,7 +103,7 @@ export function excerpt(node: RichNode, max = 180) {
 export function safeHref(href: unknown): string | null {
   if (typeof href !== 'string') return null
   const v = href.trim()
-  if (v.startsWith('/') && !v.startsWith('//')) return v
+  if (v.startsWith('/')) return isSitePath(v) ? v : null
   return /^(https?:|mailto:)/i.test(v) ? v : null
 }
 
@@ -164,7 +164,7 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ESC[c] ?? c)
 
 /**
  * HTML for emails (inline styles, no highlighting). Same allow-list as the
- * React renderer. `origin` makes uploaded image paths absolute.
+ * React renderer. `origin` makes uploaded images and site links absolute.
  */
 export function richTextToEmailHtml(node: RichNode, origin = ''): string {
   const kids = () =>
@@ -211,7 +211,9 @@ export function richTextToEmailHtml(node: RichNode, origin = ''): string {
           out = `<code style="background:${EMAIL.ground};padding:1px 5px;border-radius:5px;font-size:14px">${out}</code>`
         else if (m.type === 'link') {
           const href = safeHref(m.attrs?.href)
-          if (href) out = `<a href="${esc(href)}" style="color:${BRAND.navy}">${out}</a>`
+          // A mail client has no page to resolve a site path against.
+          const abs = href?.startsWith('/') ? `${origin}${href}` : href
+          if (abs) out = `<a href="${esc(abs)}" style="color:${BRAND.navy}">${out}</a>`
         }
       }
       return out
