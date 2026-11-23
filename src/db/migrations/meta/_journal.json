@@ -22,6 +22,13 @@
       "when": 1793605434619,
       "tag": "0002_mcp",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1795477759709,
+      "tag": "0003_mcp_client_approval",
+      "breakpoints": true
     }
   ]
 }

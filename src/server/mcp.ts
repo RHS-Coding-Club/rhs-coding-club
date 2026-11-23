@@ -82,11 +82,19 @@ export const getMcpOverview = createServerFn({ method: 'GET' })
           clientId: schema.oauthConsent.clientId,
           name: schema.oauthClient.name,
           connectedAt: schema.oauthConsent.createdAt,
+          approval: schema.mcpClientApproval.mode,
         })
         .from(schema.oauthConsent)
         .innerJoin(
           schema.oauthClient,
           eq(schema.oauthClient.clientId, schema.oauthConsent.clientId),
+        )
+        .leftJoin(
+          schema.mcpClientApproval,
+          and(
+            eq(schema.mcpClientApproval.clientId, schema.oauthConsent.clientId),
+            eq(schema.mcpClientApproval.userId, schema.oauthConsent.userId),
+          ),
         )
         .where(eq(schema.oauthConsent.userId, user.id))
         .orderBy(desc(schema.oauthConsent.createdAt)),
@@ -108,7 +116,7 @@ export const getMcpOverview = createServerFn({ method: 'GET' })
     ])
     return {
       mcpUrl: mcpResource(),
-      connections,
+      connections: connections.map((c) => ({ ...c, approval: c.approval ?? 'website' })),
       pending: pending.filter((p) => p.expiresAt.getTime() > Date.now()),
       activity,
       seesEveryone: hasRole(user.role, 'admin'),
@@ -127,9 +135,13 @@ export const disconnectMcpClient = createServerFn({ method: 'POST' })
       oauthAccessToken: access,
       oauthRefreshToken: refresh,
       oauthConsent: consent,
+      mcpClientApproval: approval,
     } = schema
     // Access tokens first: they point at the refresh tokens.
     await db.batch([
+      db
+        .delete(approval)
+        .where(and(eq(approval.clientId, clientId), eq(approval.userId, userId))),
       db
         .delete(access)
         .where(and(eq(access.clientId, clientId), eq(access.userId, userId))),
@@ -140,5 +152,40 @@ export const disconnectMcpClient = createServerFn({ method: 'POST' })
         .delete(consent)
         .where(and(eq(consent.clientId, clientId), eq(consent.userId, userId))),
     ])
+    return { ok: true as const }
+  })
+
+/**
+ * How risky tools from one of your connected apps get approved: here (the
+ * default), in the app's own prompt, or not at all beyond its Allow button.
+ * Website only: no MCP tool can change it.
+ */
+export const setMcpClientApproval = createServerFn({ method: 'POST' })
+  .middleware([requireOfficer])
+  .validator(
+    z.object({
+      clientId: z.string().min(1).max(2000),
+      mode: z.enum(['website', 'in-app', 'skip']),
+    }),
+  )
+  .handler(async ({ data, context }) => {
+    const db = getDb()
+    const { clientId, mode } = data
+    const userId = context.user.id
+    const { mcpClientApproval: approval, oauthConsent: consent } = schema
+    const mine = and(eq(approval.clientId, clientId), eq(approval.userId, userId))
+    if (mode === 'website') {
+      await db.delete(approval).where(mine)
+      return { ok: true as const }
+    }
+    const connected = await db.query.oauthConsent.findFirst({
+      where: and(eq(consent.clientId, clientId), eq(consent.userId, userId)),
+      columns: { id: true },
+    })
+    if (!connected) throw new Error('That app is not connected to your account.')
+    await db
+      .insert(approval)
+      .values({ userId, clientId, mode })
+      .onConflictDoUpdate({ target: [approval.userId, approval.clientId], set: { mode } })
     return { ok: true as const }
   })

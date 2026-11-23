@@ -79,12 +79,19 @@ function errorMessage(error: unknown) {
 export interface ToolResult {
   isError: boolean
   text: string[]
+  /**
+   * Set instead of acting when the person trusts this app's Approve prompt and the
+   * app can show one: ask the person this, then `answerApproval` for `id`.
+   */
+  ask?: { id: string; message: string }
 }
 
 export interface Caller {
   db: Db
   user: McpUser
   clientId: string | null
+  /** The app said it can show the person a form (MCP elicitation). */
+  canAsk?: boolean
 }
 
 async function audit(
@@ -119,6 +126,43 @@ function needsApproval(tool: McpTool, data: never) {
   return typeof tool.confirm === 'function' ? tool.confirm(data) : tool.confirm === true
 }
 
+/**
+ * How this person chose, on the website, to approve risky tools from this app.
+ * Read from the database, never from the app: an app could say anything.
+ */
+async function approvalModeOf({ db, user, clientId }: Caller) {
+  if (!clientId) return 'website' as const
+  const row = await db.query.mcpClientApproval.findFirst({
+    where: and(
+      eq(schema.mcpClientApproval.userId, user.id),
+      eq(schema.mcpClientApproval.clientId, clientId),
+    ),
+    columns: { mode: true },
+  })
+  return row?.mode ?? ('website' as const)
+}
+
+/** The fallback: a link to the website's approval page. */
+function approvalLink(id: string, summary: string, expiresAt: Date): ToolResult {
+  const approveUrl = `${env.APP_URL}/admin/mcp/${id}`
+  return {
+    isError: false,
+    text: [
+      JSON.stringify({
+        status: 'awaiting_approval',
+        done: false,
+        summary,
+        approveUrl,
+        expiresInMinutes: Math.max(
+          1,
+          Math.round((expiresAt.getTime() - Date.now()) / 60_000),
+        ),
+        message: `Nothing has happened yet. Show the officer this link so they can approve it: ${approveUrl}`,
+      }),
+    ],
+  }
+}
+
 /** One tools/call. Failures come back as results, so the AI can read and fix them. */
 export async function callTool(
   caller: Caller,
@@ -141,9 +185,13 @@ export async function callTool(
   const ctx = { db: caller.db, user: caller.user }
 
   try {
-    if (needsApproval(tool, data)) {
+    const risky = needsApproval(tool, data)
+    const mode = risky ? await approvalModeOf(caller) : null
+    const trusted = mode === 'skip'
+    if (risky && !trusted) {
       const summary = tool.preview ? await tool.preview(ctx, data) : tool.title
       const id = crypto.randomUUID()
+      const expiresAt = new Date(Date.now() + APPROVAL_MINUTES * 60_000)
       await caller.db.insert(schema.mcpPendingAction).values({
         id,
         userId: caller.user.id,
@@ -151,27 +199,25 @@ export async function callTool(
         tool: name,
         args: JSON.stringify(args ?? {}),
         summary,
-        expiresAt: new Date(Date.now() + APPROVAL_MINUTES * 60_000),
+        expiresAt,
       })
       await audit(caller, name, args, 'awaiting-approval', summary)
-      const approveUrl = `${env.APP_URL}/admin/mcp/${id}`
-      return {
-        isError: false,
-        text: [
-          JSON.stringify({
-            status: 'awaiting_approval',
-            done: false,
-            summary,
-            approveUrl,
-            expiresInMinutes: APPROVAL_MINUTES,
-            message: `Nothing has happened yet. Show the officer this link so they can approve it: ${approveUrl}`,
-          }),
-        ],
+      if (mode === 'in-app' && caller.canAsk) {
+        // The app shows this to the person, not to the AI, and sends back their answer.
+        const ask = { id, message: `${tool.title}: ${summary}` }
+        return { isError: false, text: [], ask }
       }
+      return approvalLink(id, summary, expiresAt)
     }
 
     const result = await tool.run(ctx, data)
-    await audit(caller, name, args, 'ok')
+    await audit(
+      caller,
+      name,
+      args,
+      'ok',
+      trusted ? "No approval asked: you trust this app's Allow button." : undefined,
+    )
     return success(tool, result)
   } catch (error) {
     const message = errorMessage(error)
@@ -233,6 +279,12 @@ async function claim(db: Db, user: McpUser, id: string, status: 'approved' | 're
 
 /** Runs an approved action as the person approving it, with their current role. */
 export async function approvePendingAction(db: Db, user: McpUser, id: string) {
+  await runPendingAction(db, user, id)
+  return { ok: true as const }
+}
+
+/** Claims, re-checks, and runs a pending action, returning what the tool returned. */
+async function runPendingAction(db: Db, user: McpUser, id: string) {
   const row = await claim(db, user, id, 'approved')
   const caller: Caller = { db, user, clientId: row.clientId }
   const args = JSON.parse(row.args) as unknown
@@ -252,21 +304,22 @@ export async function approvePendingAction(db: Db, user: McpUser, id: string) {
   const parsed = tool.input.safeParse(args)
   if (!parsed.success) return fail(errorMessage(parsed.error))
   const ctx = { db, user }
+  let result: unknown
   try {
-    // What gets approved is what the page showed. If the draft, the title, or the
-    // person's role has moved on since, the approval doesn't cover it any more.
+    // What gets approved is what the person was shown. If the draft, the title, or
+    // the person's role has moved on since, the approval doesn't cover it any more.
     const now = tool.preview ? await tool.preview(ctx, parsed.data as never) : tool.title
     if (now !== row.summary)
       return await fail(
         'This changed after the app asked. Nothing ran. Ask the app to request it again.',
       )
-    await tool.run(ctx, parsed.data as never)
+    result = await tool.run(ctx, parsed.data as never)
   } catch (error) {
     if (error instanceof ApprovalError) throw error
     return fail(errorMessage(error))
   }
   await audit(caller, row.tool, args, 'approved', row.summary)
-  return { ok: true as const }
+  return { tool, result }
 }
 
 export async function rejectPendingAction(db: Db, user: McpUser, id: string) {
@@ -279,6 +332,59 @@ export async function rejectPendingAction(db: Db, user: McpUser, id: string) {
     row.summary,
   )
   return { ok: true as const }
+}
+
+export type AppDecision = 'accept' | 'decline' | 'cancel' | 'missing'
+
+/**
+ * The app's retry after asking the person: run it, drop it, or fall back to the
+ * website link. `id` comes back through the app, so it only counts if it names
+ * a pending action this person's same app asked for with the same tool.
+ */
+export async function answerApproval(
+  caller: Caller,
+  name: string,
+  id: string,
+  decision: AppDecision,
+): Promise<ToolResult> {
+  const { db, user } = caller
+  const row = await db.query.mcpPendingAction.findFirst({
+    where: and(
+      eq(schema.mcpPendingAction.id, id),
+      eq(schema.mcpPendingAction.userId, user.id),
+    ),
+  })
+  if (!row || row.tool !== name || row.clientId !== caller.clientId)
+    return failure('That approval does not match this request. Nothing ran.')
+  // The answer comes from the app, so it only counts if this person chose to
+  // trust the app's prompt. Otherwise the website decides.
+  if ((await approvalModeOf(caller)) !== 'in-app')
+    return approvalLink(row.id, row.summary, row.expiresAt)
+
+  try {
+    if (decision === 'decline') {
+      await rejectPendingAction(db, user, id)
+      return {
+        isError: false,
+        text: [
+          JSON.stringify({
+            status: 'declined',
+            done: false,
+            message: 'The officer declined. Nothing happened.',
+          }),
+        ],
+      }
+    }
+    // Closed or skipped without an answer. Some apps do this when they can't
+    // actually show the form, so the website can still approve it.
+    if (decision !== 'accept') return approvalLink(row.id, row.summary, row.expiresAt)
+
+    const { tool, result } = await runPendingAction(db, user, id)
+    return success(tool, result)
+  } catch (error) {
+    if (error instanceof ApprovalError) return failure(error.message)
+    throw error
+  }
 }
 
 /** Recent tool calls for the website, for one person or (with null) everyone. */

@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import { user } from './auth'
 import { createdAt, id } from './helpers'
 
@@ -12,7 +12,8 @@ export const MCP_ACTION_STATUSES = [
 export type McpActionStatus = (typeof MCP_ACTION_STATUSES)[number]
 
 /**
- * A risky MCP tool call waiting for its caller to approve it on the website.
+ * A risky MCP tool call waiting for its caller to approve it, in the AI app or
+ * on the website.
  * `args` is what the AI sent; it is validated again when approved.
  */
 export const mcpPendingAction = sqliteTable(
@@ -62,4 +63,26 @@ export const mcpAuditLog = sqliteTable(
     createdAt: createdAt(),
   },
   (t) => [index('mcp_audit_log_created_idx').on(t.createdAt)],
+)
+
+export const MCP_APPROVAL_MODES = ['in-app', 'skip'] as const
+export type McpApprovalMode = (typeof MCP_APPROVAL_MODES)[number]
+
+/**
+ * How one officer's connected app gets risky tools approved, when it isn't the
+ * default of the website. `in-app` trusts the app's own Approve prompt, `skip`
+ * its Allow button. Both trust the app, so they're set on the website only.
+ */
+export const mcpClientApproval = sqliteTable(
+  'mcp_client_approval',
+  {
+    id: id(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    clientId: text('client_id').notNull(),
+    mode: text('mode', { enum: MCP_APPROVAL_MODES }).notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex('mcp_client_approval_user_client_idx').on(t.userId, t.clientId)],
 )

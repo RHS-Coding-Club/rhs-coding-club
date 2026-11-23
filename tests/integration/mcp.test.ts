@@ -123,7 +123,12 @@ async function tokenFor(cookie: string) {
 
 // ---------- MCP requests on the 2026-07-28 wire format ----------
 
-function rpc(token: string | null, method: string, params: Record<string, unknown> = {}) {
+function rpc(
+  token: string | null,
+  method: string,
+  params: Record<string, unknown> = {},
+  clientCapabilities: Record<string, unknown> = {},
+) {
   return handleMcpRequest(
     new Request(url('/mcp'), {
       method: 'POST',
@@ -144,7 +149,7 @@ function rpc(token: string | null, method: string, params: Record<string, unknow
           _meta: {
             'io.modelcontextprotocol/protocolVersion': PROTOCOL,
             'io.modelcontextprotocol/clientInfo': { name: 'test', version: '1' },
-            'io.modelcontextprotocol/clientCapabilities': {},
+            'io.modelcontextprotocol/clientCapabilities': clientCapabilities,
           },
         },
       }),
@@ -541,6 +546,7 @@ const COVERAGE: Record<string, string | null> = {
   rejectMcpAction: null,
   getMcpOverview: null,
   disconnectMcpClient: null,
+  setMcpClientApproval: null,
 }
 
 describe('the tool list', () => {
@@ -1136,5 +1142,232 @@ describe('cleanUpMcp', () => {
         where: eq(schema.mcpPendingAction.id, 'old-action'),
       }),
     ).toBeUndefined()
+  })
+})
+
+// ---------- Approving in the app ----------
+
+const FORMS = { elicitation: { form: {} } }
+
+interface AskResult {
+  resultType: string
+  inputRequests: Record<string, { method: string; params: { message: string } }>
+  requestState: string
+}
+
+/** A tools/call from an app that can show the person a form. */
+async function ask(token: string, name: string, args: Record<string, unknown>) {
+  const res = await rpc(token, 'tools/call', { name, arguments: args }, FORMS)
+  expect(res.status).toBe(200)
+  return (await res.json<{ result: AskResult }>()).result
+}
+
+/** The app's retry with the person's answer. */
+async function answer(
+  token: string,
+  name: string,
+  args: Record<string, unknown>,
+  requestState: string,
+  action: 'accept' | 'decline' | 'cancel',
+) {
+  const res = await rpc(
+    token,
+    'tools/call',
+    {
+      name,
+      arguments: args,
+      requestState,
+      inputResponses: {
+        approve: action === 'accept' ? { action, content: {} } : { action },
+      },
+    },
+    FORMS,
+  )
+  expect(res.status).toBe(200)
+  return (await res.json<{ result: CallResult }>()).result
+}
+
+const setMode = async (user: { id: string }, mode: 'in-app' | 'skip' | null) => {
+  await db
+    .delete(schema.mcpClientApproval)
+    .where(eq(schema.mcpClientApproval.userId, user.id))
+  if (mode)
+    await db
+      .insert(schema.mcpClientApproval)
+      .values({ userId: user.id, clientId: CLIENT_ID, mode })
+}
+
+describe('approving in the app', () => {
+  beforeAll(() => setMode(admin.user, 'in-app'))
+  afterAll(() => setMode(admin.user, null))
+
+  it("doesn't take the app's word unless the person chose to", async () => {
+    await setMode(admin.user, null)
+    try {
+      const target = await createUser('selfapprove', 'member')
+      const args = { userId: target.user.id, role: 'admin' }
+      // An app that can show forms still gets the link by default...
+      const id = approveIdOf(
+        (
+          await rpc(
+            adminToken,
+            'tools/call',
+            { name: 'set_user_role', arguments: args },
+            FORMS,
+          ).then((r) => r.json<{ result: CallResult }>())
+        ).result,
+      )
+      // ...and an Accept it makes up on its own doesn't run anything.
+      const forged = await answer(adminToken, 'set_user_role', args, id, 'accept')
+      expect(approveIdOf(forged)).toBe(id)
+      expect(await roleOf(target.user.id)).toBe('member')
+      expect((await getPendingAction(db, admin.user, id))?.status).toBe('pending')
+    } finally {
+      await setMode(admin.user, 'in-app')
+    }
+  })
+
+  it('asks the person in the app, and runs once when they accept', async () => {
+    const target = await createUser('inapp', 'member')
+    const args = { userId: target.user.id, role: 'officer' }
+    const asked = await ask(adminToken, 'set_user_role', args)
+    expect(asked.resultType).toBe('input_required')
+    expect(asked.inputRequests.approve.method).toBe('elicitation/create')
+    expect(asked.inputRequests.approve.params.message).toContain(
+      'Change the account inapp@mcp.test',
+    )
+    expect(await roleOf(target.user.id)).toBe('member')
+
+    const done = await answer(
+      adminToken,
+      'set_user_role',
+      args,
+      asked.requestState,
+      'accept',
+    )
+    expect(done.isError).toBeFalsy()
+    expect(await roleOf(target.user.id)).toBe('officer')
+    expect((await getPendingAction(db, admin.user, asked.requestState))?.status).toBe(
+      'approved',
+    )
+
+    const again = await answer(
+      adminToken,
+      'set_user_role',
+      args,
+      asked.requestState,
+      'accept',
+    )
+    expect(again.isError).toBe(true)
+  })
+
+  it('drops it when the person declines', async () => {
+    const target = await createUser('declined', 'member')
+    const args = { userId: target.user.id, role: 'admin' }
+    const asked = await ask(adminToken, 'set_user_role', args)
+    const result = await answer(
+      adminToken,
+      'set_user_role',
+      args,
+      asked.requestState,
+      'decline',
+    )
+    expect(json(result).status).toBe('declined')
+    expect(await roleOf(target.user.id)).toBe('member')
+    expect((await getPendingAction(db, admin.user, asked.requestState))?.status).toBe(
+      'rejected',
+    )
+  })
+
+  it('falls back to the website link when the prompt is closed', async () => {
+    const target = await createUser('closed', 'member')
+    const args = { userId: target.user.id, role: 'admin' }
+    const asked = await ask(adminToken, 'set_user_role', args)
+    const result = await answer(
+      adminToken,
+      'set_user_role',
+      args,
+      asked.requestState,
+      'cancel',
+    )
+    expect(approveIdOf(result)).toBe(asked.requestState)
+    expect((await getPendingAction(db, admin.user, asked.requestState))?.status).toBe(
+      'pending',
+    )
+  })
+
+  it("won't run someone else's request, or under another tool's name", async () => {
+    const target = await createUser('stolen', 'member')
+    const args = { userId: target.user.id, role: 'admin' }
+    const asked = await ask(adminToken, 'set_user_role', args)
+
+    const otherTool = await answer(
+      adminToken,
+      'delete_resource',
+      { id: 'x' },
+      asked.requestState,
+      'accept',
+    )
+    expect(otherTool.isError).toBe(true)
+    const otherPerson = await answer(
+      officerToken,
+      'set_user_role',
+      args,
+      asked.requestState,
+      'accept',
+    )
+    expect(otherPerson.isError).toBe(true)
+    expect(await roleOf(target.user.id)).toBe('member')
+    expect((await getPendingAction(db, admin.user, asked.requestState))?.status).toBe(
+      'pending',
+    )
+  })
+
+  it('still gives a link to apps that can’t show a form, or only say so vaguely', async () => {
+    const target = await createUser('noform', 'member')
+    const result = await call(adminToken, 'set_user_role', {
+      userId: target.user.id,
+      role: 'admin',
+    })
+    expect(approveIdOf(result)).toBeTruthy()
+    const bare = await rpc(
+      adminToken,
+      'tools/call',
+      { name: 'set_user_role', arguments: { userId: target.user.id, role: 'admin' } },
+      { elicitation: {} },
+    ).then((r) => r.json<{ result: CallResult }>())
+    expect(approveIdOf(bare.result)).toBeTruthy()
+  })
+})
+
+describe('trusting an app', () => {
+  it("runs risky tools straight away from a trusted app, and only that person's", async () => {
+    await setMode(admin.user, 'skip')
+    try {
+      const target = await createUser('trusted', 'member')
+      const result = await call(adminToken, 'set_user_role', {
+        userId: target.user.id,
+        role: 'officer',
+      })
+      expect(result.isError).toBeFalsy()
+      expect(json(result).status).not.toBe('awaiting_approval')
+      expect(await roleOf(target.user.id)).toBe('officer')
+
+      // The officer using the same app hasn't trusted it.
+      const saved = json(
+        await call(officerToken, 'save_newsletter_issue', {
+          subject: 'Trust test',
+          content: 'Hi.',
+        }),
+      ) as { id: string }
+      approveIdOf(await call(officerToken, 'send_newsletter', { id: saved.id }))
+    } finally {
+      await setMode(admin.user, null)
+    }
+
+    const later = await createUser('untrusted', 'member')
+    approveIdOf(
+      await call(adminToken, 'set_user_role', { userId: later.user.id, role: 'officer' }),
+    )
   })
 })
