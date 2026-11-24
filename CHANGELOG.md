@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/RHS-Coding-Club/rhs-coding-club/compare/v1.3.1...v1.4.0) (2026-11-24)
+
+
+### Features
+
+* **mcp:** let officers approve risky actions in their AI app ([#133](https://github.com/RHS-Coding-Club/rhs-coding-club/issues/133)) ([40170e1](https://github.com/RHS-Coding-Club/rhs-coding-club/commit/40170e127e7ed240280be87a919dd4c257e56dfd))
+
+
+### Bug Fixes
+
+* keep rich-text images inside /files/ ([#130](https://github.com/RHS-Coding-Club/rhs-coding-club/issues/130)) ([3e940a1](https://github.com/RHS-Coding-Club/rhs-coding-club/commit/3e940a10b37d9b2d06af4b852bbc28d350c98b53))
+* redesign and polish every page of the site ([#134](https://github.com/RHS-Coding-Club/rhs-coding-club/issues/134)) ([5bcb905](https://github.com/RHS-Coding-Club/rhs-coding-club/commit/5bcb905840027b619cab48e6c5104ca99389f16d))
+
 ## [1.3.1](https://github.com/RHS-Coding-Club/rhs-coding-club/compare/v1.3.0...v1.3.1) (2026-11-23)
 
 
