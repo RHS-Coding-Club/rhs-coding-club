@@ -28,6 +28,8 @@ const BLURB: Partial<Record<(typeof ADMIN_NAV)[number]['to'], string>> = {
   '/admin/users': 'Roles and accounts',
   '/admin/officers': 'Who shows on the about page',
   '/admin/settings': 'Points, email, club details',
+  '/admin/mcp': 'Apps that run this panel for you',
+  '/admin/backups': 'Copies of the club’s data',
   '/admin/reset': 'New school year, sample data, full wipe',
 }
 
@@ -45,7 +47,6 @@ function AdminHome() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Overview"
         title={
           total === 0
             ? 'All caught up.'
@@ -54,7 +55,9 @@ function AdminHome() {
         description="Pending work across every queue. Everything else is in the dock at the bottom of the screen."
       />
 
-      <ul className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      {/* Phones get one row per queue (count on the right, thumb-sized);
+          wider screens get a card per queue. */}
+      <ul className="grid gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
         {queues.map((q) => {
           const n = 'queue' in q ? counts[q.queue] : 0
           const Icon = q.icon
@@ -63,7 +66,7 @@ function AdminHome() {
               <Link
                 to={q.to}
                 className={cn(
-                  'group ring-border/70 hover:ring-foreground/25 flex h-full flex-col rounded-3xl p-5 ring-1 transition-shadow',
+                  'group ring-border/70 hover:ring-foreground/25 flex h-full items-center gap-3 rounded-2xl p-4 ring-1 transition-[box-shadow,scale] duration-150 ease-out active:scale-[0.98] sm:flex-col sm:items-stretch sm:gap-0 sm:rounded-3xl sm:p-5',
                   n > 0 && 'ring-brand-sky/50',
                 )}
                 style={{ background: 'var(--bits-surface)' }}
@@ -77,21 +80,19 @@ function AdminHome() {
                     aria-hidden="true"
                   />
                   <ArrowUpRight
-                    className="text-muted-foreground size-4 opacity-0 transition-opacity group-hover:opacity-100"
+                    className="text-muted-foreground hidden size-4 opacity-0 transition-opacity group-hover:opacity-100 sm:block"
                     aria-hidden="true"
                   />
                 </span>
-                <span
-                  className={cn(
-                    'tabular mt-6 font-mono text-4xl font-medium tracking-tight',
-                    n === 0 && 'text-muted-foreground/60',
-                  )}
-                >
-                  {n}
+                <span className="min-w-0 sm:order-2 sm:mt-1">
+                  <span className="block font-medium">{q.label}</span>
+                  <span className="text-muted-foreground mt-0.5 block text-xs text-pretty">
+                    {BLURB[q.to]}
+                  </span>
                 </span>
-                <span className="mt-1 font-medium">{q.label}</span>
-                <span className="text-muted-foreground mt-0.5 text-xs">
-                  {BLURB[q.to]}
+                <span className="ml-auto font-mono text-2xl font-medium tracking-tight tabular-nums sm:order-1 sm:mt-6 sm:ml-0 sm:text-4xl">
+                  <span className={cn(n === 0 && 'text-muted-foreground/60')}>{n}</span>
+                  <span className="sr-only"> waiting</span>
                 </span>
               </Link>
             </li>
@@ -99,7 +100,9 @@ function AdminHome() {
         })}
       </ul>
 
-      <h2 className="mt-12 mb-4 text-lg font-semibold tracking-[-0.02em]">Manage</h2>
+      <h2 className="mt-10 mb-3 text-lg font-semibold tracking-[-0.02em] sm:mt-12 sm:mb-4">
+        Manage
+      </h2>
       <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {rest.map((p) => {
           const Icon = p.icon
@@ -107,7 +110,7 @@ function AdminHome() {
             <li key={p.to}>
               <Link
                 to={p.to}
-                className="hover:bg-muted/60 ring-border/70 flex items-center gap-4 rounded-2xl p-4 ring-1 transition-colors"
+                className="hover:bg-muted/60 ring-border/70 flex items-center gap-4 rounded-2xl p-3.5 ring-1 transition-[background-color,scale] duration-150 ease-out active:scale-[0.98] sm:p-4"
               >
                 <span className="bg-muted grid size-10 shrink-0 place-items-center rounded-xl">
                   <Icon className="size-4.5" aria-hidden="true" />

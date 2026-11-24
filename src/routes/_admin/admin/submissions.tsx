@@ -159,12 +159,21 @@ function AdminSubmissions() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Review"
         title="Submissions"
         description={
-          pendingTotal === 0
-            ? 'Nothing waiting. Every submission has been reviewed.'
-            : `${pendingTotal} waiting for review. Press j and k to move through the queue.`
+          pendingTotal === 0 ? (
+            'Nothing waiting. Every submission has been reviewed.'
+          ) : (
+            <>
+              {pendingTotal} waiting for review.
+              {/* Keyboard hint only where there's a keyboard. */}
+              <span className="hidden [@media(hover:hover)_and_(pointer:fine)]:inline">
+                {' '}
+                Press <kbd className="font-mono">j</kbd> and{' '}
+                <kbd className="font-mono">k</kbd> to move through the queue.
+              </span>
+            </>
+          )
         }
       />
 
@@ -237,7 +246,7 @@ function AdminSubmissions() {
       </div>
 
       {visible.length === 0 ? (
-        <EmptyState icon={<CodeXml />} title="No submissions here.">
+        <EmptyState icon={<CodeXml />} title="No submissions in this view">
           {query
             ? 'Nobody by that name in this view.'
             : status === 'pending'
@@ -294,7 +303,7 @@ function AdminSubmissions() {
           {desktop && (
             <section
               aria-label="Selected submission"
-              className="bg-card border-border hidden self-start rounded-lg border p-5 lg:sticky lg:top-24 lg:block"
+              className="bg-card border-border hidden self-start rounded-lg border p-5 lg:sticky lg:top-28 lg:block"
             >
               {detail ?? (
                 <p className="text-muted-foreground py-16 text-center text-sm">
@@ -313,7 +322,7 @@ function AdminSubmissions() {
         >
           <SheetContent
             side="right"
-            className="w-full overflow-y-auto p-5 pt-12 sm:max-w-lg"
+            className="w-full overflow-y-auto overscroll-contain p-5 pt-12 sm:max-w-lg"
           >
             <SheetTitle className="sr-only">Submission</SheetTitle>
             {detail}

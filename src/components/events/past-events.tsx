@@ -66,14 +66,20 @@ export function PastEvents({ events }: { events: EventCardData[] }) {
                         <span className="sr-only sm:hidden">You were there</span>
                       </span>
                     )}
-                    <span className="text-muted-foreground tabular-nums">
-                      <span className="text-foreground font-semibold">{e.attended}</span>
-                      <span className="sr-only sm:not-sr-only"> attended</span>
-                      <Users
-                        className="ml-1 inline size-3.5 align-[-2px] sm:hidden"
-                        aria-hidden="true"
-                      />
-                    </span>
+                    {/* No count at all beats a column of zeros on events
+                        nobody checked in to (older ones predate check-in). */}
+                    {e.attended > 0 && (
+                      <span className="text-muted-foreground tabular-nums">
+                        <span className="text-foreground font-semibold">
+                          {e.attended}
+                        </span>
+                        <span className="sr-only sm:not-sr-only"> attended</span>
+                        <Users
+                          className="ml-1 inline size-3.5 align-[-2px] sm:hidden"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    )}
                   </span>
                 </Link>
               </li>

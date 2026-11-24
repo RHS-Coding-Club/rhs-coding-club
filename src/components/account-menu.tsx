@@ -5,8 +5,8 @@ import { FolderPlus } from '#/components/icons/folder-plus'
 import { LayoutDashboard } from '#/components/icons/layout-dashboard'
 import { LogOut } from '#/components/icons/log-out'
 import { ShieldCheck } from '#/components/icons/shield-check'
-import { Sparkles } from '#/components/icons/sparkles'
 import { UserCog } from '#/components/icons/user-cog'
+import { UserPlus } from '#/components/icons/user-plus'
 import { UserRound } from '#/components/icons/user-round'
 import type { IconComponent } from '#/components/icons/create-icon'
 import { signOut } from '#/lib/auth-client'
@@ -113,7 +113,7 @@ export function AccountMenu({ user }: { user: SessionUser }) {
               label="Profile"
             />
           ) : (
-            <Tile to="/join" icon={Sparkles} label="Apply to join" />
+            <Tile to="/join" icon={UserPlus} label="Apply to join" />
           )}
           <Tile to="/account" icon={UserCog} label="Settings" />
           {isOfficer ? (

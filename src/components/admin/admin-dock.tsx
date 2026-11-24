@@ -168,15 +168,26 @@ export function AdminDock({
         className="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-28"
       >
         <div className="pointer-events-auto hidden xl:contents">
-          <Dock items={wide} {...shared} className="bottom-4!" />
+          <Dock
+            items={wide}
+            {...shared}
+            className="bottom-[calc(1rem+env(safe-area-inset-bottom,0px))]!"
+          />
         </div>
         <div className="pointer-events-auto contents xl:hidden">
-          <Dock items={compact} {...shared} className="bottom-3!" />
+          <Dock
+            items={compact}
+            {...shared}
+            className="bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))]!"
+          />
         </div>
       </nav>
 
       <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
-        <SheetContent side="bottom" className="max-h-[80dvh] rounded-t-3xl p-4 pb-8">
+        <SheetContent
+          side="bottom"
+          className="max-h-[80dvh] overflow-y-auto overscroll-contain rounded-t-3xl p-4 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]"
+        >
           <SheetTitle className="px-2.5 pt-1 pb-3 text-base font-semibold">
             Admin pages
           </SheetTitle>

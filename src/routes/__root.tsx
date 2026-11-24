@@ -10,6 +10,8 @@ import { MotionConfig } from 'motion/react'
 import { getSessionUser } from '#/server/auth'
 import type { SessionUser } from '#/server/auth'
 import { getTheme } from '#/server/theme'
+import { STATIC_GROUND } from '#/lib/static-palette'
+import { cn } from '#/lib/utils'
 import { SiteHeader } from '#/components/site-header'
 import { SiteFooter } from '#/components/site-footer'
 import { ThemeToggle } from '#/components/theme-toggle'
@@ -34,13 +36,25 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     const [user, theme] = await Promise.all([getSessionUser(), getTheme()])
     return { user, theme }
   },
-  head: () => ({
+  head: ({ match }) => ({
     meta: [
       { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      // viewport-fit=cover lets the floating header and toggle read the safe-area
+      // insets; resizes-content makes Android's keyboard shrink the layout.
+      {
+        name: 'viewport',
+        content:
+          'width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content',
+      },
       { title: 'RHS Coding Club' },
       { name: 'description', content: DESCRIPTION },
-      { name: 'theme-color', content: '#0b0f15' },
+      // The browser chrome matches the page ground of the theme in the cookie;
+      // the toggle updates it on a flip (see useFlipTheme).
+      {
+        name: 'theme-color',
+        content:
+          match.context.theme === 'light' ? STATIC_GROUND.light : STATIC_GROUND.dark,
+      },
       // Defaults for link previews; a page's own og: tags replace these one by one, so
       // nothing here may describe this particular image (cover images override it).
       { property: 'og:site_name', content: 'RHS Coding Club' },
@@ -103,6 +117,8 @@ function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isHome = pathname === '/'
   const bare = AUTH_PAGES.has(pathname)
+  // Admin pages are a tool: the dock sits where the footer would, so no footer.
+  const isAdmin = pathname === '/admin' || pathname.startsWith('/admin/')
   return (
     // reducedMotion="user": with the OS setting on, motion skips transforms and
     // layout animation site-wide and keeps fades, without changing markup.
@@ -110,11 +126,24 @@ function RootLayout() {
       <SmoothScroll>
         <SparkRoot>
           <div className="flex min-h-dvh flex-col">
+            <a
+              href="#main"
+              className="fixed top-3 left-3 z-60 -translate-y-24 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus-visible:translate-y-0"
+            >
+              Skip to content
+            </a>
             {!bare && <SiteHeader user={user} />}
-            <main className={isHome || bare ? 'flex-1' : 'flex-1 pt-(--header-offset)'}>
+            <main
+              id="main"
+              tabIndex={-1}
+              className={cn(
+                'flex-1 outline-none',
+                !(isHome || bare) && 'pt-(--header-offset)',
+              )}
+            >
               <Outlet />
             </main>
-            {!bare && <SiteFooter theme={theme} />}
+            {!bare && !isAdmin && <SiteFooter theme={theme} />}
             <ThemeToggle initial={theme} />
           </div>
         </SparkRoot>

@@ -17,8 +17,6 @@ import type { EditableResource } from '#/components/resources/admin-resource-dia
 import { EMPTY_RESOURCE } from '#/components/resources/resource-form'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -26,6 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '#/components/ui/alert-dialog'
+import { ConfirmAction, ConfirmCancel } from '#/components/admin/confirm-buttons'
 import {
   Select,
   SelectContent,
@@ -97,7 +96,6 @@ function AdminResources() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Content"
         title="Resources"
         description="Links on /resources. Member suggestions wait here as pending until you approve them."
         actions={
@@ -159,7 +157,9 @@ function AdminResources() {
       {visible.length === 0 ? (
         <EmptyState
           icon={<LibraryBig />}
-          title={status === 'pending' ? 'No suggestions waiting.' : 'Nothing here.'}
+          title={
+            status === 'pending' ? 'No suggestions waiting' : 'No resources in this view'
+          }
         >
           {status === 'pending'
             ? 'Members suggest links from /resources. They show up here for review.'
@@ -284,9 +284,8 @@ function AdminResources() {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            <ConfirmCancel />
+                            <ConfirmAction
                               onClick={() =>
                                 act(
                                   r.id,
@@ -295,8 +294,8 @@ function AdminResources() {
                                 )
                               }
                             >
-                              Delete
-                            </AlertDialogAction>
+                              {r.approved ? 'Delete resource' : 'Reject suggestion'}
+                            </ConfirmAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>

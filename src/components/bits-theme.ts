@@ -44,19 +44,6 @@ export const CAROUSEL_VARS = {
   '--carousel-badge': WELL,
 } as CSSProperties
 
-export const PROFILE_CARD_VARS = {
-  '--pc-frame': 'var(--bits-glass)',
-  '--pc-frame-edge': 'var(--bits-edge)',
-  '--pc-frame-highlight': 'var(--bits-highlight)',
-  '--pc-frame-shadow': 'var(--bits-shadow)',
-  '--pc-tile': 'var(--bits-tile)',
-  '--pc-tile-edge': 'var(--bits-edge)',
-  '--pc-tile-highlight': 'var(--bits-highlight)',
-  '--pc-tile-shadow': 'var(--bits-tile-shadow)',
-  '--pc-ink': 'var(--foreground)',
-  '--pc-muted': 'var(--muted-foreground)',
-} as CSSProperties
-
 export const CARD_SWAP_VARS = {
   '--swap-tile': 'var(--bits-tile)',
   '--swap-tile-edge': 'var(--bits-edge)',

@@ -112,7 +112,6 @@ function AdminGithub() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Members"
         title="GitHub org"
         description={`Invite requests for the ${org} organization. The hourly sync marks people joined once they accept.`}
         actions={
@@ -182,7 +181,7 @@ function AdminGithub() {
       {visible.length === 0 ? (
         <EmptyState
           icon={<Github />}
-          title={tab === 'pending' ? 'No requests waiting.' : 'Nothing here.'}
+          title={tab === 'pending' ? 'No requests waiting' : 'No requests in this view'}
         >
           Members request invites from /github.
         </EmptyState>

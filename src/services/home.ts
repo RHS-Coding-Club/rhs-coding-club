@@ -213,10 +213,35 @@ export async function getClubPulseData(db: Db, now = new Date()) {
 
 export type ClubPulse = Awaited<ReturnType<typeof getClubPulseData>>
 
-export async function getAboutData(db: Db) {
-  const [club, social, officers] = await Promise.all([
+/** The three live numbers the home and about pages show. */
+async function getClubStats(db: Db, now: Date) {
+  const since = await pointsWindowStart(db, now)
+  const [members, events, projects] = await Promise.all([
+    db
+      .select({ n: count() })
+      .from(schema.user)
+      .where(inArray(schema.user.role, MEMBER_ROLES)),
+    db
+      .select({ n: count() })
+      .from(schema.event)
+      .where(and(gte(schema.event.startsAt, since), lt(schema.event.startsAt, now))),
+    db
+      .select({ n: count() })
+      .from(schema.project)
+      .where(eq(schema.project.status, 'approved')),
+  ])
+  return {
+    members: members[0]?.n ?? 0,
+    eventsThisSemester: events[0]?.n ?? 0,
+    projects: projects[0]?.n ?? 0,
+  }
+}
+
+export async function getAboutData(db: Db, now = new Date()) {
+  const [club, social, stats, officers] = await Promise.all([
     getSetting(db, 'club-info'),
     getSetting(db, 'social'),
+    getClubStats(db, now),
     db.query.officer.findMany({
       where: eq(schema.officer.isActive, true),
       orderBy: [schema.officer.sortOrder, schema.officer.name],
@@ -230,7 +255,7 @@ export async function getAboutData(db: Db) {
       },
     }),
   ])
-  return { club, social, officers }
+  return { club, social, stats, officers }
 }
 
 export type AboutData = Awaited<ReturnType<typeof getAboutData>>

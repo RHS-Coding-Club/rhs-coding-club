@@ -96,7 +96,6 @@ function AttendancePage() {
         All events
       </Link>
       <AdminPageHeader
-        eyebrow="Attendance"
         title={event.title}
         description={`${fmtEventWhen(event.startsAt, event.endsAt)} · ${event.location}`}
         actions={

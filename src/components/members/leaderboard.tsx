@@ -4,7 +4,7 @@ import { Calendar } from '#/components/icons/calendar'
 import { CodeXml } from '#/components/icons/code-xml'
 import { Crown } from '#/components/icons/crown'
 import { FolderGit2 } from '#/components/icons/folder-git-2'
-import { Sparkles } from '#/components/icons/sparkles'
+import { Award } from '#/components/icons/award'
 import CountUp from '#/components/bits/CountUp'
 import TiltedCard from '#/components/bits/TiltedCard'
 import { FadeUp, EASE } from '#/components/motion'
@@ -93,7 +93,7 @@ export function Podium({
   const second = rows.at(1)
   const third = rows.at(2)
   return (
-    <ol className="grid items-end gap-4 md:grid-cols-[1fr_1.15fr_1fr]">
+    <ol className="grid grid-cols-2 items-end gap-3 sm:gap-4 md:grid-cols-[1fr_1.15fr_1fr]">
       {second && (
         <li className="order-2 md:order-1">
           <FadeUp delay={0.1}>
@@ -102,7 +102,7 @@ export function Podium({
         </li>
       )}
       {first && (
-        <li className="order-1 md:order-2">
+        <li className="order-1 col-span-2 md:order-2 md:col-span-1">
           <FadeUp>
             <ChampionCard row={first} dark={dark} you={first.userId === viewerId} />
           </FadeUp>
@@ -124,7 +124,7 @@ function PodiumCard({ row, place, you }: { row: Row; place: 2 | 3; you: boolean 
     <Link
       to="/members/$id"
       params={{ id: row.userId }}
-      className="group bg-card ring-border/70 hover:ring-border focus-visible:ring-ring flex flex-col items-center rounded-3xl px-6 pt-8 pb-7 text-center ring-1 transition-shadow outline-none focus-visible:ring-2"
+      className="group bg-card ring-border/70 hover:ring-border focus-visible:ring-ring flex flex-col items-center rounded-3xl px-4 pt-6 pb-6 text-center ring-1 transition-shadow outline-none focus-visible:ring-2 sm:px-6 sm:pt-8 sm:pb-7"
       style={{ background: 'var(--bits-surface)' }}
     >
       <span className={cn('font-mono text-xs', PLACE[place].text)}>
@@ -133,12 +133,15 @@ function PodiumCard({ row, place, you }: { row: Row; place: 2 | 3; you: boolean 
       </span>
       <UserAvatar
         user={row}
-        className={cn('mt-4 size-20 text-2xl ring-4', PLACE[place].ring)}
+        className={cn(
+          'mt-4 size-16 text-xl ring-4 sm:size-20 sm:text-2xl',
+          PLACE[place].ring,
+        )}
       />
-      <p className="mt-4 max-w-full truncate text-lg font-semibold tracking-tight group-hover:underline group-hover:underline-offset-4">
+      <p className="mt-4 max-w-full truncate text-base font-semibold tracking-tight group-hover:underline group-hover:underline-offset-4 sm:text-lg">
         {row.name}
       </p>
-      <p className="mt-1 text-3xl font-semibold tracking-[-0.04em] tabular-nums">
+      <p className="mt-1 text-2xl font-semibold tracking-[-0.04em] tabular-nums sm:text-3xl">
         <CountUp to={row.points} separator="," duration={1.4} />
         <span className="text-muted-foreground ml-1.5 text-sm font-normal tracking-normal">
           pts
@@ -286,7 +289,7 @@ export function HowPoints({ values }: { values: Leaderboard['values'] }) {
       body: `${values.project} for each teammate when a project is approved for the showcase.`,
     },
     {
-      icon: Sparkles,
+      icon: Award,
       title: 'Officer bonuses',
       body: 'Officers add points for things like running a lunch session or mentoring at RAP.',
     },

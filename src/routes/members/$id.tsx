@@ -1,24 +1,21 @@
-import { Link, createFileRoute, notFound } from '@tanstack/react-router'
-import { ArrowUpRight } from '#/components/icons/arrow-up-right'
+import { createFileRoute, notFound } from '@tanstack/react-router'
 import { Award } from '#/components/icons/award'
 import { CodeXml } from '#/components/icons/code-xml'
 import { FolderGit2 } from '#/components/icons/folder-git-2'
-import { Github } from '#/components/icons/github'
 import { EmptyState } from '#/components/empty-state'
-import { BadgeShelf } from '#/components/members/badge-shelf'
+import { BadgeBinder, RARITY_ORDER } from '#/components/members/badge-binder'
 import { DotGridBackground } from '#/components/members/dot-grid-bg'
-import { MemberProfileCard } from '#/components/members/profile-card'
-import { Stat } from '#/components/members/stat'
+import { GithubLink, MemberCard } from '#/components/members/member-card'
+import { ProjectRail } from '#/components/members/project-rail'
+import { RARITY } from '#/components/members/rarity'
+import { WeeksSolved } from '#/components/members/weeks-solved'
 import { FadeUp } from '#/components/motion'
 import { PageHero } from '#/components/page-hero'
-import { TooltipProvider } from '#/components/ui/tooltip'
 import { useIsDark } from '#/hooks/use-is-dark'
-import { fileUrl } from '#/lib/files'
 import { fmtDate } from '#/lib/format'
 import { ROLE_LABEL } from '#/lib/schemas/users'
 import { cn } from '#/lib/utils'
 import { getMember } from '#/server/members'
-import type { MemberProfile } from '#/services/members'
 
 export const Route = createFileRoute('/members/$id')({
   loader: async ({ params }) => {
@@ -46,230 +43,113 @@ export const Route = createFileRoute('/members/$id')({
   component: MemberPage,
 })
 
+const heading = 'text-3xl font-semibold tracking-[-0.035em] sm:text-4xl'
+
 function MemberPage() {
   const p = Route.useLoaderData()
   const { theme } = Route.useRouteContext()
   const dark = useIsDark(theme === 'dark')
-  const { user, stats } = p
-  const role = ROLE_LABEL[user.role]
+  const { user, stats, collection, weeks } = p
+  const earned = collection.filter((b) => b.awardedAt)
+  const counts = RARITY_ORDER.map((r) => ({
+    r,
+    n: earned.filter((b) => b.rarity === r).length,
+  })).filter((x) => x.n > 0)
 
   return (
-    <TooltipProvider>
+    <>
       <PageHero
         size="lg"
         background={<DotGridBackground initialDark={theme === 'dark'} />}
-        eyebrow={`${role}${user.gradYear ? ` · Class of ${user.gradYear}` : ''}`}
+        eyebrow={`${ROLE_LABEL[user.role]}${user.gradYear ? ` · Class of ${user.gradYear}` : ''}`}
         title={user.name}
         description={
-          user.bio ?? `Member of RHS Coding Club since ${fmtDate(user.createdAt)}.`
+          user.bio ??
+          `In RHS Coding Club since ${fmtDate(user.createdAt)}, with ${stats.allTime.toLocaleString('en-US')} points.`
         }
-        actions={
-          user.githubUsername ? (
-            <a
-              href={`https://github.com/${user.githubUsername}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-ink/8 px-4 py-2 font-mono text-sm text-ink ring-1 ring-ink/12 transition-colors hover:bg-ink/14"
-            >
-              <Github className="size-4" aria-hidden="true" />
-              {user.githubUsername}
-              <ArrowUpRight className="size-3.5 opacity-60" aria-hidden="true" />
-            </a>
-          ) : undefined
-        }
-        aside={
-          <div className="flex justify-center lg:justify-end">
-            <MemberProfileCard user={user} title={role} dark={dark} />
-          </div>
-        }
-      >
-        {user.skills.length > 0 && (
-          <ul className="flex flex-wrap gap-2" aria-label="Skills">
-            {user.skills.map((s) => (
-              <li
-                key={s}
-                className="rounded-full bg-white/70 px-3 py-1 text-sm text-ink/85 ring-1 ring-ink/10 backdrop-blur dark:bg-white/8"
-              >
-                {s}
-              </li>
-            ))}
-          </ul>
-        )}
-      </PageHero>
+        actions={user.githubUsername ? <GithubLink user={user} /> : undefined}
+        aside={<MemberCard p={p} dark={dark} />}
+      />
 
-      <section
-        className="mx-auto max-w-6xl px-(--gutter) py-16 sm:py-20"
-        aria-label="Stats"
-      >
-        <FadeUp>
-          <dl className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
-            <Stat value={stats.allTime} label="Points, all time" />
-            <Stat value={stats.semester} label="This semester" />
-            <Stat value={stats.rank} prefix="#" label="Semester rank" empty="Unranked" />
-            <Stat value={stats.solved} label="Challenges solved" />
-            <Stat value={stats.events} label="Events attended" />
-            <Stat value={stats.projects} label="Projects shipped" />
-          </dl>
-        </FadeUp>
-      </section>
+      <div className="mx-auto flex max-w-6xl flex-col gap-20 px-(--gutter) py-14 sm:gap-24 sm:py-20">
+        <section aria-labelledby="badges-heading">
+          <FadeUp className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 id="badges-heading" className={heading}>
+                The collection
+              </h2>
+              <p className="text-muted-foreground mt-2">
+                {earned.length} of {collection.length} badges collected
+              </p>
+            </div>
+            {counts.length > 0 && (
+              <ul className="flex flex-wrap gap-2" aria-label="Collected by rarity">
+                {counts.map(({ r, n }) => (
+                  <li
+                    key={r}
+                    className={cn(
+                      'rounded-full px-3 py-1 text-xs ring-1',
+                      RARITY[r].chip,
+                    )}
+                  >
+                    <span className="font-mono font-medium tabular-nums">{n}</span>{' '}
+                    {RARITY[r].label.toLowerCase()}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </FadeUp>
+          <FadeUp>
+            {collection.length === 0 ? (
+              <EmptyState icon={<Award />} title="No badges to collect yet." />
+            ) : (
+              <BadgeBinder collection={collection} />
+            )}
+          </FadeUp>
+        </section>
 
-      <Section id="badges" title="Badges" count={p.badges.length}>
-        {p.badges.length === 0 ? (
-          <EmptyState icon={<Award />} title="No badges yet.">
-            Badges unlock on their own as points, solves, and check-ins add up.
-          </EmptyState>
-        ) : (
-          <BadgeShelf badges={p.badges} dark={dark} />
-        )}
-      </Section>
-
-      <div className="mx-auto grid max-w-6xl gap-x-10 px-(--gutter) lg:grid-cols-2">
-        <Section id="solved" title="Solved challenges" count={p.solved.length} bare>
-          {p.solved.length === 0 ? (
-            <EmptyState icon={<CodeXml />} title="Nothing solved yet." />
-          ) : (
-            <SolvedList rows={p.solved} />
-          )}
-        </Section>
-        <Section id="projects" title="Projects" count={p.projects.length} bare>
-          {p.projects.length === 0 ? (
-            <EmptyState icon={<FolderGit2 />} title="No approved projects yet." />
-          ) : (
-            <ProjectList rows={p.projects} />
-          )}
-        </Section>
-      </div>
-    </TooltipProvider>
-  )
-}
-
-function Section({
-  id,
-  title,
-  count,
-  bare,
-  children,
-}: {
-  id: string
-  title: string
-  count: number
-  /** Inside a parent grid: no own max-width or gutter. */
-  bare?: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <section
-      aria-labelledby={`${id}-heading`}
-      className={cn('pb-16 sm:pb-20', !bare && 'mx-auto max-w-6xl px-(--gutter)')}
-    >
-      <FadeUp className="mb-6 flex items-baseline gap-3">
-        <h2
-          id={`${id}-heading`}
-          className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl"
+        <section
+          aria-labelledby="solved-heading"
+          className="grid gap-8 lg:grid-cols-[1fr_2fr]"
         >
-          {title}
-        </h2>
-        {count > 0 && (
-          <span className="text-muted-foreground font-mono text-sm">{count}</span>
-        )}
-      </FadeUp>
-      <FadeUp delay={0.05}>{children}</FadeUp>
-    </section>
-  )
-}
+          <FadeUp>
+            <h2 id="solved-heading" className={heading}>
+              Weeks solved
+            </h2>
+            <p className="text-muted-foreground mt-3 max-w-xs text-pretty">
+              {stats.solved} of {weeks.length} weekly challenges passed. Old weeks stay
+              open, so there&apos;s always one to go back for.
+            </p>
+          </FadeUp>
+          <FadeUp>
+            {weeks.length === 0 ? (
+              <EmptyState icon={<CodeXml />} title="No challenges posted yet." />
+            ) : (
+              <WeeksSolved weeks={weeks} solved={p.solved} />
+            )}
+          </FadeUp>
+        </section>
 
-const DIFFICULTY_STYLE = {
-  easy: 'text-success bg-success/10',
-  medium: 'text-warning bg-warning/10',
-  hard: 'text-destructive bg-destructive/10',
-} as const
-
-function SolvedList({ rows }: { rows: MemberProfile['solved'] }) {
-  return (
-    <ol className="bg-card ring-border/70 divide-border/70 divide-y overflow-hidden rounded-3xl ring-1">
-      {rows.map((c) => (
-        <li key={c.id}>
-          <Link
-            to="/challenges/$id"
-            params={{ id: c.id }}
-            className="hover:bg-muted/50 focus-visible:bg-muted/60 flex items-center gap-4 px-5 py-4 transition-colors outline-none"
-          >
-            <span className="text-muted-foreground w-14 shrink-0 font-mono text-xs">
-              Wk {c.weekNo}
-            </span>
-            <span className="min-w-0 flex-1 truncate font-medium">{c.title}</span>
-            <span
-              className={cn(
-                'rounded-full px-2 py-0.5 text-xs capitalize',
-                DIFFICULTY_STYLE[c.difficulty],
-              )}
-            >
-              {c.difficulty}
-            </span>
-            <span className="text-muted-foreground hidden w-16 text-right font-mono text-xs sm:inline">
-              {fmtDate(c.solvedAt, 'short')}
-            </span>
-          </Link>
-        </li>
-      ))}
-    </ol>
-  )
-}
-
-function ProjectList({ rows }: { rows: MemberProfile['projects'] }) {
-  return (
-    <ul className="grid gap-3">
-      {rows.map((pr) => (
-        <li key={pr.id}>
-          <Link
-            to="/projects/$id"
-            params={{ id: pr.id }}
-            className="group bg-card ring-border/70 hover:ring-border focus-visible:ring-ring flex gap-4 rounded-3xl p-4 ring-1 transition-shadow outline-none focus-visible:ring-2"
-          >
-            <span className="bg-muted relative size-20 shrink-0 overflow-hidden rounded-2xl">
-              {pr.imageKeys[0] ? (
-                <img
-                  src={fileUrl(pr.imageKeys[0], 256)}
-                  alt=""
-                  className="size-full object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <span className="brand-gradient absolute inset-0 grid place-items-center">
-                  <FolderGit2 className="size-6 text-white/80" aria-hidden="true" />
-                </span>
-              )}
-            </span>
-            <span className="min-w-0 flex-1 py-0.5">
-              <span className="flex items-center gap-2">
-                <span className="truncate font-semibold tracking-tight group-hover:underline group-hover:underline-offset-4">
-                  {pr.title}
-                </span>
-                {pr.year && (
-                  <span className="text-muted-foreground font-mono text-xs">
-                    {pr.year}
-                  </span>
-                )}
+        <section aria-labelledby="projects-heading">
+          <FadeUp className="mb-6 flex items-baseline gap-3">
+            <h2 id="projects-heading" className={heading}>
+              Shipped
+            </h2>
+            {p.projects.length > 0 && (
+              <span className="text-muted-foreground font-mono text-sm">
+                {p.projects.length}
               </span>
-              <span className="text-muted-foreground mt-1 line-clamp-2 text-sm">
-                {pr.description}
-              </span>
-              {pr.tech.length > 0 && (
-                <span className="mt-2 flex flex-wrap gap-1.5">
-                  {pr.tech.slice(0, 4).map((t) => (
-                    <span
-                      key={t}
-                      className="bg-muted text-muted-foreground rounded-md px-1.5 py-0.5 font-mono text-[11px]"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </span>
-              )}
-            </span>
-          </Link>
-        </li>
-      ))}
-    </ul>
+            )}
+          </FadeUp>
+          <FadeUp>
+            {p.projects.length === 0 ? (
+              <EmptyState icon={<FolderGit2 />} title="No approved projects yet." />
+            ) : (
+              <ProjectRail rows={p.projects} />
+            )}
+          </FadeUp>
+        </section>
+      </div>
+    </>
   )
 }

@@ -89,7 +89,7 @@ function ChallengesPage() {
         </section>
       )}
 
-      <HowItWorks points={points} />
+      <HowItWorks points={points} initialDark={initialDark} />
 
       {challenges.length > 0 && (
         <ChallengeArchive

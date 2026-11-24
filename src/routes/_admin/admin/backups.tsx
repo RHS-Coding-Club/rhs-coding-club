@@ -19,7 +19,6 @@ function BackupsPage() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Site"
         title="Backups"
         description="Automatic copies of the club's data, in private storage. Passwords, sessions, and uploaded images aren't included."
       />

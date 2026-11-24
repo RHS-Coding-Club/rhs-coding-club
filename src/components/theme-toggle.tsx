@@ -5,6 +5,7 @@ import { setTheme } from '#/server/theme'
 import { RaisedButton } from '#/components/raised-button'
 import { useIsDark } from '#/hooks/use-is-dark'
 import type { Theme } from '#/server/theme'
+import { STATIC_GROUND } from '#/lib/static-palette'
 
 /**
  * Returns a function that flips the theme: swaps the <html> class right away
@@ -17,6 +18,9 @@ export function useFlipTheme() {
     const next: Theme = root.classList.contains('dark') ? 'light' : 'dark'
     root.classList.toggle('dark', next === 'dark')
     root.classList.toggle('light', next === 'light')
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', STATIC_GROUND[next])
     void persist({ data: next })
     return next
   }
@@ -40,7 +44,7 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
       onClick={flip}
       aria-label={label}
       title={label}
-      className="fixed right-5 bottom-5 z-50 rounded-full [body:has(#admin-dock)_&]:hidden"
+      className="fixed right-[max(1.25rem,env(safe-area-inset-right))] bottom-[max(1.25rem,env(safe-area-inset-bottom))] z-50 rounded-full print:hidden [body:has(#admin-dock)_&]:hidden"
     >
       {dark ? <Sun /> : <Moon />}
     </RaisedButton>

@@ -84,6 +84,11 @@ describe('getAboutData', () => {
     const data = await getAboutData(db)
     expect(data.officers.map((o) => o.id)).toEqual(['o1', 'o2'])
   })
+
+  it('carries the same live numbers as the home page', async () => {
+    const data = await getAboutData(db, now)
+    expect(data.stats).toEqual({ members: 2, eventsThisSemester: 1, projects: 1 })
+  })
 })
 
 describe('settings round-trip', () => {

@@ -5,6 +5,7 @@ import { Eye } from '#/components/icons/eye'
 import { Pencil } from '#/components/icons/pencil'
 import { FadeUp } from '#/components/motion'
 import { RaisedButton } from '#/components/raised-button'
+import { SplitButton } from '#/components/split-button'
 import { RichText } from '#/components/rich-text/rich-text'
 import { PostByline } from '#/components/blog/post-byline'
 import { PostOutline } from '#/components/blog/post-outline'
@@ -168,11 +169,15 @@ function PostPage() {
               Lunch meetings in Mr. Derrick&apos;s room. No experience required.
             </p>
           </div>
-          <RaisedButton asChild variant="secondary" size="lg">
-            <Link to={user ? '/dashboard' : '/signup'}>
-              {user ? 'Go to your dashboard' : 'Join the club'}
-            </Link>
-          </RaisedButton>
+          {user ? (
+            <RaisedButton asChild variant="secondary" size="lg">
+              <Link to="/dashboard">Go to your dashboard</Link>
+            </RaisedButton>
+          ) : (
+            <SplitButton to="/signup" size="lg">
+              Join the club
+            </SplitButton>
+          )}
         </div>
       </section>
     </article>

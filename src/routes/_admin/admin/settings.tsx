@@ -29,7 +29,6 @@ function AdminSettings() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Site"
         title="Settings"
         description={
           canEdit

@@ -22,7 +22,7 @@ function Home() {
       <Hero />
       <TechLoop />
       <Mission />
-      <FeatureBento theme={theme} />
+      <FeatureBento theme={theme} points={data.points} />
       <Community stats={data.stats} awards={data.recentAwards} />
       <FeaturedProjects projects={data.featuredProjects} theme={theme} />
       <LatestPosts posts={data.latestPosts} />

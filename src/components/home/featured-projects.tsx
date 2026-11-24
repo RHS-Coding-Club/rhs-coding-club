@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowUpRight } from '#/components/icons/arrow-up-right'
-import { FolderGit2 } from '#/components/icons/folder-git-2'
 import { fileUrl } from '#/lib/files'
 import CardSwap, { Card } from '#/components/bits/CardSwap'
 import type { HomeData } from '#/services/home'
@@ -8,6 +7,8 @@ import { FadeUp } from '#/components/motion'
 import { useIsDark } from '#/hooks/use-is-dark'
 import type { Theme } from '#/server/theme'
 import { CARD_SWAP_VARS } from '#/components/bits-theme'
+import { projectCoverUrl } from '#/components/projects/cover'
+import { initials } from '#/lib/format'
 
 type Project = HomeData['featuredProjects'][number]
 
@@ -68,7 +69,7 @@ export function FeaturedProjects({
             >
               {projects.map((p) => (
                 <Card key={p.id} style={CARD_SWAP_VARS}>
-                  <ProjectCard project={p} />
+                  <ProjectCard project={p} dark={dark} />
                 </Card>
               ))}
             </CardSwap>
@@ -79,25 +80,30 @@ export function FeaturedProjects({
   )
 }
 
-function ProjectCard({ project }: { project: Project }) {
+function ProjectCard({ project, dark }: { project: Project; dark: boolean }) {
+  // A screenshot when there is one, otherwise the same generated cover the
+  // showcase uses, so a project looks the same everywhere.
+  const src =
+    fileUrl(project.imageKeys[0], 960) ??
+    projectCoverUrl({
+      id: project.id,
+      title: project.title,
+      tech: project.tech,
+      initials: [initials(project.authorName)],
+      dark,
+      width: 600,
+      height: 400,
+      captionSpace: true,
+    })
   return (
     <div className="flex h-full flex-col p-2">
       <div className="bg-brand-navy relative min-h-0 flex-1 overflow-hidden rounded-[16px]">
-        {project.imageKeys[0] ? (
-          <img
-            src={fileUrl(project.imageKeys[0], 960)}
-            alt=""
-            draggable={false}
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover select-none"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_20%_20%,var(--brand-sky)_0%,transparent_60%),radial-gradient(60%_70%_at_85%_90%,#1f4f8a_0%,transparent_65%)]">
-            <FolderGit2
-              className="absolute right-4 bottom-4 size-7 text-white/70"
-              aria-hidden="true"
-            />
-          </div>
-        )}
+        <img
+          src={src}
+          alt=""
+          draggable={false}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover select-none"
+        />
       </div>
       <div className="px-2.5 pt-3.5 pb-1.5">
         <div className="flex items-baseline justify-between gap-3">

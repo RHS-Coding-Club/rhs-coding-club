@@ -1,5 +1,6 @@
 import {
   and,
+  asc,
   count,
   desc,
   eq,
@@ -16,6 +17,7 @@ import type { Db } from '#/db'
 import { schema } from '#/db'
 import type { EmailTopic, PointSource } from '#/db/schema'
 import { badgeStats, badgesForUsers } from '#/lib/badges'
+import type { BadgeStats } from '#/lib/badges'
 import { weekKey } from '#/lib/dates'
 import { hasRole } from '#/lib/roles'
 import type { Role } from '#/lib/roles'
@@ -252,6 +254,53 @@ export async function describeLedger<
   })
 }
 
+// ---------- Badge collection ----------
+
+/**
+ * Every active badge, marked with when `userId` earned it. Auto-awarded badges
+ * they don't hold yet carry `current` (their count toward `threshold`); custom
+ * badges, which only officers hand out, have `current: null`.
+ */
+export async function badgeCollection(db: Db, userId: string) {
+  const [all, held, stats] = await Promise.all([
+    db
+      .select({
+        id: schema.badge.id,
+        name: schema.badge.name,
+        description: schema.badge.description,
+        rarity: schema.badge.rarity,
+        criteriaType: schema.badge.criteriaType,
+        threshold: schema.badge.threshold,
+        autoAward: schema.badge.autoAward,
+      })
+      .from(schema.badge)
+      .where(eq(schema.badge.isActive, true))
+      .orderBy(asc(schema.badge.sortOrder), asc(schema.badge.name)),
+    badgesForUsers(db, [userId]),
+    badgeStats(db, userId),
+  ])
+  const heldAt = new Map(held.map((h) => [h.badgeId, h.awardedAt]))
+  return all.map((b) => {
+    const tracked =
+      b.autoAward &&
+      b.criteriaType !== 'custom' &&
+      b.threshold !== null &&
+      b.threshold > 0
+    return {
+      id: b.id,
+      name: b.name,
+      description: b.description,
+      rarity: b.rarity,
+      criteriaType: b.criteriaType,
+      threshold: b.threshold,
+      awardedAt: heldAt.get(b.id) ?? null,
+      current: tracked ? stats[b.criteriaType as keyof BadgeStats] : null,
+    }
+  })
+}
+
+export type CollectionBadge = Awaited<ReturnType<typeof badgeCollection>>[number]
+
 // ---------- Public profile ----------
 
 /**
@@ -277,52 +326,76 @@ export async function getMemberProfile(db: Db, userId: string, now = new Date())
   if (!u) return null
 
   const since = await pointsWindowStart(db, now)
-  const [allTime, semester, rank, allTimeRank, solved, attended, projects, badges] =
-    await Promise.all([
-      pointsFor(db, u.id),
-      pointsFor(db, u.id, since),
-      rankIn(db, u.id, since),
-      rankIn(db, u.id),
-      db
-        .select({
-          id: schema.challenge.id,
-          title: schema.challenge.title,
-          weekNo: schema.challenge.weekNo,
-          difficulty: schema.challenge.difficulty,
-          solvedAt:
-            sql<number>`coalesce(${schema.submission.reviewedAt}, ${schema.submission.submittedAt})`.mapWith(
-              (v) => new Date(Number(v)),
-            ),
-        })
-        .from(schema.submission)
-        .innerJoin(
-          schema.challenge,
-          eq(schema.challenge.id, schema.submission.challengeId),
-        )
-        .where(
-          and(eq(schema.submission.userId, u.id), eq(schema.submission.status, 'pass')),
-        )
-        .orderBy(desc(schema.challenge.weekNo)),
-      db
-        .select({ n: count() })
-        .from(schema.attendance)
-        .where(eq(schema.attendance.userId, u.id)),
-      db
-        .select({
-          id: schema.project.id,
-          title: schema.project.title,
-          description: schema.project.description,
-          tech: schema.project.tech,
-          imageKeys: schema.project.imageKeys,
-          repoUrl: schema.project.repoUrl,
-          demoUrl: schema.project.demoUrl,
-          year: schema.project.year,
-        })
-        .from(schema.project)
-        .where(and(eq(schema.project.status, 'approved'), onProject(u.id)))
-        .orderBy(desc(schema.project.featured), desc(schema.project.createdAt)),
-      badgesForUsers(db, [u.id]),
-    ])
+  const [
+    allTime,
+    semester,
+    rank,
+    allTimeRank,
+    solved,
+    attended,
+    projects,
+    badges,
+    collection,
+    weeks,
+  ] = await Promise.all([
+    pointsFor(db, u.id),
+    pointsFor(db, u.id, since),
+    rankIn(db, u.id, since),
+    rankIn(db, u.id),
+    db
+      .select({
+        id: schema.challenge.id,
+        title: schema.challenge.title,
+        weekNo: schema.challenge.weekNo,
+        difficulty: schema.challenge.difficulty,
+        solvedAt:
+          sql<number>`coalesce(${schema.submission.reviewedAt}, ${schema.submission.submittedAt})`.mapWith(
+            (v) => new Date(Number(v)),
+          ),
+      })
+      .from(schema.submission)
+      .innerJoin(schema.challenge, eq(schema.challenge.id, schema.submission.challengeId))
+      .where(
+        and(eq(schema.submission.userId, u.id), eq(schema.submission.status, 'pass')),
+      )
+      .orderBy(desc(schema.challenge.weekNo)),
+    db
+      .select({ n: count() })
+      .from(schema.attendance)
+      .where(eq(schema.attendance.userId, u.id)),
+    db
+      .select({
+        id: schema.project.id,
+        title: schema.project.title,
+        description: schema.project.description,
+        tech: schema.project.tech,
+        imageKeys: schema.project.imageKeys,
+        repoUrl: schema.project.repoUrl,
+        demoUrl: schema.project.demoUrl,
+        year: schema.project.year,
+      })
+      .from(schema.project)
+      .where(and(eq(schema.project.status, 'approved'), onProject(u.id)))
+      .orderBy(desc(schema.project.featured), desc(schema.project.createdAt)),
+    badgesForUsers(db, [u.id]),
+    badgeCollection(db, u.id),
+    // Every live weekly challenge, for the "weeks solved" grid.
+    db
+      .select({
+        id: schema.challenge.id,
+        title: schema.challenge.title,
+        weekNo: schema.challenge.weekNo,
+        difficulty: schema.challenge.difficulty,
+      })
+      .from(schema.challenge)
+      .where(
+        and(
+          isNotNull(schema.challenge.publishedAt),
+          lte(schema.challenge.publishedAt, now),
+        ),
+      )
+      .orderBy(asc(schema.challenge.weekNo)),
+  ])
 
   return {
     user: u,
@@ -345,6 +418,8 @@ export async function getMemberProfile(db: Db, userId: string, now = new Date())
       imageKey: b.imageKey,
       awardedAt: b.awardedAt,
     })),
+    collection,
+    weeks,
   }
 }
 
@@ -375,7 +450,7 @@ export async function getDashboard(
   const [
     allTime,
     semester,
-    rank,
+    ranked,
     challenge,
     rsvps,
     projects,
@@ -384,10 +459,12 @@ export async function getDashboard(
     queues,
     stats,
     recent,
+    collection,
+    values,
   ] = await Promise.all([
     pointsFor(db, viewer.id),
     pointsFor(db, viewer.id, since),
-    rankIn(db, viewer.id, since),
+    rankMembers(db, { since }),
     db.query.challenge.findFirst({
       where: and(
         isNotNull(schema.challenge.publishedAt),
@@ -447,7 +524,17 @@ export async function getDashboard(
           gte(schema.pointEntry.createdAt, new Date(`${weekKey(weeksFrom)}T00:00:00Z`)),
         ),
       ),
+    badgeCollection(db, viewer.id),
+    getSetting(db, 'points'),
   ])
+
+  // The viewer's place on the semester board: two above, two below.
+  const at = ranked.findIndex((r) => r.userId === viewer.id)
+  const rank = at < 0 ? null : (ranked[at]?.rank ?? null)
+  const neighbors = (
+    at < 0 ? ranked.slice(-3) : ranked.slice(Math.max(0, at - 2), at + 3)
+  ).map((r) => ({ ...r, me: r.userId === viewer.id }))
+  const above = at > 0 ? (ranked[at - 1] ?? null) : null
 
   const submission = challenge
     ? await db.query.submission.findFirst({
@@ -473,6 +560,16 @@ export async function getDashboard(
   return {
     kind: 'member' as const,
     points: { allTime, semester, rank, weeks },
+    board: {
+      ranked: ranked.length,
+      neighbors,
+      above: above ? { name: above.name, points: above.points, rank: above.rank } : null,
+    },
+    collection,
+    values: {
+      attendance: values.attendance,
+      project: values.project,
+    },
     stats: {
       challenges: stats.challenges,
       events: stats.events,

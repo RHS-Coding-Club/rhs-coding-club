@@ -89,7 +89,7 @@ function ForgotPasswordPage() {
   return (
     <AuthLayout
       title="Reset your password"
-      subtitle="Had an account on the old club site? This is how you set a password for the new one."
+      subtitle="Forgot it, or had an account on the old club site? We'll email you a link to set a new one."
       pulse={pulse}
     >
       <form onSubmit={onSubmit} className="flex flex-col gap-3">

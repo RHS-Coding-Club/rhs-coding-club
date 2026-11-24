@@ -287,43 +287,47 @@ function EventPage() {
             </dl>
           </FadeUp>
 
-          <FadeUp>
-            <div className="mb-5 flex items-end justify-between gap-4">
-              <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-                {ended ? 'Who RSVPed' : "Who's going"}
-              </h2>
-              {data.maybeCount > 0 && (
-                <p className="text-muted-foreground text-sm">
-                  plus{' '}
-                  <span className="text-foreground font-medium">{data.maybeCount}</span>{' '}
-                  maybe
+          {/* A finished event nobody RSVPed to has nothing to list; the
+              check-in count above already says who came. */}
+          {!(ended && going.faces.length === 0) && (
+            <FadeUp>
+              <div className="mb-5 flex items-end justify-between gap-4">
+                <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+                  {ended ? 'Who RSVPed' : "Who's going"}
+                </h2>
+                {data.maybeCount > 0 && (
+                  <p className="text-muted-foreground text-sm">
+                    plus{' '}
+                    <span className="text-foreground font-medium">{data.maybeCount}</span>{' '}
+                    maybe
+                  </p>
+                )}
+              </div>
+              {going.faces.length === 0 ? (
+                <p className="text-muted-foreground border-border flex items-center gap-3 rounded-3xl border border-dashed px-5 py-8 text-sm">
+                  <Users className="size-5" aria-hidden="true" />
+                  {ended ? 'Nobody RSVPed for this one.' : 'No RSVPs yet. Be the first.'}
                 </p>
+              ) : (
+                <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {going.faces.map((f) => (
+                    <li
+                      key={f.id}
+                      className="bg-card ring-border/70 flex items-center gap-3 rounded-2xl p-3 ring-1"
+                    >
+                      <UserAvatar user={f} className="size-9" />
+                      <span className="truncate text-sm font-medium">
+                        {f.name}
+                        {user?.id === f.id && (
+                          <span className="text-muted-foreground"> (you)</span>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               )}
-            </div>
-            {going.faces.length === 0 ? (
-              <p className="text-muted-foreground border-border flex items-center gap-3 rounded-3xl border border-dashed px-5 py-8 text-sm">
-                <Users className="size-5" aria-hidden="true" />
-                {ended ? 'Nobody RSVPed for this one.' : 'No RSVPs yet. Be the first.'}
-              </p>
-            ) : (
-              <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {going.faces.map((f) => (
-                  <li
-                    key={f.id}
-                    className="bg-card ring-border/70 flex items-center gap-3 rounded-2xl p-3 ring-1"
-                  >
-                    <UserAvatar user={f} className="size-9" />
-                    <span className="truncate text-sm font-medium">
-                      {f.name}
-                      {user?.id === f.id && (
-                        <span className="text-muted-foreground"> (you)</span>
-                      )}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </FadeUp>
+            </FadeUp>
+          )}
         </article>
       </section>
     </>

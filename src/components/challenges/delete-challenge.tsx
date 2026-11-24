@@ -64,13 +64,13 @@ export function DeleteChallengeDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <RaisedButton variant="outline" onClick={() => onOpenChange(false)}>
-            Keep it
+            Cancel
           </RaisedButton>
           <RaisedButton
-            className="text-destructive-foreground [--raise-fill:var(--destructive)]"
+            variant="destructive"
             onClick={confirm}
             loading={pending}
-            loadingText="Deleting"
+            loadingText="Deleting…"
           >
             Delete challenge
           </RaisedButton>

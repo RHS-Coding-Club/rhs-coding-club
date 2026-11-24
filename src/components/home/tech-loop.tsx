@@ -36,7 +36,7 @@ const LOGOS: LogoItem[] = TOOLS.map(([icon, name]) => ({
   title: name,
   ariaLabel: name,
   node: (
-    <span className="text-foreground/70 flex items-center gap-2.5 text-lg font-medium tracking-tight whitespace-nowrap">
+    <span className="text-foreground/85 flex items-center gap-2.5 text-lg font-medium tracking-tight whitespace-nowrap">
       <HugeiconsIcon icon={icon} size={24} strokeWidth={1.6} />
       {name}
     </span>

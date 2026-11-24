@@ -244,7 +244,6 @@ function AdminEvents() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Admin"
         title="Events"
         description="Schedule meetings, run check-in from the projector, and fix attendance by hand."
         actions={
@@ -289,24 +288,24 @@ function AdminEvents() {
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete "{toDelete?.title}"?</AlertDialogTitle>
+            <AlertDialogTitle>Delete “{toDelete?.title}”?</AlertDialogTitle>
             <AlertDialogDescription>
               This removes the event, its RSVPs, and its attendance.
               {toDelete && toDelete.attended > 0
                 ? ` The ${toDelete.attended} members who attended lose the attendance points it gave them.`
                 : ''}{' '}
-              This can't be undone.
+              This can’t be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <RaisedButton variant="outline" onClick={() => setToDelete(null)}>
-              Keep it
+              Cancel
             </RaisedButton>
             <RaisedButton
               onClick={() => void confirmDelete()}
               loading={deleting}
-              loadingText="Deleting"
-              className="text-white [--raise-fill:var(--destructive)]"
+              loadingText="Deleting…"
+              variant="destructive"
             >
               Delete event
             </RaisedButton>

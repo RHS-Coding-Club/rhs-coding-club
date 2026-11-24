@@ -17,7 +17,6 @@ function NewChallenge() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Challenges"
         title="New challenge"
         description="Write the prompt, set the difficulty, and decide when it goes live."
       />

@@ -31,6 +31,12 @@ export function PostOutline({
   )
   if (sections.length < 2) return null
   return (
-    <OutlineMenu sections={sections} defaultOpen={defaultOpen} className={className} />
+    <OutlineMenu
+      sections={sections}
+      // Folded (phones), the count says there's something to open.
+      title={defaultOpen ? undefined : `On this page · ${sections.length} sections`}
+      defaultOpen={defaultOpen}
+      className={className}
+    />
   )
 }

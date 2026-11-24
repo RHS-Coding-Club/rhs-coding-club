@@ -1,156 +1,117 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { CalendarDays } from '#/components/icons/calendar-days'
-import { Github } from '#/components/icons/github'
-import { Instagram } from '#/components/icons/instagram'
 import { MapPin } from '#/components/icons/map-pin'
-import { fileUrl } from '#/lib/files'
-import BlurText from '#/components/bits/BlurText'
-import SpotlightCard from '#/components/bits/SpotlightCard'
-import Magnet from '#/components/bits/Magnet'
-import { getAbout } from '#/server/public'
-import { initials } from '#/lib/format'
+import CountUp from '#/components/bits/CountUp'
+import { OfficerCredits } from '#/components/about/officer-credits'
+import { WavesBackground } from '#/components/about/waves-bg'
+import { YearRail } from '#/components/about/year-rail'
 import { FadeUp } from '#/components/motion'
+import { PageHero } from '#/components/page-hero'
 import { RaisedButton } from '#/components/raised-button'
 import { SplitButton } from '#/components/split-button'
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
-import { useIsDark } from '#/hooks/use-is-dark'
-import { safeHref } from '#/lib/rich-text'
+import { getAbout } from '#/server/public'
+
+const DESCRIPTION =
+  'Who runs RHS Coding Club, when and where we meet, and how the year runs: weekly challenges, teaching at RAP, and the H2O hackathon.'
 
 export const Route = createFileRoute('/about')({
   loader: () => getAbout(),
-  head: () => ({ meta: [{ title: 'About · RHS Coding Club' }] }),
+  head: () => ({
+    meta: [
+      { title: 'About · RHS Coding Club' },
+      { name: 'description', content: DESCRIPTION },
+      { property: 'og:title', content: 'About RHS Coding Club' },
+      { property: 'og:description', content: DESCRIPTION },
+    ],
+  }),
   component: AboutPage,
 })
 
+/**
+ * People first: the mission is the headline over React Bits Waves, then the
+ * live numbers as one sentence, the year as a swipeable rail, the officers
+ * as credits, and an invitation to a meeting.
+ */
 function AboutPage() {
-  const { club, social, officers } = Route.useLoaderData()
+  const { club, social, stats, officers } = Route.useLoaderData()
   const { theme } = Route.useRouteContext()
-  const dark = useIsDark(theme === 'dark')
+  const [lead, rest] = splitFirstSentence(club.missionStatement)
 
   return (
     <>
-      <section className="mx-auto max-w-6xl px-(--gutter) pt-16 pb-16 sm:pt-24">
-        <h1 className="max-w-4xl text-[clamp(2.75rem,6.5vw,5.5rem)] leading-[1.02] font-semibold tracking-[-0.045em]">
-          <BlurText text={club.tagline} trigger="load" delay={70} stepDuration={0.4} />
-        </h1>
-        <FadeUp delay={0.3}>
-          <p className="text-muted-foreground mt-7 max-w-2xl text-xl leading-relaxed">
-            {club.description}
-          </p>
-          <div className="mt-12 flex flex-wrap gap-x-14 gap-y-6">
-            <Fact icon={CalendarDays} term="When we meet" value={club.meetingSchedule} />
-            <Fact icon={MapPin} term="Where" value={club.meetingLocation} />
-          </div>
-        </FadeUp>
-      </section>
-
-      <section className="mx-2.5">
-        <div className="bg-brand-navy rounded-4xl px-(--gutter) py-20 text-brand-frost sm:py-28">
-          <FadeUp className="mx-auto max-w-4xl">
-            <p className="text-sm text-brand-frost/80">Our mission</p>
-            <p className="mt-5 text-3xl leading-snug font-medium tracking-[-0.02em] text-balance sm:text-4xl sm:leading-snug">
-              {club.missionStatement}
-            </p>
-          </FadeUp>
-        </div>
-      </section>
-
-      <section
-        className="mx-auto max-w-6xl px-(--gutter) py-20 sm:py-28"
-        aria-labelledby="officers-heading"
-      >
-        <FadeUp className="mb-12 flex flex-wrap items-end justify-between gap-6">
-          <h2
-            id="officers-heading"
-            className="text-4xl font-semibold tracking-[-0.035em] sm:text-5xl"
-          >
-            The people running it
-          </h2>
-          <div className="flex gap-2">
-            {social.instagram && (
-              <SocialLink href={social.instagram} icon={Instagram} label="Instagram" />
-            )}
-            {social.github && (
-              <SocialLink href={social.github} icon={Github} label="GitHub" />
-            )}
-          </div>
-        </FadeUp>
-
-        {officers.length === 0 ? (
-          <p className="text-muted-foreground border-border rounded-3xl border border-dashed px-5 py-14 text-center text-sm">
-            Officer profiles are on their way.
-          </p>
-        ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {officers.map((o, i) => (
-              <li key={o.id}>
-                <FadeUp delay={(i % 3) * 0.08} className="h-full">
-                  <SpotlightCard
-                    theme={dark ? 'dark' : 'light'}
-                    spotlightColor="color-mix(in srgb, var(--brand-sky) 90%, transparent)"
-                    intensity={0.18}
-                    className="h-full rounded-3xl! p-6"
-                    style={
-                      {
-                        '--spotlight-card-surface': 'var(--bits-surface)',
-                        '--spotlight-card-border': 'var(--bits-edge)',
-                      } as React.CSSProperties
-                    }
-                  >
-                    <div className="flex items-center gap-4">
-                      <Avatar className="size-14">
-                        <AvatarImage src={fileUrl(o.imageKey, 128)} alt="" />
-                        <AvatarFallback>{initials(o.name)}</AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <h3 className="truncate text-xl font-semibold tracking-tight">
-                          {o.name}
-                        </h3>
-                        <p className="text-brand-sky text-sm font-medium">{o.title}</p>
-                      </div>
-                    </div>
-                    {o.bio && (
-                      <p className="text-muted-foreground mt-5 text-sm leading-relaxed">
-                        {o.bio}
-                      </p>
-                    )}
-                    {o.githubUrl && (
-                      <a
-                        href={safeHref(o.githubUrl) ?? undefined}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-foreground/80 hover:text-foreground mt-5 inline-flex items-center gap-1.5 font-mono text-xs transition-colors"
-                      >
-                        <Github className="size-3.5" aria-hidden="true" />
-                        {o.githubUrl.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
-                      </a>
-                    )}
-                  </SpotlightCard>
-                </FadeUp>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="mx-auto max-w-6xl px-(--gutter) pb-8">
-        <FadeUp className="border-border flex flex-wrap items-center justify-between gap-8 border-t pt-14">
-          <div>
-            <p className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-              No experience required.
-            </p>
-            <p className="text-muted-foreground mt-2 text-lg">
-              Open to every RHS student. Bring curiosity.
-            </p>
-          </div>
-          <Magnet padding={60} magnetStrength={3} maxOffset={14}>
+      <PageHero
+        size="lg"
+        background={<WavesBackground initialDark={theme === 'dark'} />}
+        eyebrow="About the club"
+        title={lead}
+        description={rest || club.description}
+        actions={
+          <>
             <SplitButton to="/signup" size="lg">
               Join the club
             </SplitButton>
-          </Magnet>
+            <RaisedButton asChild variant="ghost" size="lg">
+              <a href="#people">Meet the officers</a>
+            </RaisedButton>
+          </>
+        }
+        aside={
+          <dl className="bg-card/80 ring-border/70 grid min-w-64 gap-4 rounded-3xl p-5 ring-1 backdrop-blur-md">
+            <Fact icon={CalendarDays} term="We meet" value={club.meetingSchedule} />
+            <Fact icon={MapPin} term="Where" value={club.meetingLocation} />
+          </dl>
+        }
+      />
+
+      <section className="mx-auto max-w-6xl px-(--gutter) pt-20 sm:pt-28">
+        <FadeUp>
+          <p className="max-w-4xl text-3xl leading-snug font-medium tracking-[-0.025em] text-balance sm:text-[2.6rem] sm:leading-[1.2]">
+            Right now the club has <Num n={stats.members} /> active members, has run{' '}
+            <Num n={stats.eventsThisSemester} /> events this semester, and has{' '}
+            <Num n={stats.projects} /> projects in the showcase.
+          </p>
+          <p className="text-muted-foreground mt-5 max-w-2xl text-lg text-pretty">
+            {club.description}
+          </p>
+        </FadeUp>
+      </section>
+
+      <YearRail />
+
+      <OfficerCredits officers={officers} social={social} />
+
+      <section className="mx-auto max-w-6xl px-(--gutter) pb-10">
+        <FadeUp className="bg-card ring-border/70 relative overflow-hidden rounded-4xl px-6 py-14 text-center ring-1 sm:px-12 sm:py-20">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_55%_at_50%_0%,color-mix(in_oklab,var(--brand-sky)_16%,transparent),transparent_75%)]"
+          />
+          <h2 className="relative text-3xl font-semibold tracking-[-0.03em] text-balance sm:text-5xl">
+            Come to a meeting
+          </h2>
+          <p className="text-muted-foreground relative mx-auto mt-4 max-w-md text-lg text-pretty">
+            {club.meetingSchedule} in {club.meetingLocation}. No experience needed, and
+            you can bring a friend.
+          </p>
+          <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
+            <SplitButton to="/signup" size="lg">
+              Join the club
+            </SplitButton>
+            <RaisedButton asChild variant="ghost" size="lg">
+              <Link to="/contact">Ask an officer</Link>
+            </RaisedButton>
+          </div>
         </FadeUp>
       </section>
     </>
+  )
+}
+
+function Num({ n }: { n: number }) {
+  return (
+    <span className="text-primary tabular-nums">
+      <CountUp to={n} duration={1.2} trigger="view" />
+    </span>
   )
 }
 
@@ -164,31 +125,18 @@ function Fact({
   value: string
 }) {
   return (
-    <div className="flex gap-3">
-      <Icon className="text-brand-sky mt-0.5 size-5 shrink-0" aria-hidden="true" />
+    <div className="flex items-start gap-3">
+      <Icon className="text-brand-sky mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <div>
-        <p className="text-muted-foreground text-sm">{term}</p>
-        <p className="mt-1 text-lg font-medium">{value}</p>
+        <dt className="text-muted-foreground text-sm">{term}</dt>
+        <dd className="mt-0.5 font-medium">{value}</dd>
       </div>
     </div>
   )
 }
 
-function SocialLink({
-  href,
-  icon: Icon,
-  label,
-}: {
-  href: string
-  icon: typeof Github
-  label: string
-}) {
-  return (
-    <RaisedButton asChild variant="outline">
-      <a href={href} target="_blank" rel="noreferrer">
-        <Icon aria-hidden="true" />
-        {label}
-      </a>
-    </RaisedButton>
-  )
+/** "We teach. Then more." -> ["We teach.", "Then more."]; one sentence stays whole. */
+function splitFirstSentence(text: string): [string, string] {
+  const m = text.match(/^(.+?[.!?])\s+(.*)$/s)
+  return m?.[1] && m[2] ? [m[1], m[2]] : [text, '']
 }

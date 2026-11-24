@@ -15,6 +15,33 @@ export class ContactError extends Error {
   }
 }
 
+/**
+ * Everything /contact shows besides the form: when and where the club meets,
+ * its socials, and the officers who read the inbox (faces and names only).
+ */
+export async function getContactPage(db: Db) {
+  const [club, social, officers] = await Promise.all([
+    getSetting(db, 'club-info'),
+    getSetting(db, 'social'),
+    db.query.officer.findMany({
+      where: eq(schema.officer.isActive, true),
+      orderBy: [schema.officer.sortOrder, schema.officer.name],
+      columns: { id: true, name: true, imageKey: true },
+    }),
+  ])
+  return {
+    club: {
+      clubName: club.clubName,
+      meetingSchedule: club.meetingSchedule,
+      meetingLocation: club.meetingLocation,
+    },
+    social,
+    officers,
+  }
+}
+
+export type ContactPageData = Awaited<ReturnType<typeof getContactPage>>
+
 /** At most this many messages per address in RATE_WINDOW. */
 const RATE_LIMIT = 3
 const RATE_WINDOW = 10 * 60 * 1000

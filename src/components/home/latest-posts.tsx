@@ -38,32 +38,71 @@ export function LatestPosts({ posts }: { posts: HomeData['latestPosts'] }) {
           No posts yet.
         </FadeUp>
       ) : (
-        <FadeUp delay={0.1} style={{ height: posts.length * 112 }}>
-          <FlowingMenu
-            items={posts.map((p) => ({
-              text: p.title,
-              link: `/blog/${p.slug}`,
-              meta: p.publishedAt ? fmtDate(p.publishedAt, 'short') : undefined,
-              marquee: p.summary,
-            }))}
-            align="left"
-            showIndex
-            showArrow
-            dividers
-            bandInset={6}
-            bandRadius={18}
-            textColor="var(--foreground)"
-            bgColor="transparent"
-            marqueeBgColor="var(--brand-sky)"
-            marqueeTextColor="var(--on-sky)"
-            borderColor="var(--border)"
-            ariaLabel="Latest posts"
-            onItemClick={(item, _index, event) => {
-              event.preventDefault()
-              if (item.link) void router.navigate({ to: item.link })
-            }}
-          />
-        </FadeUp>
+        <>
+          {/* Phones: a plain list. The flowing band is a pointer effect, and
+              its 45px titles don't fit a narrow column. */}
+          <FadeUp delay={0.1} className="sm:hidden">
+            <ul className="divide-border border-border divide-y border-y">
+              {posts.map((p, i) => (
+                <li key={p.slug}>
+                  <Link
+                    to="/blog/$slug"
+                    params={{ slug: p.slug }}
+                    className="active:bg-muted/60 flex items-baseline gap-4 py-5 transition-colors"
+                  >
+                    <span className="text-muted-foreground w-5 shrink-0 font-mono text-xs tabular-nums">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xl font-medium tracking-[-0.02em] text-pretty">
+                        {p.title}
+                      </span>
+                      {p.publishedAt && (
+                        <span className="text-muted-foreground mt-1 block text-sm">
+                          {fmtDate(p.publishedAt, 'short')}
+                        </span>
+                      )}
+                    </span>
+                    <ArrowUpRight
+                      className="text-muted-foreground size-4 shrink-0 self-center"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </FadeUp>
+          <FadeUp
+            delay={0.1}
+            className="hidden sm:block"
+            style={{ height: posts.length * 112 }}
+          >
+            <FlowingMenu
+              items={posts.map((p) => ({
+                text: p.title,
+                link: `/blog/${p.slug}`,
+                meta: p.publishedAt ? fmtDate(p.publishedAt, 'short') : undefined,
+                marquee: p.summary,
+              }))}
+              align="left"
+              showIndex
+              showArrow
+              dividers
+              bandInset={6}
+              bandRadius={18}
+              textColor="var(--foreground)"
+              bgColor="transparent"
+              marqueeBgColor="var(--brand-sky)"
+              marqueeTextColor="var(--on-sky)"
+              borderColor="var(--border)"
+              ariaLabel="Latest posts"
+              onItemClick={(item, _index, event) => {
+                event.preventDefault()
+                if (item.link) void router.navigate({ to: item.link })
+              }}
+            />
+          </FadeUp>
+        </>
       )}
     </section>
   )
