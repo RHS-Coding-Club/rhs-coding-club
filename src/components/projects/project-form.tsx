@@ -205,7 +205,7 @@ export function ProjectForm({
           {err('description')}
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_12rem]">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,1fr)_12rem]">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="project-tech">Tech stack</Label>
             <ChipInput
@@ -246,7 +246,7 @@ export function ProjectForm({
       </Section>
 
       <Section title="Links" hint="Both optional. Use full https:// links.">
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="project-repoUrl">Code repository</Label>
             <Input
@@ -399,7 +399,7 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <fieldset className="grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
+    <fieldset className="grid grid-cols-1 gap-6 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
       <legend className="sr-only">{title}</legend>
       <div>
         <p aria-hidden="true" className="text-lg font-semibold tracking-tight">

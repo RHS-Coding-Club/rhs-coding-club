@@ -192,7 +192,7 @@ const ROOT_CLASS =
   'magic-bento relative box-border grid w-full [grid-auto-flow:row_dense] text-[color:var(--mb-ink)] [-webkit-tap-highlight-color:transparent]'
 const CELL_CLASS = 'magic-bento__cell relative min-h-0 min-w-0 [--mb-delay:0ms]'
 const CARD_CLASS =
-  'magic-bento__card relative box-border isolate flex h-full w-full select-none flex-col overflow-hidden rounded-[var(--mb-radius)] text-[color:var(--mb-ink)] no-underline outline-none [background:var(--mb-surface)] [box-shadow:var(--mb-shadow)] [transform:perspective(900px)_translate3d(var(--mb-tx,0px),var(--mb-ty,0px),0)_rotateX(var(--mb-rx,0deg))_rotateY(var(--mb-ry,0deg))_scale(var(--mb-press,1))] data-[clickable]:cursor-pointer focus-visible:[box-shadow:var(--mb-shadow),0_0_0_2px_var(--mb-focus)]'
+  'magic-bento__card relative box-border isolate flex h-full w-full select-none flex-col overflow-hidden rounded-[var(--mb-radius)] text-[color:var(--mb-ink)] no-underline outline-none [background:var(--mb-surface)] [box-shadow:var(--mb-shadow)] data-[clickable]:cursor-pointer focus-visible:[box-shadow:var(--mb-shadow),0_0_0_2px_var(--mb-focus)]'
 const IMAGE_CLASS = 'pointer-events-none absolute inset-0 z-0 h-full w-full object-cover'
 const SCRIM_CLASS = 'pointer-events-none absolute inset-0 z-0'
 const LIGHT_CLASS = 'pointer-events-none absolute inset-0 z-[1] rounded-[inherit]'
@@ -844,6 +844,12 @@ const MagicBento = ({
   const cellRefs = useRef<(HTMLDivElement | null)[]>([])
   const cardRefs = useRef<(HTMLElement | null)[]>([])
   const starRefs = useRef<(HTMLCanvasElement | null)[]>([])
+  // RHS: the pointer-driven glow variables are written only on these two
+  // childless layers, and the tilt/press transform straight onto the card, so
+  // a pointer move restyles a handful of elements instead of every card's
+  // whole subtree (the cards hold live demos).
+  const lightRefs = useRef<(HTMLElement | null)[]>([])
+  const borderRefs = useRef<(HTMLElement | null)[]>([])
   const engineRef = useRef<{ sync: () => void } | null>(null)
   const [cols, setCols] = useState(Math.max(1, Math.round(columns)))
 
@@ -922,11 +928,13 @@ const MagicBento = ({
     const write = (
       element: HTMLElement,
       state: CardState,
+      layer: string,
       name: string,
       value: string,
     ) => {
-      if (state.written[name] === value) return
-      state.written[name] = value
+      const key = layer + name
+      if (state.written[key] === value) return
+      state.written[key] = value
       element.style.setProperty(name, value)
     }
 
@@ -1164,19 +1172,58 @@ const MagicBento = ({
           state.vpress = 0
         } else busy = true
 
-        write(card, state, '--mb-x', `${lx.toFixed(1)}px`)
-        write(card, state, '--mb-y', `${ly.toFixed(1)}px`)
-        write(card, state, '--mb-near', (s.enableBorderGlow ? light.near : 0).toFixed(3))
-        write(card, state, '--mb-hot', state.hot.toFixed(3))
-        write(card, state, '--mb-rx', `${state.rx.toFixed(3)}deg`)
-        write(card, state, '--mb-ry', `${state.ry.toFixed(3)}deg`)
-        write(card, state, '--mb-tx', `${state.tx.toFixed(2)}px`)
-        write(card, state, '--mb-ty', `${state.ty.toFixed(2)}px`)
-        write(card, state, '--mb-press', state.press.toFixed(4))
-        write(card, state, '--mb-wx', `${(wave.x - rect.left).toFixed(1)}px`)
-        write(card, state, '--mb-wy', `${(wave.y - rect.top).toFixed(1)}px`)
-        write(card, state, '--mb-wr', `${waveRadius.toFixed(1)}px`)
-        write(card, state, '--mb-wa', waveAlpha.toFixed(3))
+        const lightLayer = lightRefs.current[index]
+        const borderLayer = borderRefs.current[index]
+        // RHS: a layer whose glow can't show stays parked (one write, then no
+        // restyles): the spotlight only lights the hovered card (weighted by
+        // --mb-hot), and the border glow reaches 0.75 x the spotlight radius.
+        const reachBorder = Math.round(Math.max(40, s.spotlightRadius) * 0.75)
+        const gapX = Math.max(0, -lx, lx - rect.width)
+        const gapY = Math.max(0, -ly, ly - rect.height)
+        const rim = Math.hypot(gapX, gapY) < reachBorder
+        const spot = state.hot > 0
+        const at = (v: number, on: boolean) => (on ? `${v.toFixed(1)}px` : '-999px')
+        if (lightLayer) {
+          write(lightLayer, state, 'l', '--mb-x', at(lx, spot))
+          write(lightLayer, state, 'l', '--mb-y', at(ly, spot))
+          write(lightLayer, state, 'l', '--mb-hot', state.hot.toFixed(3))
+        }
+        const x = at(lx, rim)
+        const y = at(ly, rim)
+        if (borderLayer) {
+          write(borderLayer, state, 'b', '--mb-x', x)
+          write(borderLayer, state, 'b', '--mb-y', y)
+          write(
+            borderLayer,
+            state,
+            'b',
+            '--mb-near',
+            (s.enableBorderGlow ? light.near : 0).toFixed(3),
+          )
+          write(
+            borderLayer,
+            state,
+            'b',
+            '--mb-wx',
+            `${(wave.x - rect.left).toFixed(1)}px`,
+          )
+          write(borderLayer, state, 'b', '--mb-wy', `${(wave.y - rect.top).toFixed(1)}px`)
+          write(borderLayer, state, 'b', '--mb-wr', `${waveRadius.toFixed(1)}px`)
+          write(borderLayer, state, 'b', '--mb-wa', waveAlpha.toFixed(3))
+        }
+        const resting =
+          state.rx === 0 &&
+          state.ry === 0 &&
+          state.tx === 0 &&
+          state.ty === 0 &&
+          state.press === 1
+        const transform = resting
+          ? ''
+          : `perspective(900px) translate3d(${state.tx.toFixed(2)}px, ${state.ty.toFixed(2)}px, 0) rotateX(${state.rx.toFixed(3)}deg) rotateY(${state.ry.toFixed(3)}deg) scale(${state.press.toFixed(4)})`
+        if (state.written.transform !== transform) {
+          state.written.transform = transform
+          card.style.transform = transform
+        }
 
         if (s.enableStars && starRefs.current[index]) {
           const starTarget = inside && motion ? 1 : 0
@@ -1466,7 +1513,15 @@ const MagicBento = ({
               <img className={IMAGE_CLASS} src={entry.image} alt="" draggable={false} />
             )}
             {entry.image && <span className={SCRIM_CLASS} style={SCRIM_STYLE} />}
-            {enableSpotlight && <span className={LIGHT_CLASS} style={LIGHT_STYLE} />}
+            {enableSpotlight && (
+              <span
+                ref={(element) => {
+                  lightRefs.current[index] = element
+                }}
+                className={LIGHT_CLASS}
+                style={LIGHT_STYLE}
+              />
+            )}
             {enableStars && (
               <canvas
                 ref={(element) => {
@@ -1502,7 +1557,13 @@ const MagicBento = ({
               )}
             </div>
             <span className={RIM_CLASS} />
-            <span className={BORDER_CLASS} style={BORDER_STYLE} />
+            <span
+              ref={(element) => {
+                borderRefs.current[index] = element
+              }}
+              className={BORDER_CLASS}
+              style={BORDER_STYLE}
+            />
           </>
         )
 

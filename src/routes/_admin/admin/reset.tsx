@@ -20,7 +20,6 @@ function ResetPage() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Danger zone"
         title="Reset data"
         description="Start a new school year, clear out demo content, or wipe the site. Pick a preset or choose exactly what goes, download a backup, then confirm."
       />

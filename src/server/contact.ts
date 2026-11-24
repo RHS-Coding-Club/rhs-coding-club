@@ -7,27 +7,14 @@ import { contactSchema, markMessageSchema, messageIdSchema } from '#/lib/schemas
 import { TURNSTILE_ACTIONS, TURNSTILE_FAILED } from '#/lib/turnstile'
 import { requireOfficer } from '#/server/auth'
 import * as contact from '#/services/contact'
-import { getSetting } from '#/services/settings'
 import { passesTurnstile } from '#/services/turnstile'
 
 // ---------- Public ----------
 
-/** /contact side column: when and where the club meets, and its socials. */
-export const getContactInfo = createServerFn({ method: 'GET' }).handler(async () => {
-  const db = getDb()
-  const [club, social] = await Promise.all([
-    getSetting(db, 'club-info'),
-    getSetting(db, 'social'),
-  ])
-  return {
-    club: {
-      clubName: club.clubName,
-      meetingSchedule: club.meetingSchedule,
-      meetingLocation: club.meetingLocation,
-    },
-    social,
-  }
-})
+/** Everything /contact shows besides the form: meeting details, socials, and the officers. */
+export const getContactInfo = createServerFn({ method: 'GET' }).handler(() =>
+  contact.getContactPage(getDb()),
+)
 
 export const sendContactMessage = createServerFn({ method: 'POST' })
   .validator(contactSchema)

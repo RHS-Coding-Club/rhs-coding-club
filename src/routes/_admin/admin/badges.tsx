@@ -13,8 +13,6 @@ import { EmptyState } from '#/components/empty-state'
 import { RaisedButton } from '#/components/raised-button'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -22,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '#/components/ui/alert-dialog'
+import { ConfirmAction, ConfirmCancel } from '#/components/admin/confirm-buttons'
 import {
   Sheet,
   SheetContent,
@@ -75,7 +74,6 @@ function AdminBadges() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Recognition"
         title="Badges"
         description="Automatic badges unlock when a member reaches the threshold; custom ones are handed out here."
         actions={
@@ -89,7 +87,7 @@ function AdminBadges() {
       {badges.length === 0 ? (
         <EmptyState
           icon={<Award />}
-          title="No badges yet."
+          title="No badges yet"
           action={
             <RaisedButton onClick={() => setOpen('new')}>
               Create the first one
@@ -99,7 +97,7 @@ function AdminBadges() {
           Badges show on profiles and the leaderboard.
         </EmptyState>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {badges.map((b) => (
             <li key={b.id}>
               <button
@@ -130,7 +128,7 @@ function AdminBadges() {
                     {criteriaSummary(b)}
                   </span>
                 </span>
-                <span className="text-right">
+                <span className="shrink-0 text-right">
                   <span className="tabular block font-mono text-lg">{b.holders}</span>
                   <span className="text-muted-foreground text-[11px]">
                     {b.holders === 1 ? 'holder' : 'holders'}
@@ -143,7 +141,7 @@ function AdminBadges() {
       )}
 
       <Sheet open={Boolean(search.badge)} onOpenChange={(o) => !o && setOpen(undefined)}>
-        <SheetContent className="w-full gap-0 overflow-y-auto sm:max-w-lg">
+        <SheetContent className="w-full gap-0 overflow-y-auto overscroll-contain sm:max-w-lg">
           <SheetHeader className="border-border border-b">
             <SheetTitle>{isNew ? 'New badge' : (open?.name ?? 'Badge')}</SheetTitle>
             <SheetDescription>
@@ -210,13 +208,10 @@ function AdminBadges() {
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            onClick={() => onDelete(open.id)}
-                          >
-                            Delete
-                          </AlertDialogAction>
+                          <ConfirmCancel />
+                          <ConfirmAction onClick={() => onDelete(open.id)}>
+                            Delete badge
+                          </ConfirmAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>

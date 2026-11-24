@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { weekKey } from '#/lib/dates'
 import { formatDelta, ledgerLabel } from '#/components/members/ledger'
 import { semesterName } from '#/components/members/leaderboard-helpers'
-import { initialsPortrait } from '#/components/members/portrait'
 import {
   cleanSkills,
   expandPrefs,
@@ -66,14 +65,6 @@ describe('semesterName', () => {
     expect(semesterName(new Date(Date.UTC(2026, 7, 1)))).toBe('Fall 2026')
     expect(semesterName(new Date(Date.UTC(2027, 0, 1)))).toBe('Spring 2027')
     expect(semesterName(undefined)).toBe('All time')
-  })
-})
-
-describe('initialsPortrait', () => {
-  it('is an SVG data URL with escaped initials', () => {
-    const url = initialsPortrait('Ada <Lovelace>')
-    expect(url.startsWith('data:image/svg+xml')).toBe(true)
-    expect(decodeURIComponent(url)).toContain('>A&#60;<')
   })
 })
 

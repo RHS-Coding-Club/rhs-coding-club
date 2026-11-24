@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { getDb, schema } from '#/db'
-import { getAboutData, getAdminOverview, getHomeData } from '#/services/home'
+import { getAboutData, getAdminOverview, getHomeData, groupAwards } from '#/services/home'
 import { getSetting, setSetting } from '#/services/settings'
 
 const db = getDb()
@@ -79,10 +79,33 @@ describe('getHomeData', () => {
   })
 })
 
+describe('groupAwards', () => {
+  it('keeps one entry per member, newest first, and counts the rest', () => {
+    const rows = [
+      { id: 'a1', userId: 'ann' },
+      { id: 'b1', userId: 'bo' },
+      { id: 'a2', userId: 'ann' },
+      { id: 'a3', userId: 'ann' },
+      { id: 'c1', userId: 'cy' },
+    ]
+    expect(groupAwards(rows)).toEqual([
+      { id: 'a1', userId: 'ann', more: 2 },
+      { id: 'b1', userId: 'bo', more: 0 },
+      { id: 'c1', userId: 'cy', more: 0 },
+    ])
+    expect(groupAwards(rows, 2).map((r) => r.userId)).toEqual(['ann', 'bo'])
+  })
+})
+
 describe('getAboutData', () => {
   it('orders active officers by sortOrder and hides inactive ones', async () => {
     const data = await getAboutData(db)
     expect(data.officers.map((o) => o.id)).toEqual(['o1', 'o2'])
+  })
+
+  it('carries the same live numbers as the home page', async () => {
+    const data = await getAboutData(db, now)
+    expect(data.stats).toEqual({ members: 2, eventsThisSemester: 1, projects: 1 })
   })
 })
 

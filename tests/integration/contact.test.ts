@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { getDb, schema } from '#/db'
+import { officerSchema } from '#/lib/schemas/officers'
 import {
   deleteMessage,
+  getContactPage,
   listMessages,
   setMessageRead,
   submitContactMessage,
   unreadCount,
 } from '#/services/contact'
+import { saveOfficer } from '#/services/officers'
 
 const db = getDb()
 
@@ -62,5 +65,28 @@ describe('inbox', () => {
     await deleteMessage(db, first.id)
     list = await listMessages(db)
     expect(list.some((m) => m.id === first.id)).toBe(false)
+  })
+})
+
+describe('getContactPage', () => {
+  it('lists active officers in order, with only their name and photo', async () => {
+    const make = (name: string, isActive = true) =>
+      officerSchema.parse({
+        name,
+        title: 'Officer',
+        bio: 'Private bio',
+        email: 'officer@example.com',
+        githubUrl: '',
+        imageKey: null,
+        isActive,
+      })
+    await saveOfficer(db, make('Ana'))
+    await saveOfficer(db, make('Ben', false))
+    await saveOfficer(db, make('Cam'))
+
+    const page = await getContactPage(db)
+    expect(page.officers.map((o) => o.name)).toEqual(['Ana', 'Cam'])
+    expect(Object.keys(page.officers[0]).sort()).toEqual(['id', 'imageKey', 'name'])
+    expect(page.club.meetingSchedule).toBeTruthy()
   })
 })

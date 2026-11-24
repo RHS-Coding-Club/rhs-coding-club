@@ -92,7 +92,9 @@ const SIZER = 'invisible'
 const WINDOW =
   'pointer-events-none absolute top-[calc(var(--counter-fade,0em)*-1)] right-0 bottom-[calc(var(--counter-fade,0em)*-1)] left-0 overflow-hidden'
 const STRIP = 'absolute inset-0'
-const NUMERAL = 'absolute inset-0 flex items-center justify-center will-change-transform'
+// RHS: no permanent will-change on every numeral; paint() sets it on a digit's
+// numerals only while that digit rolls.
+const NUMERAL = 'absolute inset-0 flex items-center justify-center'
 const SYMBOL =
   'relative inline-flex justify-center mx-[calc(var(--counter-gap,0px)/2*var(--counter-shown,1))] opacity-[var(--counter-shown,1)] [clip-path:inset(-0.5em_0)]'
 const SYMBOL_TEXT = 'inline-block whitespace-pre'
@@ -115,9 +117,15 @@ const mod = (value: number, base: number) => ((value % base) + base) % base
 
 const wrap = (offset: number) => mod(offset + 5, 10) - 5
 
-const prefersReduced = () =>
-  typeof window !== 'undefined' &&
-  (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)
+// RHS: one MediaQueryList for the module, read each frame, instead of a new
+// matchMedia() call per frame.
+let reducedQuery: MediaQueryList | null | undefined
+const prefersReduced = () => {
+  if (typeof window === 'undefined') return false
+  if (reducedQuery === undefined)
+    reducedQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)') ?? null
+  return reducedQuery?.matches ?? false
+}
 
 const stepBetween = (from: number, to: number, direction: string) => {
   const up = mod(to - from, 10)
@@ -315,6 +323,7 @@ function Counter({
     if (item.kind === 'digit') {
       item.numerals?.forEach((numeral, n) => {
         numeral.style.transform = `translateY(${(wrap(n - item.pos) * 100).toFixed(3)}%)`
+        numeral.style.willChange = resting ? '' : 'transform'
       })
       if (shown >= 1 && (s.tabular || resting)) {
         el.style.width = ''

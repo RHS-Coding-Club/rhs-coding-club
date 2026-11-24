@@ -28,7 +28,14 @@ function AdminShell() {
 
   return (
     <>
-      <div className="mx-auto w-full max-w-7xl px-4 pt-6 pb-36 sm:px-6">
+      {/* Bottom room for the fixed dock (and the home indicator on phones), so the
+          last row of every page scrolls clear of it. Admin is a tool used all day:
+          the wheel scrolls natively (no Lenis smoothing) and icons hold still. */}
+      <div
+        data-lenis-prevent
+        data-calm-icons
+        className="mx-auto w-full max-w-7xl px-4 pt-6 pb-[calc(9rem+env(safe-area-inset-bottom,0px))] sm:px-6"
+      >
         <Outlet />
       </div>
       <AdminDock role={user.role} counts={counts} initialDark={theme === 'dark'} />

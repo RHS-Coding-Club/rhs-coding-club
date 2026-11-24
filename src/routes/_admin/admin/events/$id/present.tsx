@@ -110,7 +110,7 @@ function PresentPage() {
         </div>
       </header>
 
-      <main className="relative grid flex-1 items-center gap-10 px-6 py-6 sm:px-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16 lg:px-16">
+      <main className="relative grid grid-cols-1 flex-1 items-center gap-10 px-6 py-6 sm:px-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16 lg:px-16">
         <div className="flex min-w-0 flex-col gap-8 lg:gap-12">
           <div>
             <p className="font-mono text-[clamp(0.9rem,1.4vw,1.25rem)] opacity-60">

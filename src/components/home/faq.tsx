@@ -42,7 +42,7 @@ export function Faq({
   return (
     <section
       id="faq"
-      className="mx-auto grid max-w-6xl scroll-mt-(--header-offset) gap-12 px-(--gutter) py-16 sm:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]"
+      className="mx-auto grid grid-cols-1 max-w-6xl scroll-mt-(--header-offset) gap-12 px-(--gutter) py-16 sm:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]"
       aria-labelledby="faq-heading"
     >
       <FadeUp className="max-w-sm">
@@ -65,8 +65,8 @@ export function Faq({
       </FadeUp>
 
       <Accordion type="single" collapsible className="border-border border-t">
-        {items.map((item, i) => (
-          <FadeUp key={item.q} delay={i * 0.05} distance={16}>
+        {items.map((item) => (
+          <FadeUp key={item.q}>
             <AccordionItem value={item.q} className="border-border">
               <AccordionTrigger className="py-5 text-lg font-medium hover:no-underline">
                 {item.q}

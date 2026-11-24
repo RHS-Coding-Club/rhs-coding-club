@@ -93,7 +93,6 @@ function AdminApplications() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Membership"
         title="Applications"
         description="Guests who want to join. Approving makes them a member and emails them; rejecting sends your note so they know what to change."
       />
@@ -125,7 +124,7 @@ function AdminApplications() {
       {rows.length === 0 ? (
         <EmptyState
           icon={<UserCheck />}
-          title={status === 'pending' ? 'No one is waiting.' : 'Nothing here.'}
+          title={status === 'pending' ? 'No one is waiting' : `No ${status} applications`}
         >
           {status === 'pending'
             ? 'New applications from /join show up here.'
@@ -164,7 +163,10 @@ function AdminApplications() {
                       <UserAvatar user={r} className="size-8" />
                       <span className="min-w-0">
                         <span className="block truncate font-medium">{r.name}</span>
-                        <span className="text-muted-foreground block truncate text-xs">
+                        <span
+                          className="text-muted-foreground block max-w-[14rem] truncate text-xs"
+                          title={r.email}
+                        >
                           {r.email}
                         </span>
                       </span>
@@ -198,7 +200,7 @@ function AdminApplications() {
           if (!open) void navigate({ search: (s) => ({ ...s, id: undefined }) })
         }}
       >
-        <SheetContent className="w-full gap-0 overflow-y-auto sm:max-w-xl">
+        <SheetContent className="w-full gap-0 overflow-y-auto overscroll-contain sm:max-w-xl">
           {search.id && <ApplicationPanel id={search.id} />}
         </SheetContent>
       </Sheet>

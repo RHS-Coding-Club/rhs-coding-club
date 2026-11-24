@@ -29,11 +29,20 @@ describe('resolveSetting', () => {
 })
 
 describe('format helpers', () => {
-  it('builds initials from up to two words', () => {
+  it('builds initials from the first and last word', () => {
     expect(initials('Ada Lovelace')).toBe('AL')
-    expect(initials('  grace   brewster hopper ')).toBe('GB')
+    expect(initials('  grace   brewster hopper ')).toBe('GH')
     expect(initials('ada')).toBe('A')
     expect(initials('')).toBe('')
+  })
+
+  it('takes whole graphemes and skips emoji words', () => {
+    expect(initials('🦊 Fox')).toBe('F')
+    expect(initials('👩🏽‍💻 Priya Natarajan')).toBe('PN')
+    expect(initials('Đặng Thị Ngọc Hân')).toBe('ĐH')
+    expect(initials('王秀英')).toBe('王')
+    expect(initials('🦊')).toBe('🦊')
+    expect(initials('éclair')).toBe('É')
   })
 
   it('slugifies titles', () => {

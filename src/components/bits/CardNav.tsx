@@ -52,6 +52,8 @@ export interface CardNavProps {
   theme?: 'dark' | 'light'
   surface?: 'glass' | 'solid'
   openOn?: 'click' | 'hover'
+  // RHS: the menu now opens with a CSS clip-path reveal (cards rise 8px and
+  // fade, 30ms apart), so these four are accepted for compatibility and ignored.
   cardEffect?: 'rise' | 'unfold' | 'fade'
   stagger?: number
   bounce?: number
@@ -82,6 +84,8 @@ interface AnchorProps {
   onClick?: (event: ReactMouseEvent<HTMLElement>) => void
 }
 
+// RHS: the menu toggle's icon and label swap and the link arrows run at
+// 250ms and 200ms (were 500ms and 450ms); it's the site's main navigation.
 const THEMES: Record<string, Record<string, string>> = {
   dark: {
     '--cn-panel': 'rgba(38, 35, 46, 0.72)',
@@ -127,8 +131,17 @@ const THEMES: Record<string, Record<string, string>> = {
 
 const ROOT =
   'group/cn relative mx-auto h-[var(--cn-bar)] w-full max-w-[var(--cn-max)] text-[14px] leading-[1.4] [-webkit-tap-highlight-color:transparent]'
+// RHS: the panel opens with a clip-path reveal at its open height instead of a
+// per-frame JS height spring (250ms open, 200ms close, all on the compositor).
+// While shown it is full height and clipped to the bar; revealed unclips it
+// (stacked variants, so the revealed clip outranks the shown one).
+// Its drop shadow lives on SHADOW, because a clip-path would cut it off.
 const PANEL =
-  'absolute inset-x-0 top-0 z-10 h-[var(--cn-bar)] overflow-hidden rounded-[var(--cn-radius)] [background:var(--cn-panel)] [box-shadow:var(--cn-shadow)] [-webkit-backdrop-filter:var(--cn-blur)] [backdrop-filter:var(--cn-blur)]'
+  'absolute inset-x-0 top-0 z-10 h-[var(--cn-bar)] overflow-hidden rounded-[var(--cn-radius)] [background:var(--cn-panel)] [-webkit-backdrop-filter:var(--cn-blur)] [backdrop-filter:var(--cn-blur)] transition-[clip-path] duration-200 ease-out group-data-[shown]/cn:h-[calc(var(--cn-bar)+var(--cn-open,0px))] group-data-[shown]/cn:[clip-path:inset(0_0_calc(100%_-_var(--cn-bar))_0_round_var(--cn-radius))] group-data-[shown]/cn:group-data-[revealed]/cn:[clip-path:inset(0_0_0_0_round_var(--cn-radius))] group-data-[revealed]/cn:duration-250 group-data-[instant]/cn:transition-none motion-reduce:transition-none'
+// RHS: a bar-sized layer that carries the panel's shadow and slides down with
+// the panel's bottom edge as it opens.
+const SHADOW =
+  'pointer-events-none absolute inset-x-0 top-0 z-[9] h-[var(--cn-bar)] rounded-[var(--cn-radius)] [box-shadow:var(--cn-shadow)] transition-[translate] duration-200 ease-out group-data-[revealed]/cn:translate-y-[var(--cn-open,0px)] group-data-[revealed]/cn:duration-250 group-data-[instant]/cn:transition-none motion-reduce:transition-none'
 const RIM =
   'pointer-events-none absolute inset-0 z-[3] rounded-[inherit] [box-shadow:inset_0_0_0_1px_var(--cn-edge),inset_0_1px_0_var(--cn-highlight)]'
 const BAR =
@@ -137,14 +150,14 @@ const MENU =
   'inline-flex h-[calc(var(--cn-bar)_-_var(--cn-inset)*2)] cursor-pointer items-center gap-[10px] justify-self-start rounded-[calc(var(--cn-radius)_-_var(--cn-inset))] border-0 pl-[16px] pr-[14px] [background:none] [font-family:inherit] [font-size:inherit] font-medium text-[var(--cn-text)] outline-none transition-[background-color] duration-200 ease-[ease] hover:[background:var(--cn-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--cn-ring)] data-[icon-only]:w-[calc(var(--cn-bar)_-_var(--cn-inset)*2)] data-[icon-only]:justify-center data-[icon-only]:p-0 group-data-[narrow]/cn:col-[3] group-data-[narrow]/cn:row-[1] group-data-[narrow]/cn:justify-self-end'
 const BURGER = 'relative h-[12px] w-[18px]'
 const LINE_TOP =
-  'absolute left-0 top-[2.25px] h-[1.5px] w-full rounded-[2px] bg-current transition-[top,rotate] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[open]/cn:top-[5.25px] group-data-[open]/cn:rotate-45 motion-reduce:transition-none'
+  'absolute left-0 top-[2.25px] h-[1.5px] w-full rounded-[2px] bg-current transition-[translate,rotate] duration-250 ease-out group-data-[open]/cn:translate-y-[3px] group-data-[open]/cn:rotate-45 motion-reduce:transition-none'
 const LINE_BOTTOM =
-  'absolute left-0 top-[8.25px] h-[1.5px] w-full rounded-[2px] bg-current transition-[top,rotate] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[open]/cn:top-[5.25px] group-data-[open]/cn:-rotate-45 motion-reduce:transition-none'
+  'absolute left-0 top-[8.25px] h-[1.5px] w-full rounded-[2px] bg-current transition-[translate,rotate] duration-250 ease-out group-data-[open]/cn:-translate-y-[3px] group-data-[open]/cn:-rotate-45 motion-reduce:transition-none'
 const MENU_LABEL = 'relative inline-grid overflow-hidden'
 const WORD_OPEN =
-  '[grid-area:1/1] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[open]/cn:-translate-y-[110%] motion-reduce:transition-none'
+  '[grid-area:1/1] transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[open]/cn:-translate-y-[110%] motion-reduce:transition-none'
 const WORD_CLOSE =
-  '[grid-area:1/1] translate-y-[110%] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[open]/cn:translate-y-0 motion-reduce:transition-none'
+  '[grid-area:1/1] translate-y-[110%] transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[open]/cn:translate-y-0 motion-reduce:transition-none'
 const LOGO =
   'inline-flex h-[var(--cn-logo)] items-center justify-self-center text-[var(--cn-text)] no-underline outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--cn-ring)] [&_img]:block [&_img]:h-full [&_img]:w-auto [&_svg]:block [&_svg]:h-full [&_svg]:w-auto group-data-[narrow]/cn:col-[1] group-data-[narrow]/cn:row-[1] group-data-[narrow]/cn:justify-self-start group-data-[narrow]/cn:pl-[14px]'
 const CTA =
@@ -152,10 +165,14 @@ const CTA =
 const CTA_WIDE =
   'flex h-[44px] w-full cursor-pointer items-center justify-center whitespace-nowrap rounded-[calc(var(--cn-radius)_-_var(--cn-inset))] border-0 px-[16px] [background:var(--cn-cta)] [box-shadow:var(--cn-cta-shadow)] [font-family:inherit] [font-size:inherit] font-semibold text-[var(--cn-cta-ink)] no-underline outline-none transition-[filter] duration-200 ease-[ease] hover:[filter:var(--cn-cta-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--cn-ring)]'
 const CONTENT =
-  'invisible absolute inset-x-0 top-[var(--cn-bar)] box-border flex flex-col gap-[var(--cn-gap)] px-[var(--cn-inset)] pb-[var(--cn-inset)] [perspective:900px] group-data-[shown]/cn:visible'
+  'pointer-events-none invisible absolute inset-x-0 top-[var(--cn-bar)] box-border flex flex-col gap-[var(--cn-gap)] px-[var(--cn-inset)] pb-[var(--cn-inset)] group-data-[shown]/cn:visible group-data-[revealed]/cn:pointer-events-auto'
+// RHS: each card (and the phone CTA) rises 8px and fades in, 30ms apart by
+// --i; on close they all leave together, faster.
+const REVEAL =
+  'opacity-0 translate-y-2 transition-[opacity,translate] duration-150 ease-out group-data-[revealed]/cn:translate-y-0 group-data-[revealed]/cn:opacity-100 group-data-[revealed]/cn:duration-200 group-data-[revealed]/cn:[transition-delay:calc(var(--i,0)*30ms)] group-data-[instant]/cn:transition-none motion-reduce:translate-y-0'
 const CARDS = 'flex gap-[var(--cn-gap)] group-data-[narrow]/cn:flex-col'
 const CARD =
-  'group/card relative box-border flex min-h-[var(--cn-card)] min-w-0 flex-[1_1_0] origin-top flex-col gap-[18px] rounded-[calc(var(--cn-radius)_-_var(--cn-inset))] px-[16px] pb-[14px] pt-[16px] [background:var(--cn-tile)] [box-shadow:var(--cn-tile-rim)] text-[var(--cn-text)] will-change-[transform,opacity] data-[tinted]:[box-shadow:inset_0_1px_0_rgba(255,255,255,0.16),0_4px_10px_-4px_rgba(0,0,0,0.45)] group-data-[narrow]/cn:min-h-0 group-data-[narrow]/cn:flex-none group-data-[narrow]/cn:gap-[10px] group-data-[narrow]/cn:px-[14px] group-data-[narrow]/cn:pb-[12px] group-data-[narrow]/cn:pt-[14px]'
+  'group/card relative box-border flex min-h-[var(--cn-card)] min-w-0 flex-[1_1_0] origin-top flex-col gap-[18px] rounded-[calc(var(--cn-radius)_-_var(--cn-inset))] px-[16px] pb-[14px] pt-[16px] [background:var(--cn-tile)] [box-shadow:var(--cn-tile-rim)] text-[var(--cn-text)] data-[tinted]:[box-shadow:inset_0_1px_0_rgba(255,255,255,0.16),0_4px_10px_-4px_rgba(0,0,0,0.45)] group-data-[narrow]/cn:min-h-0 group-data-[narrow]/cn:flex-none group-data-[narrow]/cn:gap-[10px] group-data-[narrow]/cn:px-[14px] group-data-[narrow]/cn:pb-[12px] group-data-[narrow]/cn:pt-[14px]'
 const CARD_HEAD = 'flex flex-col gap-[4px]'
 const LABEL = 'text-[17px] font-semibold tracking-[-0.015em]'
 const DESCRIPTION =
@@ -166,9 +183,9 @@ const LINK =
   'group/link inline-flex cursor-pointer items-center gap-[8px] rounded-[6px] border-0 px-0 py-[3px] [background:none] [font-family:inherit] text-[14px] font-medium text-inherit no-underline opacity-[0.82] outline-none transition-opacity duration-200 ease-[ease] hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--cn-ring)]'
 const ARROW = 'relative inline-block h-[14px] w-[14px] flex-none overflow-hidden'
 const ARROW_OUT =
-  'absolute inset-0 h-full w-full transition-transform duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/link:translate-x-[110%] group-hover/link:-translate-y-[110%] group-focus-visible/link:translate-x-[110%] group-focus-visible/link:-translate-y-[110%] motion-reduce:transition-none'
+  'absolute inset-0 h-full w-full transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/link:translate-x-[110%] group-hover/link:-translate-y-[110%] group-focus-visible/link:translate-x-[110%] group-focus-visible/link:-translate-y-[110%] motion-reduce:transition-none'
 const ARROW_IN =
-  'absolute inset-0 h-full w-full -translate-x-[110%] translate-y-[110%] transition-transform duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/link:translate-x-0 group-hover/link:translate-y-0 group-focus-visible/link:translate-x-0 group-focus-visible/link:translate-y-0 motion-reduce:transition-none'
+  'absolute inset-0 h-full w-full -translate-x-[110%] translate-y-[110%] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/link:translate-x-0 group-hover/link:translate-y-0 group-focus-visible/link:translate-x-0 group-focus-visible/link:translate-y-0 motion-reduce:transition-none'
 
 const DEFAULT_ITEMS: CardNavItem[] = [
   {
@@ -201,11 +218,6 @@ const DEFAULT_ITEMS: CardNavItem[] = [
 const NARROW = 560
 const EASE_OUT = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, value))
-
-const easeOut = (t: number) => 1 - (1 - t) ** 3
-
 const contrastInk = (color?: string): string | null => {
   const hex = String(color || '')
     .trim()
@@ -236,10 +248,6 @@ const CardNav = ({
   theme = 'dark',
   surface = 'glass',
   openOn = 'click',
-  cardEffect = 'rise',
-  stagger = 0.12,
-  bounce = 0.2,
-  speed = 1,
   cardHeight = 176,
   maxWidth = 800,
   accentColor,
@@ -259,28 +267,19 @@ const CardNav = ({
   const panelRef = useRef<HTMLElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLButtonElement>(null)
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-  const engineRef = useRef<{ wake: () => void; refresh: () => void } | null>(null)
   const leaveRef = useRef(0)
   const barRef = useRef<HTMLDivElement>(null)
   const introRef = useRef(intro)
   const [openState, setOpenState] = useState(defaultOpen)
   const [narrow, setNarrow] = useState(false)
   const [shown, setShown] = useState(defaultOpen)
+  const [revealed, setRevealed] = useState(defaultOpen)
+  const [instant, setInstant] = useState(false)
+  const hideRef = useRef(0)
 
   const controlled = openProp !== undefined
   const hasCta = Boolean(cta)
   const open = controlled ? openProp : openState
-
-  const settings = {
-    open,
-    cardEffect,
-    stagger: clamp(stagger, 0, 0.3),
-    bounce: clamp(bounce, 0, 1),
-    speed: clamp(speed, 0.2, 3),
-  }
-  const settingsRef = useRef(settings)
-  settingsRef.current = settings
 
   const palette = THEMES[theme] ?? THEMES.dark
   const vars: Record<string, string> = {
@@ -314,117 +313,44 @@ const CardNav = ({
   const setOpenRef = useRef(setOpen)
   setOpenRef.current = setOpen
 
-  useEffect(() => {
-    const panel = panelRef.current
+  // RHS: the open height is measured into --cn-open; CSS does the motion.
+  useLayoutEffect(() => {
+    const root = rootRef.current
     const content = contentRef.current
-    if (!panel || !content) return undefined
-    const reduce =
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
-    const state = {
-      p: settingsRef.current.open ? 1 : 0,
-      v: 0,
-      height: content.offsetHeight,
-      bar: 60,
-    }
-    let raf = 0
-    let last = 0
-
-    const render = () => {
-      const s = settingsRef.current
-      state.bar = parseFloat(getComputedStyle(panel).getPropertyValue('--cn-bar')) || 60
-      panel.style.height = `${state.bar + Math.max(0, state.p) * state.height}px`
-      const cards = cardRefs.current.filter(
-        (card): card is HTMLDivElement => card !== null,
-      )
-      const count = cards.length
-      const lag = count > 1 ? Math.min(s.stagger, 0.7 / (count - 1)) : 0
-      const span = 1 - lag * (count - 1)
-      cards.forEach((card, index) => {
-        const local = clamp((state.p - index * lag) / Math.max(span, 0.05), 0, 1)
-        const e = easeOut(local)
-        if (s.cardEffect === 'unfold') {
-          card.style.transform = `translateY(${(1 - e) * -10}px) rotateX(${(1 - e) * -72}deg)`
-          card.style.opacity = `${clamp(local * 1.8, 0, 1)}`
-          card.style.filter = ''
-        } else if (s.cardEffect === 'fade') {
-          card.style.transform = `translateY(${(1 - e) * 6}px)`
-          card.style.opacity = `${e}`
-          card.style.filter = e < 0.999 ? `blur(${(1 - e) * 6}px)` : ''
-        } else {
-          card.style.transform = `translateY(${(1 - e) * 26}px) scale(${0.97 + 0.03 * e})`
-          card.style.opacity = `${e}`
-          card.style.filter = ''
-        }
-      })
-    }
-
-    const tick = (now: number) => {
-      raf = 0
-      const s = settingsRef.current
-      const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60
-      last = now
-      const target = s.open ? 1 : 0
-      if (reduce) {
-        state.p = target
-        state.v = 0
-      } else {
-        const k = 160 * s.speed * s.speed
-        const zeta = s.open ? 1 - 0.68 * s.bounce : 1
-        const steps = Math.ceil(dt / (1 / 240))
-        const h = dt / steps
-        for (let i = 0; i < steps; i++) {
-          state.v += (-k * (state.p - target) - 2 * zeta * Math.sqrt(k) * state.v) * h
-          state.p += state.v * h
-        }
-      }
-      const done = Math.abs(state.p - target) < 0.0005 && Math.abs(state.v) < 0.002
-      if (done) {
-        state.p = target
-        state.v = 0
-      }
-      render()
-      if (done && target === 0) setShown(false)
-      if (!done) raf = requestAnimationFrame(tick)
-    }
-
-    const wake = () => {
-      if (!raf) {
-        last = 0
-        raf = requestAnimationFrame(tick)
-      }
-    }
-
-    engineRef.current = {
-      wake,
-      refresh: () => {
-        state.height = content.offsetHeight
-        render()
-      },
-    }
-
-    render()
-    const observer = new ResizeObserver(() => {
-      state.height = content.offsetHeight
-      render()
-    })
+    if (!root || !content) return undefined
+    const measure = () => root.style.setProperty('--cn-open', `${content.offsetHeight}px`)
+    measure()
+    const observer = new ResizeObserver(measure)
     observer.observe(content)
-
-    return () => {
-      cancelAnimationFrame(raf)
-      observer.disconnect()
-      engineRef.current = null
-    }
+    return () => observer.disconnect()
   }, [items.length, hasCta, narrow])
 
   useLayoutEffect(() => {
-    if (open) setShown(true)
-    engineRef.current?.refresh()
-    engineRef.current?.wake()
+    window.clearTimeout(hideRef.current)
+    if (open) {
+      setShown(true)
+      // Unclip a frame after the panel is shown at the bar's height, so the
+      // reveal starts from the bar.
+      let second = 0
+      const first = requestAnimationFrame(() => {
+        second = requestAnimationFrame(() => setRevealed(true))
+      })
+      return () => {
+        cancelAnimationFrame(first)
+        cancelAnimationFrame(second)
+      }
+    }
+    setRevealed(false)
+    if (instant) {
+      setShown(false)
+      const frame = requestAnimationFrame(() => setInstant(false))
+      return () => cancelAnimationFrame(frame)
+    }
+    // Collapse once the 200ms close has played.
+    hideRef.current = window.setTimeout(() => setShown(false), 220)
+    return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
-
-  useEffect(() => {
-    engineRef.current?.refresh()
-  })
 
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -456,7 +382,13 @@ const CardNav = ({
     }
   }, [open])
 
-  useEffect(() => () => window.clearTimeout(leaveRef.current), [])
+  useEffect(
+    () => () => {
+      window.clearTimeout(leaveRef.current)
+      window.clearTimeout(hideRef.current)
+    },
+    [],
+  )
 
   useLayoutEffect(() => {
     const panel = panelRef.current
@@ -541,11 +473,14 @@ const CardNav = ({
       className={[ROOT, className].filter(Boolean).join(' ')}
       data-open={open ? '' : undefined}
       data-shown={shown || open ? '' : undefined}
+      data-revealed={revealed && open ? '' : undefined}
+      data-instant={instant ? '' : undefined}
       data-narrow={narrow ? '' : undefined}
       style={{ ...vars, ...style } as CSSProperties}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
     >
+      <span className={SHADOW} aria-hidden="true" />
       <nav ref={panelRef} className={PANEL} aria-label={ariaLabel}>
         <div ref={barRef} className={BAR}>
           <button
@@ -596,15 +531,15 @@ const CardNav = ({
             {items.map((item, index) => (
               <div
                 key={`${item.label}-${index}`}
-                ref={(element) => {
-                  cardRefs.current[index] = element
-                }}
-                className={CARD}
+                className={`${CARD} ${REVEAL}`}
                 data-tinted={item.bgColor ? '' : undefined}
                 style={
-                  item.bgColor
-                    ? { background: item.bgColor, color: item.textColor }
-                    : undefined
+                  {
+                    '--i': index,
+                    ...(item.bgColor
+                      ? { background: item.bgColor, color: item.textColor }
+                      : {}),
+                  } as CSSProperties
                 }
               >
                 <div className={CARD_HEAD}>
@@ -622,6 +557,8 @@ const CardNav = ({
                           tabIndex: open ? undefined : -1,
                           onClick: (event) => {
                             onLinkClick?.(link, item, event)
+                            // RHS: following a link closes the menu at once.
+                            setInstant(true)
                             setOpen(false)
                           },
                         },
@@ -650,11 +587,7 @@ const CardNav = ({
             ))}
           </div>
           {!actions && cta && narrow && (
-            <div
-              ref={(element) => {
-                cardRefs.current[items.length] = element
-              }}
-            >
+            <div className={REVEAL} style={{ '--i': items.length } as CSSProperties}>
               {ctaButton(cta, true)}
             </div>
           )}

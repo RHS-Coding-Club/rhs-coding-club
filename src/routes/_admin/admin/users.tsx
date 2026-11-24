@@ -99,7 +99,6 @@ function AdminUsers() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="People"
         title="Users"
         description={
           hasRole(me.role, 'admin')
@@ -114,6 +113,7 @@ function AdminUsers() {
             aria-hidden="true"
           />
           <Input
+            type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by name or email"
@@ -144,7 +144,7 @@ function AdminUsers() {
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState icon={<Users />} title="No users match.">
+        <EmptyState icon={<Users />} title="No users match">
           Try a different search or role.
         </EmptyState>
       ) : (
@@ -186,7 +186,10 @@ function AdminUsers() {
                             </span>
                           )}
                         </span>
-                        <span className="text-muted-foreground block truncate text-xs">
+                        <span
+                          className="text-muted-foreground block max-w-[14rem] truncate text-xs"
+                          title={u.email}
+                        >
                           {u.email}
                         </span>
                       </span>
@@ -214,7 +217,7 @@ function AdminUsers() {
           if (!open) void navigate({ search: (s) => ({ ...s, user: undefined }) })
         }}
       >
-        <SheetContent className="w-full gap-0 overflow-y-auto sm:max-w-xl">
+        <SheetContent className="w-full gap-0 overflow-y-auto overscroll-contain sm:max-w-xl">
           {search.user && (
             <UserPanel
               id={search.user}
@@ -422,7 +425,7 @@ function UserBody({
           </p>
           <form
             onSubmit={adjust}
-            className="mt-4 grid gap-3 sm:grid-cols-[7rem_minmax(0,1fr)]"
+            className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[7rem_minmax(0,1fr)]"
             noValidate
           >
             <div className="flex flex-col gap-1.5">

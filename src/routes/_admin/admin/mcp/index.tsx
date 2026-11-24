@@ -137,7 +137,7 @@ function AdminMcp() {
             Your connected apps
           </h2>
           {connections.length === 0 ? (
-            <EmptyState icon={<Bot />} title="Nothing connected.">
+            <EmptyState icon={<Bot />} title="No apps connected">
               Apps you connect show up here so you can cut them off.
             </EmptyState>
           ) : (

@@ -14,8 +14,6 @@ import { EmptyState } from '#/components/empty-state'
 import { RaisedButton } from '#/components/raised-button'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -23,6 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '#/components/ui/alert-dialog'
+import { ConfirmAction, ConfirmCancel } from '#/components/admin/confirm-buttons'
 import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { fmtDate } from '#/lib/format'
 import { serverErrorMessage } from '#/lib/schemas/community'
@@ -58,17 +57,16 @@ function AdminMessages() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Inbox"
         title="Messages"
         description="Everything sent through /contact. Opening a message marks it read; reply goes out from your own email."
       />
 
       {messages.length === 0 ? (
-        <EmptyState icon={<Inbox />} title="No messages yet.">
+        <EmptyState icon={<Inbox />} title="No messages yet">
           Messages from the contact form land here.
         </EmptyState>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-[22rem_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[22rem_minmax(0,1fr)]">
           <div
             className={cn('flex min-w-0 flex-col gap-3', selected && 'hidden lg:flex')}
           >
@@ -277,13 +275,8 @@ function MessageView({ message: m, onBack }: { message: Message; onBack: () => v
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  onClick={onDelete}
-                >
-                  Delete
-                </AlertDialogAction>
+                <ConfirmCancel />
+                <ConfirmAction onClick={onDelete}>Delete message</ConfirmAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

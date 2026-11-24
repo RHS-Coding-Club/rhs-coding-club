@@ -75,7 +75,6 @@ function AdminChallenges() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Content"
         title="Challenges"
         description="One problem a week. Drafts and scheduled challenges stay hidden until they go live, and members get an email when they do."
         actions={
@@ -91,7 +90,7 @@ function AdminChallenges() {
       {challenges.length === 0 ? (
         <EmptyState
           icon={<FileText />}
-          title="No challenges yet."
+          title="No challenges yet"
           action={
             <RaisedButton asChild>
               <Link to="/admin/challenges/new">Write the first one</Link>

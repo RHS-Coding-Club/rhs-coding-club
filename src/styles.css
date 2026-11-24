@@ -85,7 +85,7 @@
 
   --rarity-common: #64748b;
   --rarity-rare: #2a7fc4;
-  --rarity-epic: #7c3aed;
+  --rarity-epic: #0d7d72;
   --rarity-legendary: #b7791f;
   --medal-gold: #f59e0b;
   --medal-silver: #64748b;
@@ -168,7 +168,7 @@
 
   --rarity-common: #94a3b8;
   --rarity-rare: #5fb2ee;
-  --rarity-epic: #a78bfa;
+  --rarity-epic: #4fd1c5;
   --rarity-legendary: #f2b84b;
   --medal-gold: #fcd34d;
   --medal-silver: #cbd5e1;
@@ -198,6 +198,17 @@
   --bits-highlight: rgba(255, 255, 255, 0.06);
   --bits-tile-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.6);
   --bits-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.8), 0 6px 16px -8px rgba(0, 0, 0, 0.5);
+}
+
+/*
+  Motion curves. Tailwind's ease-out / ease-in-out utilities read these, so the
+  whole site gets the strong curves: enters and exits use ease-out, things moving
+  on screen use ease-in-out, sheets and drawers use the iOS drawer curve.
+*/
+@theme {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 @theme inline {
@@ -278,6 +289,26 @@
   }
   html {
     color-scheme: light;
+    /* Pressable things draw their own pressed state; no gray flash on tap. */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    /* Anchors and focused fields land below the floating header. */
+    scroll-padding-top: calc(var(--header-offset) + 0.5rem);
+  }
+  /* No 300ms double-tap wait on anything tappable. */
+  a,
+  button,
+  [role='button'],
+  label,
+  summary {
+    touch-action: manipulation;
+  }
+  /* A long press on a control doesn't select its label. */
+  button,
+  [role='button'],
+  [role='tab'] {
+    -webkit-user-select: none;
+    user-select: none;
   }
   html.dark {
     color-scheme: dark;
@@ -293,6 +324,94 @@
   }
   ::selection {
     background: color-mix(in oklab, var(--brand-sky) 35%, transparent);
+  }
+}
+
+/*
+  iOS zooms the page into any field under 16px, so touch screens get 16px.
+  Unlayered on purpose: it has to beat text-sm on the field itself.
+*/
+@media (pointer: coarse) {
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='color']),
+  textarea,
+  select,
+  [contenteditable='true'] {
+    font-size: max(1rem, 1em);
+  }
+}
+
+/* Admin pages: focused fields and anchors stop above the fixed bottom dock. */
+html:has(#admin-dock) {
+  scroll-padding-bottom: 8rem;
+}
+
+/*
+  FadeUp (motion.tsx): sections fade in as they scroll into view, driven by the
+  scroll position itself, so nothing is hidden before hydration or without
+  JavaScript. Fully opaque once the top has come 120px into the viewport.
+  Browsers without scroll timelines skip it (a 0s animation ends at once).
+*/
+@keyframes reveal {
+  from {
+    opacity: 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0 entry 120px;
+  }
+}
+/* Paper has no scroll: print every block as if it had been scrolled to. */
+@media print {
+  .reveal {
+    animation: none;
+  }
+}
+
+/*
+  Messages that appear after an action (inline errors, a success line) ease in
+  instead of popping, so the control that was just pressed doesn't jump.
+  @starting-style only applies when the element is inserted.
+*/
+[role='alert'],
+.enter {
+  transition:
+    opacity 200ms var(--ease-out),
+    translate 200ms var(--ease-out);
+  @starting-style {
+    opacity: 0;
+    translate: 0 -4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [role='alert'],
+  .enter {
+    transition-property: opacity;
+  }
+}
+
+/* Theme flips crossfade the whole page once (useFlipTheme). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: var(--ease-out);
+}
+
+/* The floating theme toggle steps aside while a phone scrolls down (theme-toggle.tsx). */
+.theme-toggle {
+  transition:
+    translate 200ms var(--ease-out),
+    opacity 200ms var(--ease-out);
+}
+.theme-toggle[data-away] {
+  translate: 0 calc(100% + 1.5rem);
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle[data-away] {
+    translate: none;
   }
 }
 
@@ -356,7 +475,7 @@ html.lenis body {
   Raised buttons (src/components/raised-button.tsx). The face is a ::before
   layer under the label: a fill, a lip of light along the top edge, a soft
   inner glow, a 1px edge, and a stack of contact shadows. Hover lights the
-  face, press sinks it to 98.5%. Each variant sets the --raise-* variables;
+  face, press sinks it to 97% over 160ms and it springs back faster (120ms). Each variant sets the --raise-* variables;
   dark mode swaps them for a glossier face.
 */
 @layer components {
@@ -375,7 +494,7 @@ html.lenis body {
     background-color: var(--raise-fill, transparent);
     box-shadow: var(--raise-shadow, none);
     transition:
-      scale 0.2s var(--raise-ease),
+      scale 0.12s var(--ease-out),
       filter 0.2s var(--raise-ease),
       box-shadow 0.2s var(--raise-ease),
       background-color 0.15s ease-out;
@@ -389,8 +508,13 @@ html.lenis body {
   }
   .raise:active:not([aria-haspopup])::before,
   .raise[data-pressed]::before {
-    scale: 0.985;
+    scale: 0.97;
     box-shadow: var(--raise-shadow, none);
+    transition:
+      scale 0.16s var(--ease-out),
+      filter 0.2s var(--raise-ease),
+      box-shadow 0.2s var(--raise-ease),
+      background-color 0.15s ease-out;
   }
   @media (prefers-reduced-motion: reduce) {
     .raise::before {
@@ -461,6 +585,18 @@ html.lenis body {
   .raise-ghost:active::before {
     background-color: color-mix(in oklch, var(--foreground) 12%, transparent);
   }
+  /* Confirms a delete or another action that can't be undone. */
+  .raise-destructive {
+    --raise-fill: var(--destructive);
+    --raise-lit: brightness(1.1);
+    --raise-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 8px 24px -4px rgba(255, 255, 255, 0.1),
+      0 0 0 1px color-mix(in oklch, var(--destructive), black 35%),
+      0 0.5px 0.5px rgba(0, 0, 0, 0.08), 0 2px 2px -1px rgba(0, 0, 0, 0.08),
+      0 5px 5px -2.5px rgba(0, 0, 0, 0.07), 0 12px 12px -6px rgba(0, 0, 0, 0.05);
+    color: var(--destructive-foreground);
+  }
 
   .dark .raise-primary {
     --raise-lit: brightness(1.07);
@@ -516,6 +652,10 @@ html.lenis body {
   }
   .rich-text > * + * {
     margin-top: 1.1em;
+  }
+  /* Long emails, URLs and identifiers wrap instead of widening the page. */
+  .rich-text :is(p, li, h2, h3, h4, blockquote, a) {
+    overflow-wrap: anywhere;
   }
   .rich-text :is(h2, h3, h4) {
     /* Clear the floating header when a table-of-contents link jumps here. */
@@ -661,4 +801,221 @@ html.lenis body {
     stroke-dashoffset: -1;
     stroke-opacity: 0;
   }
+}
+
+/*
+  Privacy and terms on paper (src/components/legal/legal-page.tsx): only the
+  document prints, black on white, with each site link's address spelled out.
+  Scoped with :has() so a visit here never changes how other pages print.
+*/
+@media print {
+  /* the site's header and footer, not the document's own header */
+  body:has([data-legal-doc]) :is(header, footer):not([data-legal-doc] *),
+  [data-legal-doc] [data-print-hide] {
+    display: none !important;
+  }
+  body:has([data-legal-doc]) {
+    background: white !important;
+    color: black !important;
+  }
+  [data-legal-doc] {
+    --foreground: black;
+    --muted-foreground: color-mix(in srgb, black 75%, white);
+    --primary: black;
+    --border: color-mix(in srgb, black 20%, white);
+  }
+  [data-legal-doc] .rich-text a[href^='/']::after {
+    content: ' (rhs.riponhighcodingclub.workers.dev' attr(href) ')';
+    font-size: 0.85em;
+  }
+  [data-legal-doc] section {
+    break-inside: avoid-page;
+  }
+}
+
+/*
+  Join: approval demo (src/components/join/approval-demo.tsx). The Stageshow
+  device pair on /join: the officers' queue window and the applicant's phone,
+  positioned in the stage's design pixels. Wide and compact (phone) layouts.
+*/
+/* The desktop pinned top-left, off the bottom; the phone straddles its right
+   edge over the row's empty margin, about a third outside. */
+.approval-demo .ad-win {
+  position: absolute;
+  top: 40px;
+  left: 92px;
+  width: 620px;
+  height: 520px;
+  box-shadow: var(--ss-shadow-hero);
+}
+
+.approval-demo .ss-stage[data-layout='compact'] .ad-win {
+  top: 20px;
+  left: 16px;
+  width: 384px;
+  height: 330px;
+}
+
+.approval-demo .ad-phone {
+  position: absolute;
+  top: 56px;
+  left: 600px;
+  filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.35));
+}
+
+.approval-demo .ss-stage[data-layout='compact'] .ad-phone {
+  top: 262px;
+  left: 63px;
+}
+
+.approval-demo .ad-body {
+  height: 100%;
+  /* The phone covers the window's right margin; rows end clear of it */
+  padding: 24px 150px 0 26px;
+  background: var(--ss-surface);
+}
+
+.approval-demo .ss-stage[data-layout='compact'] .ad-body {
+  padding: 18px 52px 0 16px;
+}
+
+.approval-demo .ad-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.approval-demo .ad-title {
+  color: var(--ss-text-strong);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.approval-demo .ad-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.approval-demo .ad-list {
+  border-top: 1px solid var(--ss-line);
+}
+
+.approval-demo .ad-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  height: 64px;
+  border-bottom: 1px solid var(--ss-line-faint);
+  white-space: nowrap;
+}
+
+.approval-demo .ss-stage[data-layout='compact'] .ad-row {
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.approval-demo .ad-lines {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.approval-demo .ad-lines .ss-bar {
+  max-width: 100%;
+}
+
+.approval-demo .ad-name {
+  overflow: hidden;
+  color: var(--ss-text-strong);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+
+.approval-demo .ad-meta {
+  overflow: hidden;
+  color: var(--ss-text);
+  font-size: 12px;
+  text-overflow: ellipsis;
+}
+
+.approval-demo .ad-approve[data-done] {
+  background: var(--ss-success);
+  color: var(--background);
+}
+
+/*
+  Dashboard and member profile. The frosted panel that holds the season score
+  on the dashboard hero, progress meters and rings that fill once, the point
+  receipt's dotted leaders and torn foot, and the badge binder's foil sheen
+  (epic and legendary) and hatched empty slots.
+*/
+.glass-panel {
+  background: color-mix(in oklab, var(--card) 55%, transparent);
+  border: 1px solid transparent;
+  box-shadow:
+    0 0 0 1px var(--bits-edge),
+    inset 0 1px 0 var(--bits-highlight),
+    var(--bits-shadow);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass-panel {
+    background: var(--card);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+.receipt-leader {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--foreground) 28%, transparent) 1px,
+    transparent 1.2px
+  );
+  background-size: 6px 6px;
+  background-position: 0 70%;
+  background-repeat: repeat-x;
+}
+.receipt-tear {
+  --tooth: 10px;
+  mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom /
+      calc(var(--tooth) * 2) var(--tooth) repeat-x;
+}
+.badge-foil {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.badge-foil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    color-mix(in oklab, white 22%, transparent) 48%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .badge-foil:hover::after,
+  .badge-foil:focus-visible::after {
+    transition: transform 900ms cubic-bezier(0.23, 1, 0.32, 1);
+    transform: translateX(100%);
+  }
+}
+.badge-slot {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--foreground) 4%, transparent) 0 1px,
+    transparent 1px 9px
+  );
 }

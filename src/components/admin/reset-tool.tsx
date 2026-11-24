@@ -150,7 +150,7 @@ export function ResetTool({
           <h2 id="presets-heading" className="text-lg font-semibold tracking-[-0.02em]">
             Presets
           </h2>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {RESET_PRESETS.map((p) => {
               const Icon = PRESET_ICON[p.id]
               const active = preset?.id === p.id
@@ -240,7 +240,7 @@ export function ResetTool({
           <p className="text-muted-foreground mt-1 text-sm">
             Accounts with the admin role, and yours, are never deleted or demoted.
           </p>
-          <div className="mt-5 grid gap-6 lg:grid-cols-2">
+          <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2">
             {RESET_GROUPS.map((g) => (
               <fieldset
                 key={g.label}

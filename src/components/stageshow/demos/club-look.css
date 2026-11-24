@@ -1,0 +1,63 @@
+/*
+  The club's look for Stageshow demos: the kit's --ss-* tokens mapped onto the
+  site tokens in src/styles.css, so a demo follows the theme toggle with no
+  colors of its own. Stage's `theme` prop still flips the kit's placeholder
+  inks and shadows (black on light, white on dark). Unlayered on purpose: the
+  kit's CSS lives in @layer stageshow, so these win without !important.
+*/
+.club-look .ss-stage {
+  --ss-font: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --ss-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ss-accent: var(--primary);
+  --ss-accent-2: var(--brand-navy);
+  --ss-accent-soft: color-mix(in oklab, var(--primary) 14%, transparent);
+  --ss-accent-text: var(--brand-navy);
+
+  --ss-canvas: var(--background);
+  --ss-surface: var(--card);
+  --ss-chrome: var(--card);
+  --ss-raised: var(--card);
+  --ss-well: var(--muted);
+
+  --ss-line: var(--bits-edge);
+  --ss-text-strong: var(--foreground);
+  --ss-text: var(--muted-foreground);
+  --ss-text-faint: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+
+  --ss-success: var(--success);
+  --ss-success-text: var(--success);
+  --ss-success-soft: color-mix(in oklab, var(--success) 14%, transparent);
+  --ss-warning: var(--warning);
+  --ss-warning-text: var(--warning);
+  --ss-warning-soft: color-mix(in oklab, var(--warning) 14%, transparent);
+  --ss-danger: var(--destructive);
+  --ss-danger-text: var(--destructive);
+  --ss-danger-soft: color-mix(in oklab, var(--destructive) 14%, transparent);
+
+  --ss-radius-sm: 6px;
+  --ss-radius-md: 8px;
+  --ss-radius-lg: 12px;
+  --ss-radius-window: 14px;
+}
+
+/* Dark: depth from a lighter surface, never from shadow alone. */
+.dark .club-look .ss-stage {
+  --ss-accent-text: var(--brand-sky-soft);
+  --ss-canvas: color-mix(in oklab, var(--card) 92%, var(--foreground));
+  --ss-surface: color-mix(in oklab, var(--card) 94%, var(--foreground));
+  --ss-chrome: color-mix(in oklab, var(--card) 94%, var(--foreground));
+  --ss-raised: color-mix(in oklab, var(--card) 88%, var(--foreground));
+  --ss-well: color-mix(in oklab, var(--card) 90%, var(--foreground));
+}
+
+/* The pictures sit on the bento tile's own surface; the stage draws no ground. */
+.club-look .ss-stage {
+  background: transparent;
+}
+
+/* A filled button's label takes the site's on-primary ink (white on the light
+   theme's blue, near-black on the dark theme's sky), as RaisedButton does. */
+.club-look .ss-button[data-variant='primary'] {
+  color: var(--primary-foreground);
+}

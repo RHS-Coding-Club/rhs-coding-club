@@ -107,7 +107,6 @@ function AdminProjects() {
   return (
     <div>
       <AdminPageHeader
-        eyebrow="Admin"
         title="Projects"
         description="Review team submissions. Approving pays every teammate the project points; rejecting or un-approving takes them back."
       />
@@ -150,7 +149,7 @@ function AdminProjects() {
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState icon={<FolderGit2 />} title="Nothing here">
+        <EmptyState icon={<FolderGit2 />} title="No projects in this view">
           {filter === 'pending'
             ? 'The review queue is empty. New submissions show up here.'
             : 'No projects match.'}
@@ -236,7 +235,7 @@ function AdminProjects() {
       )}
 
       <Sheet open={Boolean(open)} onOpenChange={(v) => !v && setOpenId(null)}>
-        <SheetContent className="w-full gap-0 overflow-y-auto p-0 sm:max-w-xl">
+        <SheetContent className="w-full gap-0 overflow-y-auto overscroll-contain p-0 sm:max-w-xl">
           {open && (
             <ReviewPanel
               key={open.id}

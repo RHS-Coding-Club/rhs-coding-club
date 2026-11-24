@@ -30,7 +30,7 @@ const CONFIRM: Record<RsvpChoice, string> = {
 
 export function errorMessage(
   err: unknown,
-  fallback = 'Something went wrong. Try again.',
+  fallback = "That didn't go through. Check your connection and try again.",
 ) {
   if (err instanceof Error) {
     if (err.message === 'UNAUTHORIZED') return 'Sign in first.'
@@ -66,7 +66,12 @@ export function useRsvp(eventId: string, saved: RsvpChoice | null) {
         // count snapped back for a moment, then forward again.
         await router.invalidate({ sync: true })
       } catch (err) {
-        toast.error(errorMessage(err, 'Could not save your RSVP.'))
+        toast.error(
+          errorMessage(
+            err,
+            "Couldn't save your RSVP. Check your connection and try again.",
+          ),
+        )
       }
     })
   }

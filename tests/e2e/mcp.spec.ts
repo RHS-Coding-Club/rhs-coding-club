@@ -197,7 +197,7 @@ test('an officer connects, works, and approves a delete on the website', async (
   await expect(site.getByText('Approved and done').first()).toBeVisible()
   await site.waitForLoadState('networkidle')
   await site.getByRole('button', { name: 'Disconnect' }).click()
-  await expect(site.getByText('Nothing connected.')).toBeVisible()
+  await expect(site.getByText('No apps connected')).toBeVisible()
   expect(pageErrors).toEqual([])
   await client.close()
 })

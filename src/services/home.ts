@@ -95,7 +95,8 @@ export async function getHomeData(db: Db, now = new Date()) {
       .innerJoin(schema.badge, eq(schema.badge.id, schema.userBadge.badgeId))
       .where(eq(schema.badge.isActive, true))
       .orderBy(desc(schema.userBadge.awardedAt))
-      .limit(6),
+      // Grouped per member below, so read enough rows to find six people.
+      .limit(40),
     // The newest published challenge is "this week's".
     db.query.challenge.findFirst({
       where: and(
@@ -164,7 +165,7 @@ export async function getHomeData(db: Db, now = new Date()) {
     },
     featuredProjects,
     latestPosts,
-    recentAwards,
+    recentAwards: groupAwards(recentAwards),
   }
 }
 
@@ -213,10 +214,35 @@ export async function getClubPulseData(db: Db, now = new Date()) {
 
 export type ClubPulse = Awaited<ReturnType<typeof getClubPulseData>>
 
-export async function getAboutData(db: Db) {
-  const [club, social, officers] = await Promise.all([
+/** The three live numbers the home and about pages show. */
+async function getClubStats(db: Db, now: Date) {
+  const since = await pointsWindowStart(db, now)
+  const [members, events, projects] = await Promise.all([
+    db
+      .select({ n: count() })
+      .from(schema.user)
+      .where(inArray(schema.user.role, MEMBER_ROLES)),
+    db
+      .select({ n: count() })
+      .from(schema.event)
+      .where(and(gte(schema.event.startsAt, since), lt(schema.event.startsAt, now))),
+    db
+      .select({ n: count() })
+      .from(schema.project)
+      .where(eq(schema.project.status, 'approved')),
+  ])
+  return {
+    members: members[0]?.n ?? 0,
+    eventsThisSemester: events[0]?.n ?? 0,
+    projects: projects[0]?.n ?? 0,
+  }
+}
+
+export async function getAboutData(db: Db, now = new Date()) {
+  const [club, social, stats, officers] = await Promise.all([
     getSetting(db, 'club-info'),
     getSetting(db, 'social'),
+    getClubStats(db, now),
     db.query.officer.findMany({
       where: eq(schema.officer.isActive, true),
       orderBy: [schema.officer.sortOrder, schema.officer.name],
@@ -230,7 +256,7 @@ export async function getAboutData(db: Db) {
       },
     }),
   ])
-  return { club, social, officers }
+  return { club, social, stats, officers }
 }
 
 export type AboutData = Awaited<ReturnType<typeof getAboutData>>
@@ -268,3 +294,21 @@ export async function getAdminOverview(db: Db) {
 }
 
 export type AdminOverview = Awaited<ReturnType<typeof getAdminOverview>>
+
+/**
+ * One entry per member for the home page's "Badges earned recently": their
+ * newest badge plus how many more they earned in the same window, so one busy
+ * member doesn't fill the strip.
+ */
+export function groupAwards<T extends { userId: string }>(
+  rows: T[],
+  limit = 6,
+): (T & { more: number })[] {
+  const byUser = new Map<string, T & { more: number }>()
+  for (const row of rows) {
+    const seen = byUser.get(row.userId)
+    if (seen) seen.more += 1
+    else if (byUser.size < limit) byUser.set(row.userId, { ...row, more: 0 })
+  }
+  return [...byUser.values()]
+}

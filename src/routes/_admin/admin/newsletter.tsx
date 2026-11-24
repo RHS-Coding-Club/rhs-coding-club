@@ -17,8 +17,6 @@ import { NewsletterComposer } from '#/components/newsletter/composer'
 import { IssuePreview } from '#/components/newsletter/issue-preview'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -26,6 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '#/components/ui/alert-dialog'
+import { ConfirmAction, ConfirmCancel } from '#/components/admin/confirm-buttons'
 import {
   Dialog,
   DialogContent,
@@ -75,7 +74,6 @@ function AdminNewsletter() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Email"
         title="Newsletter"
         description="Write an issue, check it, and send it to everyone who signed up in the site footer."
         actions={
@@ -159,7 +157,7 @@ function IssueHistory({ issues }: { issues: Data['issues'] }) {
 
   if (issues.length === 0) {
     return (
-      <EmptyState icon={<Mail />} title="No issues yet.">
+      <EmptyState icon={<Mail />} title="No issues yet">
         Write the first one in Compose.
       </EmptyState>
     )
@@ -259,13 +257,10 @@ function IssueHistory({ issues }: { issues: Data['issues'] }) {
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                onClick={() => onDelete(i.id)}
-                              >
-                                Delete
-                              </AlertDialogAction>
+                              <ConfirmCancel />
+                              <ConfirmAction onClick={() => onDelete(i.id)}>
+                                Delete draft
+                              </ConfirmAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
@@ -349,7 +344,7 @@ function Subscribers({ rows }: { rows: Data['subscribers'] }) {
       {visible.length === 0 ? (
         <EmptyState
           icon={<Mail />}
-          title={rows.length ? 'No matches.' : 'No subscribers yet.'}
+          title={rows.length ? 'No matches' : 'No subscribers yet'}
         >
           {rows.length ? 'Try another search.' : 'People sign up from the site footer.'}
         </EmptyState>

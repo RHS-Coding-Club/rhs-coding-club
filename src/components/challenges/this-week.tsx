@@ -66,7 +66,7 @@ export function ThisWeekCard({
     >
       <article
         aria-labelledby="this-week-title"
-        className="bg-card ring-border/70 relative grid gap-8 overflow-hidden rounded-[28px] p-6 ring-1 sm:p-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-12"
+        className="bg-card ring-border/70 relative grid grid-cols-1 gap-8 overflow-hidden rounded-[28px] p-6 ring-1 sm:p-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-12"
         style={{ background: 'var(--bits-surface)' }}
       >
         <div className="flex min-w-0 flex-col">

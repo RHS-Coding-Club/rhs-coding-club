@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import type { Page } from '@playwright/test'
+import type { Cookie, Page } from '@playwright/test'
 
 const PASSWORD = 'password123'
 
@@ -9,6 +9,22 @@ const PASSWORD = 'password123'
  * the next navigation carries the session.
  */
 async function logIn(page: Page, email: string) {
+  // One real sign-in per account, then reuse its session cookie: AUTH_LIMIT
+  // allows 10 password checks a minute per IP, and the suite outgrew that.
+  const saved = sessions.get(email)
+  if (saved) {
+    await page.context().addCookies(saved)
+    // Land where a fresh sign-in would, so callers can't tell the difference.
+    await page.goto('/dashboard')
+    return
+  }
+  await signInThroughForm(page, email)
+  sessions.set(email, await page.context().cookies())
+}
+
+const sessions = new Map<string, Cookie[]>()
+
+async function signInThroughForm(page: Page, email: string) {
   await page.goto('/login', { waitUntil: 'networkidle' })
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Password').fill(PASSWORD)
@@ -25,13 +41,13 @@ test('home page renders', async ({ page }) => {
 test('footer newsletter form subscribes an email', async ({ page }) => {
   await page.goto('/')
   const email = `e2e-${Date.now()}-${Math.floor(Math.random() * 1e6)}@test.local`
-  const input = page.getByLabel('Newsletter signup')
+  const input = page.getByLabel('Email for the newsletter')
   await input.scrollIntoViewIfNeeded()
   // Submits before hydration do nothing, so retry until the success text lands.
   await expect(async () => {
     await input.fill(email)
     await page.getByRole('button', { name: 'Subscribe' }).click()
-    await expect(page.getByText('You are on the list')).toBeVisible({ timeout: 2000 })
+    await expect(page.getByText("You're on the list")).toBeVisible({ timeout: 2000 })
   }).toPass({ timeout: 15_000 })
 })
 
@@ -43,7 +59,25 @@ test('unauthenticated dashboard redirects to login', async ({ page }) => {
 test('member can log in and reach the dashboard', async ({ page }) => {
   await logIn(page, 'member@test.local')
   await expect(page).toHaveURL(/\/dashboard/)
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Hey, Max')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText("Max's season")
+  await expect(page.getByRole('heading', { name: "This week's quests" })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Around you' })).toBeVisible()
+})
+
+test('a member profile shows the card, collection, and weeks solved', async ({
+  page,
+}) => {
+  await page.goto('/members/u_member', { waitUntil: 'networkidle' })
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Max Member')
+  await expect(page.getByRole('heading', { name: 'The collection' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Weeks solved' })).toBeVisible()
+  await page.getByRole('button', { name: 'Flip the card' }).click()
+  await expect(page.getByRole('button', { name: 'Show the front' })).toBeVisible()
+})
+
+test('an unknown member id is a 404', async ({ page }) => {
+  const res = await page.goto('/members/nobody-here')
+  expect(res?.status()).toBe(404)
 })
 
 test('member is kept out of admin', async ({ page }) => {
@@ -65,6 +99,27 @@ test('about page lists officers from the database', async ({ page }) => {
     page.getByRole('heading', { level: 2, name: 'The people running it' }),
   ).toBeVisible()
   await expect(page.getByRole('heading', { level: 3, name: 'Jashan Maan' })).toBeVisible()
+})
+
+test('guest sees the membership application on /join', async ({ page }) => {
+  await logIn(page, 'guest@test.local')
+  await page.goto('/join')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    /Four quick questions|Application received/,
+  )
+})
+
+test('signed-out /join shows the steps and the sign-up link', async ({ page }) => {
+  await page.goto('/join')
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Join the club' }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('heading', { level: 2, name: 'Three steps, about two minutes' }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'Create an account' }).first(),
+  ).toBeVisible()
 })
 
 test('theme toggle persists across reloads', async ({ page }) => {
@@ -125,6 +180,39 @@ for (const path of PUBLIC_PAGES) {
   })
 }
 
+test('an unknown page shows the 404 with a guess', async ({ page }) => {
+  const res = await page.goto('/chalenges/week-9')
+  expect(res?.status()).toBe(404)
+  await expect(
+    page.getByRole('heading', { name: 'We lost the signal on this one.' }),
+  ).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Challenges' }).first()).toHaveAttribute(
+    'href',
+    '/challenges',
+  )
+})
+
+test('a missing blog post shows the 404', async ({ page }) => {
+  await page.goto('/blog/no-such-post-anywhere')
+  await expect(
+    page.getByRole('heading', { name: 'We lost the signal on this one.' }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'Blog', exact: true }).first(),
+  ).toBeVisible()
+})
+
+test('privacy switches between the full text and the short version', async ({ page }) => {
+  await page.goto('/privacy', { waitUntil: 'networkidle' })
+  await expect(page.getByText('We use two cookies', { exact: false })).toBeVisible()
+  await page.getByRole('button', { name: 'In short', exact: true }).click()
+  await expect(
+    page.getByRole('button', { name: 'In short', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByText('We use two cookies', { exact: false })).toBeHidden()
+  await expect(page.getByText(/Showing the short version/)).toBeVisible()
+})
+
 test('guest is asked to apply before submitting a challenge', async ({ page }) => {
   await logIn(page, 'guest@test.local')
   await expect(page).toHaveURL(/\/dashboard/)
@@ -165,4 +253,62 @@ test('officers can not reach backups', async ({ page }) => {
   await logIn(page, 'officer@test.local')
   await page.goto('/admin/backups')
   await expect(page).toHaveURL(/\/admin\/?$/)
+})
+
+test('a member saves one setting card on /account', async ({ page }) => {
+  await logIn(page, 'member@test.local')
+  await page.goto('/account', { waitUntil: 'networkidle' })
+  await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
+
+  const bioCard = page.getByRole('form', { name: 'Bio' })
+  const bio = bioCard.getByLabel('Bio')
+  const save = bioCard.getByRole('button', { name: 'Save' })
+  const before = await bio.inputValue()
+  await expect(save).toBeDisabled()
+
+  // Too long: the error shows under the field and nothing is saved.
+  await bio.fill('x'.repeat(300))
+  await save.click()
+  await expect(bioCard.getByText(/280/).last()).toBeVisible()
+  await expect(bio).toHaveAttribute('aria-invalid', 'true')
+
+  const next = `Saved from e2e ${Date.now()}`
+  await bio.fill(next)
+  await save.click()
+  await expect(bioCard.getByText('Saved')).toBeVisible()
+  await expect(save).toBeDisabled()
+
+  await page.reload({ waitUntil: 'networkidle' })
+  await expect(page.getByRole('form', { name: 'Bio' }).getByLabel('Bio')).toHaveValue(
+    next,
+  )
+
+  // Put the seed bio back.
+  await page.getByRole('form', { name: 'Bio' }).getByLabel('Bio').fill(before)
+  await page
+    .getByRole('form', { name: 'Bio' })
+    .getByRole('button', { name: 'Save' })
+    .click()
+  await expect(page.getByRole('form', { name: 'Bio' }).getByText('Saved')).toBeVisible()
+})
+
+test('the contact form flags missing fields, then sends', async ({ page }) => {
+  await page.goto('/contact', { waitUntil: 'networkidle' })
+  const form = page.getByRole('form', { name: 'Message the officers' })
+  await form.getByRole('button', { name: 'Send message' }).click()
+  await expect(form.getByText('Tell us your name.')).toBeVisible()
+  await expect(form.getByLabel('Your name')).toBeFocused()
+
+  // A topic fills the subject and shows the shortcut for it.
+  await form.getByText('Joining', { exact: true }).click()
+  await expect(form.getByLabel('Subject')).toHaveValue('Joining the club')
+  await expect(form.getByRole('link', { name: 'Start your application' })).toBeVisible()
+
+  const email = `e2e-${Date.now()}@example.com`
+  await form.getByLabel('Your name').fill('E2E Parent')
+  await form.getByLabel('Email').fill(email)
+  await form.getByLabel('Message').fill('Can freshmen join partway through the semester?')
+  await form.getByRole('button', { name: 'Send message' }).click()
+  await expect(page.getByRole('heading', { name: 'Message sent' })).toBeVisible()
+  await expect(page.getByText(email)).toBeVisible()
 })

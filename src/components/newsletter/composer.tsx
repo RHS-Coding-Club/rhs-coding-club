@@ -15,14 +15,13 @@ import { RichTextEditor } from '#/components/rich-text/editor'
 import { RaisedButton } from '#/components/raised-button'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '#/components/ui/alert-dialog'
+import { ConfirmAction, ConfirmCancel } from '#/components/admin/confirm-buttons'
 import {
   Dialog,
   DialogContent,
@@ -119,7 +118,7 @@ export function NewsletterComposer({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_16rem]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_16rem]">
       <div className="flex min-w-0 flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="nl-subject">Subject</Label>
@@ -232,8 +231,10 @@ export function NewsletterComposer({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Not yet</AlertDialogCancel>
-            <AlertDialogAction onClick={() => run('send')}>Send it</AlertDialogAction>
+            <ConfirmCancel>Not yet</ConfirmCancel>
+            <ConfirmAction variant="primary" onClick={() => run('send')}>
+              Send issue
+            </ConfirmAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

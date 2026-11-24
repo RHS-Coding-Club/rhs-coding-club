@@ -10,7 +10,6 @@ export function ThreadsBackground({ initialDark = true }: { initialDark?: boolea
   const [line, accent] = useCssColors('--art-line', '--art-accent')
   return (
     <Threads
-      key={dark ? 'dark' : 'light'}
       color={line}
       accentColor={accent}
       amplitude={1}

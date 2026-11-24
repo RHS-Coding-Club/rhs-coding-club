@@ -28,6 +28,12 @@ export const BRAND_TOKENS: Record<keyof typeof BRAND, string> = {
   codeFg: '--code-fg',
 }
 
+/**
+ * The page ground per theme, for the theme-color meta tag (the phone's status
+ * bar and browser chrome), which can't read CSS variables either.
+ */
+export const STATIC_GROUND = { light: '#f4f7fb', dark: '#0b0f15' } as const
+
 /** Email's own light neutrals: mail clients always get the light layout. */
 export const EMAIL = {
   ground: '#eef2f7',

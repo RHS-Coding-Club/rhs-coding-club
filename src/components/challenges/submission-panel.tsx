@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { ExternalLink } from '#/components/icons/external-link'
@@ -8,6 +8,7 @@ import { Send } from '#/components/icons/send'
 import { UserPlus } from '#/components/icons/user-plus'
 import { toast } from 'sonner'
 import ClickSpark from '#/components/bits/ClickSpark'
+import type { ClickSparkHandle } from '#/components/bits/ClickSpark'
 import { RaisedButton } from '#/components/raised-button'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
@@ -290,6 +291,8 @@ function SubmitForm({
   onDone: () => void
 }) {
   const sparks = useCssColors('--brand-sky', '--brand-sky-soft', '--brand-navy')
+  // Sparks celebrate a submission that went through, not the press itself.
+  const sparkRef = useRef<ClickSparkHandle>(null)
   const router = useRouter()
   const submit = useServerFn(submitSolution)
   const [language, setLanguage] = useState(mine?.language ?? '')
@@ -323,6 +326,7 @@ function SubmitForm({
     setPending(true)
     try {
       const res = await submit({ data: parsed.data })
+      sparkRef.current?.spark()
       toast.success(res.resubmitted ? 'Submission updated' : 'Submitted', {
         description: 'An officer will review it soon.',
       })
@@ -447,6 +451,9 @@ function SubmitForm({
 
       <div className="flex gap-2">
         <ClickSpark
+          ref={sparkRef}
+          // No sparks on the click; onSubmit fires them once it succeeds.
+          only=":not(*)"
           sparkColor={sparks}
           sparkCount={10}
           sparkRadius={34}

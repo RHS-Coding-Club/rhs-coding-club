@@ -19,7 +19,6 @@ export function ResourcesHeroBackground({ initialDark }: { initialDark: boolean 
   const [stage, wash, sky] = useCssColors('--stage', '--art-wash', '--brand-sky')
   return (
     <Grainient
-      key={dark ? 'dark' : 'light'}
       color1={stage}
       color2={wash}
       color3={sky}

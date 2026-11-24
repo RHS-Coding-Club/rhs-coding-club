@@ -1,11 +1,22 @@
-/** "Ada Lovelace" -> "AL", "ada" -> "A". */
+const graphemes = new Intl.Segmenter('en', { granularity: 'grapheme' })
+/** A word that starts with a letter or digit, so emoji and punctuation don't become initials. */
+const LETTERED = /^[\p{L}\p{N}]/u
+
+/**
+ * "Ada Lovelace" -> "AL", "ada" -> "A", "Ada King Lovelace" -> "AL" (first and
+ * last word). Works by grapheme, so "👩🏽‍💻 Priya" -> "P" and "Đặng Hân" -> "ĐH"
+ * instead of half an emoji. A name with no letters at all keeps its first grapheme.
+ */
 export function initials(name: string): string {
-  return name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
+  const words = name.trim().split(/\s+/).filter(Boolean)
+  const lettered = words.filter((word) => LETTERED.test(word))
+  const pick = lettered.length > 0 ? lettered : words.slice(0, 1)
+  const ends = pick.length > 1 ? [pick[0], pick[pick.length - 1]] : pick
+  return ends
+    .map((word) => {
+      const first = graphemes.segment(word)[Symbol.iterator]().next().value
+      return (first?.segment ?? '').toLocaleUpperCase()
+    })
     .join('')
 }
 

@@ -74,7 +74,7 @@ export function FilterPills<T extends string>({
                 transition={
                   reduced
                     ? { duration: 0 }
-                    : { type: 'spring', bounce: 0.18, duration: 0.45 }
+                    : { type: 'spring', bounce: 0.18, duration: 0.25 }
                 }
               />
             )}

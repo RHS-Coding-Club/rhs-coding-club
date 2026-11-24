@@ -139,7 +139,6 @@ function AdminOfficers() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Club"
         title="Officers"
         description="The cards on the About page, in this order. Hide someone with the switch instead of deleting them."
         actions={
@@ -158,7 +157,7 @@ function AdminOfficers() {
       {officers.length === 0 ? (
         <EmptyState
           icon={<ShieldCheck />}
-          title="No officer profiles yet."
+          title="No officer profiles yet"
           action={
             <RaisedButton onClick={() => setEditing({ ...BLANK })}>
               <Plus />
@@ -282,15 +281,16 @@ function AdminOfficers() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <RaisedButton variant="ghost" onClick={() => setDeleting(null)}>
+            <RaisedButton variant="outline" onClick={() => setDeleting(null)}>
               Cancel
             </RaisedButton>
             <RaisedButton
-              className="text-white [--raise-fill:var(--destructive)]"
+              variant="destructive"
               loading={busy === `${deleting?.id}-delete`}
+              loadingText="Deleting…"
               onClick={() => void confirmDelete()}
             >
-              Delete
+              Delete officer
             </RaisedButton>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -376,7 +376,7 @@ function OfficerForm({
           A square headshot. Without one, the card shows their initials.
         </p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {field('name', 'Name', { autoComplete: 'off' })}
         {field('title', 'Title', { placeholder: 'Vice President' })}
       </div>
@@ -396,7 +396,7 @@ function OfficerForm({
           </p>
         )}
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {field('email', 'Email (optional)', { type: 'email' })}
         {field('githubUrl', 'GitHub profile (optional)', {
           placeholder: 'https://github.com/…',

@@ -151,7 +151,7 @@ function NewsletterCard({ theme }: { theme: Theme }) {
       turnstile.current?.reset()
       setStatus({
         kind: 'error',
-        message: 'Something went wrong. Try again in a moment.',
+        message: "Couldn't subscribe you. Check your connection and try again.",
       })
     }
   }
@@ -180,10 +180,10 @@ function NewsletterCard({ theme }: { theme: Theme }) {
         </p>
 
         <form onSubmit={onSubmit} className="mx-auto mt-8 max-w-md" noValidate>
-          <div className="bg-background/95 flex items-center gap-2 rounded-full p-1.5 pl-4 shadow-lg shadow-black/10 ring-1 ring-black/5 backdrop-blur dark:ring-white/10">
+          <div className="bg-background/95 focus-within:ring-brand-sky flex items-center gap-2 rounded-full p-1.5 pl-4 shadow-lg shadow-black/10 ring-1 ring-black/5 backdrop-blur focus-within:ring-2 dark:ring-white/10">
             <Mail className="text-muted-foreground size-4 shrink-0" aria-hidden="true" />
             <label htmlFor="newsletter-email" className="sr-only">
-              Newsletter signup
+              Email for the newsletter
             </label>
             <input
               id="newsletter-email"
@@ -191,7 +191,9 @@ function NewsletterCard({ theme }: { theme: Theme }) {
               type="email"
               autoComplete="email"
               required
-              placeholder="Enter your email"
+              placeholder="you@example.com"
+              aria-invalid={status.kind === 'error' || undefined}
+              aria-describedby="newsletter-status"
               onFocus={() => turnstile.current?.start()}
               className="placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-sm outline-none"
             />
@@ -200,7 +202,7 @@ function NewsletterCard({ theme }: { theme: Theme }) {
               disabled={status.kind === 'pending'}
               className="bg-foreground text-background hover:bg-foreground/90 focus-visible:ring-ring inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-medium transition-[background-color,transform] outline-none focus-visible:ring-2 active:scale-[0.98] disabled:opacity-60"
             >
-              Subscribe
+              {status.kind === 'pending' ? 'Subscribing…' : 'Subscribe'}
               <ArrowRight className="size-4" aria-hidden="true" />
             </button>
           </div>
@@ -210,14 +212,19 @@ function NewsletterCard({ theme }: { theme: Theme }) {
             lazy
             className="mt-3 flex justify-center empty:hidden"
           />
-          <p className="mt-3 min-h-5 text-sm" role="status" aria-live="polite">
+          <p
+            id="newsletter-status"
+            className="mt-3 min-h-5 text-sm"
+            role="status"
+            aria-live="polite"
+          >
             {status.kind === 'ok' && (
-              <span className="text-white">
-                You are on the list. See you in the next update.
+              <span className="enter text-white">
+                You're on the list. See you in the next update.
               </span>
             )}
             {status.kind === 'error' && (
-              <span className="text-white">{status.message}</span>
+              <span className="enter text-white">{status.message}</span>
             )}
           </p>
         </form>

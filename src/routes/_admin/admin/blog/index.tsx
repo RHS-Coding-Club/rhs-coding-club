@@ -99,7 +99,6 @@ function AdminBlog() {
   return (
     <div>
       <AdminPageHeader
-        eyebrow="Admin"
         title="Blog"
         description="Write, preview, and publish posts. Drafts are only visible to officers."
         actions={
@@ -267,15 +266,15 @@ function AdminBlog() {
             <AlertDialogTitle>Delete “{deleting?.title}”?</AlertDialogTitle>
             <AlertDialogDescription>
               {deleting?.publishedAt ? 'It comes off the blog and the RSS feed. ' : ''}
-              This can&apos;t be undone.
+              This can’t be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <RaisedButton variant="outline" onClick={() => setDeleting(null)}>
-              Keep it
+              Cancel
             </RaisedButton>
             <RaisedButton
-              variant="secondary"
+              variant="destructive"
               loading={busy === deleting?.id}
               loadingText="Deleting…"
               onClick={() => void confirmDelete()}

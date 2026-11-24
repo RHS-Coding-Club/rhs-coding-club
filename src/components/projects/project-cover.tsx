@@ -52,6 +52,9 @@ export function ProjectCover({
           dark,
           width,
           height,
+          // Every page that shows a cover lists the stack beside it, so the
+          // cover leaves out its chip row and runs its window off the bottom.
+          captionSpace: true,
         })
       }
       alt={shot ? `Screenshot of ${project.title}` : ''}

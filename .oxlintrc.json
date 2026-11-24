@@ -104,6 +104,7 @@
   "ignorePatterns": [
     "src/routeTree.gen.ts",
     "src/components/bits/**",
+    "src/components/stageshow/kit/**",
     "src/db/migrations/**",
     "worker-configuration.d.ts",
     "dist/**",

@@ -1,13 +1,12 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { motion, useReducedMotion } from 'motion/react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Calendar } from '#/components/icons/calendar'
 import { CodeXml } from '#/components/icons/code-xml'
 import { Crown } from '#/components/icons/crown'
 import { FolderGit2 } from '#/components/icons/folder-git-2'
-import { Sparkles } from '#/components/icons/sparkles'
-import CountUp from '#/components/bits/CountUp'
+import { Award } from '#/components/icons/award'
 import TiltedCard from '#/components/bits/TiltedCard'
-import { FadeUp, EASE } from '#/components/motion'
+import { FadeUp } from '#/components/motion'
 import { UserAvatar } from '#/components/user-avatar'
 import { cn } from '#/lib/utils'
 import type { Leaderboard, LeaderboardWindow } from '#/services/members'
@@ -15,44 +14,88 @@ import { BadgePips } from './badge-pips'
 
 type Row = Leaderboard['rows'][number]
 
-/** Segmented control for the two windows. Links, so each tab has its own URL. */
+/**
+ * Segmented control for the two windows. Links, so each tab has its own URL.
+ * The active pill is a clipped copy of the whole row (white pills, ink text)
+ * laid over it; switching tabs moves the clip, so the pill and its label
+ * color travel together. The tab you click turns active at once, before the
+ * new board loads.
+ */
 export function WindowTabs({ value }: { value: LeaderboardWindow }) {
-  const reduced = useReducedMotion()
   const tabs = [
     { value: 'semester', label: 'This semester' },
     { value: 'all', label: 'All time' },
   ] as const
+  const [selected, setSelected] = useState<LeaderboardWindow>(value)
+  useEffect(() => setSelected(value), [value])
+  const links = useRef<(HTMLAnchorElement | null)[]>([])
+  const overlay = useRef<HTMLDivElement>(null)
+  const [clip, setClip] = useState<string | null>(null)
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const index = tabs.findIndex((t) => t.value === selected)
+      const link = links.current[index]
+      const box = overlay.current
+      if (!link || !box) return
+      const left = link.offsetLeft - box.offsetLeft
+      const right = box.offsetWidth - left - link.offsetWidth
+      setClip(`inset(0 ${right}px 0 ${left}px round 0.75rem)`)
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    if (overlay.current) observer.observe(overlay.current)
+    return () => observer.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected])
+
+  const tab = 'rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap'
   return (
     <nav
       aria-label="Leaderboard window"
-      className="inline-flex rounded-2xl bg-ink/8 p-1 ring-1 ring-ink/10 backdrop-blur-md"
+      className="relative inline-flex rounded-2xl bg-ink/8 p-1 ring-1 ring-ink/10 backdrop-blur-md"
     >
-      {tabs.map((t) => {
-        const active = t.value === value
-        return (
-          <Link
+      {tabs.map((t, i) => (
+        <Link
+          key={t.value}
+          ref={(el) => {
+            links.current[i] = el
+          }}
+          to="/leaderboard"
+          search={t.value === 'semester' ? {} : { window: t.value }}
+          replace
+          resetScroll={false}
+          onClick={() => setSelected(t.value)}
+          aria-current={t.value === value ? 'page' : undefined}
+          className={cn(
+            tab,
+            'focus-visible:ring-ring text-ink/60 transition-colors outline-none hover:text-ink focus-visible:ring-2',
+          )}
+        >
+          {t.label}
+        </Link>
+      ))}
+      <div
+        ref={overlay}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-1 flex transition-[clip-path] duration-200 ease-out motion-reduce:transition-none"
+        style={clip ? { clipPath: clip } : undefined}
+      >
+        {tabs.map((t) => (
+          <span
             key={t.value}
-            to="/leaderboard"
-            search={t.value === 'semester' ? {} : { window: t.value }}
-            replace
-            resetScroll={false}
-            aria-current={active ? 'page' : undefined}
             className={cn(
-              'focus-visible:ring-ring relative rounded-xl px-4 py-2 text-sm font-medium transition-colors outline-none focus-visible:ring-2',
-              active ? 'text-ink' : 'text-ink/60 hover:text-ink',
+              tab,
+              'bg-white text-ink shadow-sm dark:bg-white/14',
+              // Before the first measurement (server HTML), only the active
+              // pill shows.
+              !clip && t.value !== selected && 'invisible',
             )}
           >
-            {active && (
-              <motion.span
-                layoutId="leaderboard-tab"
-                transition={reduced ? { duration: 0 } : { duration: 0.4, ease: EASE }}
-                className="absolute inset-0 rounded-xl bg-white shadow-sm dark:bg-white/14"
-              />
-            )}
-            <span className="relative">{t.label}</span>
-          </Link>
-        )
-      })}
+            {t.label}
+          </span>
+        ))}
+      </div>
     </nav>
   )
 }
@@ -93,16 +136,16 @@ export function Podium({
   const second = rows.at(1)
   const third = rows.at(2)
   return (
-    <ol className="grid items-end gap-4 md:grid-cols-[1fr_1.15fr_1fr]">
+    <ol className="grid grid-cols-2 items-end gap-3 sm:gap-4 md:grid-cols-[1fr_1.15fr_1fr]">
       {second && (
         <li className="order-2 md:order-1">
-          <FadeUp delay={0.1}>
+          <FadeUp>
             <PodiumCard row={second} place={2} you={second.userId === viewerId} />
           </FadeUp>
         </li>
       )}
       {first && (
-        <li className="order-1 md:order-2">
+        <li className="order-1 col-span-2 md:order-2 md:col-span-1">
           <FadeUp>
             <ChampionCard row={first} dark={dark} you={first.userId === viewerId} />
           </FadeUp>
@@ -110,7 +153,7 @@ export function Podium({
       )}
       {third && (
         <li className="order-3">
-          <FadeUp delay={0.18}>
+          <FadeUp>
             <PodiumCard row={third} place={3} you={third.userId === viewerId} />
           </FadeUp>
         </li>
@@ -124,7 +167,7 @@ function PodiumCard({ row, place, you }: { row: Row; place: 2 | 3; you: boolean 
     <Link
       to="/members/$id"
       params={{ id: row.userId }}
-      className="group bg-card ring-border/70 hover:ring-border focus-visible:ring-ring flex flex-col items-center rounded-3xl px-6 pt-8 pb-7 text-center ring-1 transition-shadow outline-none focus-visible:ring-2"
+      className="group bg-card ring-border/70 hover:ring-border focus-visible:ring-ring flex flex-col items-center rounded-3xl px-4 pt-6 pb-6 text-center ring-1 transition-shadow outline-none focus-visible:ring-2 sm:px-6 sm:pt-8 sm:pb-7"
       style={{ background: 'var(--bits-surface)' }}
     >
       <span className={cn('font-mono text-xs', PLACE[place].text)}>
@@ -133,13 +176,16 @@ function PodiumCard({ row, place, you }: { row: Row; place: 2 | 3; you: boolean 
       </span>
       <UserAvatar
         user={row}
-        className={cn('mt-4 size-20 text-2xl ring-4', PLACE[place].ring)}
+        className={cn(
+          'mt-4 size-16 text-xl ring-4 sm:size-20 sm:text-2xl',
+          PLACE[place].ring,
+        )}
       />
-      <p className="mt-4 max-w-full truncate text-lg font-semibold tracking-tight group-hover:underline group-hover:underline-offset-4">
+      <p className="mt-4 max-w-full truncate text-base font-semibold tracking-tight group-hover:underline group-hover:underline-offset-4 sm:text-lg">
         {row.name}
       </p>
-      <p className="mt-1 text-3xl font-semibold tracking-[-0.04em] tabular-nums">
-        <CountUp to={row.points} separator="," duration={1.4} />
+      <p className="mt-1 text-2xl font-semibold tracking-[-0.04em] tabular-nums sm:text-3xl">
+        {row.points.toLocaleString('en-US')}
         <span className="text-muted-foreground ml-1.5 text-sm font-normal tracking-normal">
           pts
         </span>
@@ -192,7 +238,7 @@ function ChampionCard({ row, dark, you }: { row: Row; dark: boolean; you: boolea
           {row.name}
         </p>
         <p className="mt-1 text-5xl font-semibold tracking-[-0.045em] tabular-nums">
-          <CountUp to={row.points} separator="," duration={1.8} />
+          {row.points.toLocaleString('en-US')}
           <span className="ml-2 text-base font-normal tracking-normal text-white/75">
             pts
           </span>
@@ -286,17 +332,16 @@ export function HowPoints({ values }: { values: Leaderboard['values'] }) {
       body: `${values.project} for each teammate when a project is approved for the showcase.`,
     },
     {
-      icon: Sparkles,
+      icon: Award,
       title: 'Officer bonuses',
       body: 'Officers add points for things like running a lunch session or mentoring at RAP.',
     },
   ]
   return (
-    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {items.map((item, i) => (
+    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((item) => (
         <li key={item.title}>
           <FadeUp
-            delay={i * 0.06}
             className="ring-border/70 h-full rounded-3xl p-6 ring-1"
             style={{ background: 'var(--bits-surface)' }}
           >

@@ -11,7 +11,7 @@ import { cn } from '#/lib/utils'
  * The site's button: a raised face (see `.raise` in styles.css) that lights
  * on hover and sinks on press, modeled on Kobra's Button. Primary is sky,
  * secondary is navy, outline sits on the card color, ghost has no face until
- * hovered.
+ * hovered, destructive confirms something that can't be undone.
  */
 export const raisedButtonVariants = cva(
   "raise inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 font-medium whitespace-nowrap outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:not-aria-busy:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -22,6 +22,7 @@ export const raisedButtonVariants = cva(
         secondary: 'raise-secondary',
         outline: 'raise-outline',
         ghost: 'raise-ghost',
+        destructive: 'raise-destructive',
       },
       size: {
         sm: 'h-8 gap-1.5 rounded-[9px] px-3 text-sm',

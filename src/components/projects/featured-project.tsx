@@ -37,7 +37,7 @@ export function FeaturedProject({
         } as React.CSSProperties
       }
     >
-      <article className="grid min-w-0 gap-2 md:grid-cols-2">
+      <article className="grid grid-cols-1 min-w-0 gap-2 md:grid-cols-2">
         <Link
           to="/projects/$id"
           params={{ id: project.id }}
@@ -58,9 +58,13 @@ export function FeaturedProject({
         <div className="flex min-w-0 flex-col p-4 sm:p-7">
           <div className="flex items-center gap-3">
             <TeamAvatars team={project.team} linked />
-            <p className="text-muted-foreground min-w-0 truncate text-sm">
-              {teamNames(project.team)}
-              {project.year ? ` · ${project.year}` : ''}
+            <p className="text-muted-foreground flex min-w-0 text-sm">
+              <span className="truncate" title={teamNames(project.team)}>
+                {teamNames(project.team)}
+              </span>
+              {project.year ? (
+                <span className="shrink-0 whitespace-pre">{` · ${project.year}`}</span>
+              ) : null}
             </p>
           </div>
           <h3 className="mt-6 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">

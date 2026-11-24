@@ -5,6 +5,7 @@ import { Eye } from '#/components/icons/eye'
 import { Pencil } from '#/components/icons/pencil'
 import { FadeUp } from '#/components/motion'
 import { RaisedButton } from '#/components/raised-button'
+import { SplitButton } from '#/components/split-button'
 import { RichText } from '#/components/rich-text/rich-text'
 import { PostByline } from '#/components/blog/post-byline'
 import { PostOutline } from '#/components/blog/post-outline'
@@ -101,10 +102,10 @@ function PostPage() {
               </ul>
             )}
           </div>
-          <h1 className="mt-8 text-[clamp(2.5rem,6vw,4.25rem)] leading-[1.03] font-semibold tracking-[-0.045em] text-balance">
+          <h1 className="mt-8 text-[clamp(2.5rem,6vw,4.25rem)] leading-[1.03] font-semibold tracking-[-0.045em] text-balance [overflow-wrap:anywhere]">
             {post.title}
           </h1>
-          <p className="text-muted-foreground mt-6 text-xl leading-relaxed text-pretty">
+          <p className="text-muted-foreground mt-6 text-xl leading-relaxed text-pretty [overflow-wrap:anywhere]">
             {post.summary}
           </p>
           <div className="border-border mt-10 flex flex-wrap items-center justify-between gap-4 border-y py-5">
@@ -130,11 +131,11 @@ function PostPage() {
 
       {/* The text stays centered; on wide screens the table of contents
           sits in the left rail beside it and follows you down the page. */}
-      <div className="mx-auto grid max-w-3xl px-(--gutter) py-12 sm:py-16 xl:max-w-none xl:grid-cols-[minmax(0,1fr)_minmax(0,calc(48rem-2*var(--gutter)))_minmax(0,1fr)] xl:gap-10 xl:px-(--gutter)">
+      <div className="mx-auto grid grid-cols-1 max-w-3xl px-(--gutter) py-12 sm:py-16 xl:max-w-none xl:grid-cols-[minmax(0,1fr)_minmax(0,calc(48rem-2*var(--gutter)))_minmax(0,1fr)] xl:gap-10 xl:px-(--gutter)">
         <aside className="hidden xl:block xl:justify-self-end">
           <PostOutline content={post.content} className="sticky top-32" />
         </aside>
-        <FadeUp delay={0.1} className="min-w-0">
+        <FadeUp className="min-w-0">
           <PostOutline
             content={post.content}
             defaultOpen={false}
@@ -147,7 +148,7 @@ function PostPage() {
       {(prev || next) && (
         <nav
           aria-label="More posts"
-          className="mx-auto grid max-w-3xl gap-3 px-(--gutter) pb-16 sm:grid-cols-2"
+          className="mx-auto grid grid-cols-1 max-w-3xl gap-3 px-(--gutter) pb-16 sm:grid-cols-2"
         >
           {prev ? (
             <Neighbour dir="prev" title={prev.title} slug={prev.slug} />
@@ -168,11 +169,15 @@ function PostPage() {
               Lunch meetings in Mr. Derrick&apos;s room. No experience required.
             </p>
           </div>
-          <RaisedButton asChild variant="secondary" size="lg">
-            <Link to={user ? '/dashboard' : '/signup'}>
-              {user ? 'Go to your dashboard' : 'Join the club'}
-            </Link>
-          </RaisedButton>
+          {user ? (
+            <RaisedButton asChild variant="secondary" size="lg">
+              <Link to="/dashboard">Go to your dashboard</Link>
+            </RaisedButton>
+          ) : (
+            <SplitButton to="/signup" size="lg">
+              Join the club
+            </SplitButton>
+          )}
         </div>
       </section>
     </article>

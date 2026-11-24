@@ -5,8 +5,8 @@ import { FolderPlus } from '#/components/icons/folder-plus'
 import { LayoutDashboard } from '#/components/icons/layout-dashboard'
 import { LogOut } from '#/components/icons/log-out'
 import { ShieldCheck } from '#/components/icons/shield-check'
-import { Sparkles } from '#/components/icons/sparkles'
 import { UserCog } from '#/components/icons/user-cog'
+import { UserPlus } from '#/components/icons/user-plus'
 import { UserRound } from '#/components/icons/user-round'
 import type { IconComponent } from '#/components/icons/create-icon'
 import { signOut } from '#/lib/auth-client'
@@ -89,8 +89,12 @@ export function AccountMenu({ user }: { user: SessionUser }) {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="truncate font-semibold tracking-[-0.01em]">{user.name}</p>
-              <p className="text-muted-foreground truncate text-xs">{user.email}</p>
+              <p className="truncate font-semibold tracking-[-0.01em]" title={user.name}>
+                {user.name}
+              </p>
+              <p className="text-muted-foreground truncate text-xs" title={user.email}>
+                {user.email}
+              </p>
               <span
                 className={cn(
                   'mt-1.5 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium',
@@ -113,7 +117,7 @@ export function AccountMenu({ user }: { user: SessionUser }) {
               label="Profile"
             />
           ) : (
-            <Tile to="/join" icon={Sparkles} label="Apply to join" />
+            <Tile to="/join" icon={UserPlus} label="Apply to join" />
           )}
           <Tile to="/account" icon={UserCog} label="Settings" />
           {isOfficer ? (

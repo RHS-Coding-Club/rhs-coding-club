@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { CodeXml } from '#/components/icons/code-xml'
-import DecryptedText from '#/components/bits/DecryptedText'
 import { PageHero } from '#/components/page-hero'
 import { EmptyState } from '#/components/empty-state'
 import { FadeUp } from '#/components/motion'
@@ -40,16 +39,7 @@ function ChallengesPage() {
     <>
       <PageHero
         background={<DotGridBackground initialDark={initialDark} />}
-        title={
-          <DecryptedText
-            text="Weekly challenges"
-            animateOn="view"
-            sequential
-            revealDirection="start"
-            speed={40}
-            encryptedClassName="text-brand-sky"
-          />
-        }
+        title="Weekly challenges"
         description={DESCRIPTION}
         aside={
           <dl className="flex gap-8 sm:gap-10">
@@ -73,7 +63,7 @@ function ChallengesPage() {
               This week
             </h2>
           </FadeUp>
-          <FadeUp delay={0.05}>
+          <FadeUp>
             <ThisWeekCard
               challenge={featured}
               progress={user ? memberProgress(mine[featured.id]) : null}
@@ -89,7 +79,7 @@ function ChallengesPage() {
         </section>
       )}
 
-      <HowItWorks points={points} />
+      <HowItWorks points={points} initialDark={initialDark} />
 
       {challenges.length > 0 && (
         <ChallengeArchive

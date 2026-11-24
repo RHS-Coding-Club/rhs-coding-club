@@ -1,7 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Trophy } from '#/components/icons/trophy'
 import { z } from 'zod'
-import CountUp from '#/components/bits/CountUp'
 import { EmptyState } from '#/components/empty-state'
 import { LightRaysBackground } from '#/components/members/light-rays-bg'
 import { HowPoints, Podium, RankList, WindowTabs } from '#/components/members/leaderboard'
@@ -62,7 +61,7 @@ function LeaderboardPage() {
               <div>
                 <dt className="text-sm text-ink/60">Members ranked</dt>
                 <dd className="mt-1 text-4xl font-semibold tracking-[-0.04em] tabular-nums">
-                  <CountUp to={board.ranked} duration={1.2} trigger="load" />
+                  {board.ranked.toLocaleString('en-US')}
                 </dd>
               </div>
               <div>
@@ -70,12 +69,7 @@ function LeaderboardPage() {
                   Points {range === 'semester' ? 'this semester' : 'all time'}
                 </dt>
                 <dd className="mt-1 text-4xl font-semibold tracking-[-0.04em] tabular-nums">
-                  <CountUp
-                    to={board.totalPoints}
-                    separator=","
-                    duration={1.6}
-                    trigger="load"
-                  />
+                  {board.totalPoints.toLocaleString('en-US')}
                 </dd>
               </div>
             </dl>

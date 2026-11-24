@@ -81,6 +81,7 @@ beforeAll(async () => {
       rarity: 'common',
       criteriaType: 'challenges',
       threshold: 1,
+      autoAward: true,
     },
     {
       id: 'b2',
@@ -167,6 +168,21 @@ describe('getMemberProfile', () => {
     expect(p?.projects.map((x) => x.id)).toEqual(['p1'])
     expect(p?.badges.map((b) => b.name)).toEqual(['Legend', 'First Blood'])
   })
+
+  it('marks the badge collection and lists live weeks', async () => {
+    const p = await getMemberProfile(db, 'm2', now)
+    const byName = Object.fromEntries(p?.collection.map((b) => [b.name, b]) ?? [])
+    // m2 passed nothing, so First Blood shows progress; Legend is officer-only.
+    expect(byName['First Blood']).toMatchObject({
+      awardedAt: null,
+      current: 0,
+      threshold: 1,
+    })
+    expect(byName.Legend).toMatchObject({ awardedAt: null, current: null })
+    const held = await getMemberProfile(db, 'm1', now)
+    expect(held?.collection.every((b) => b.awardedAt instanceof Date)).toBe(true)
+    expect(p?.weeks.map((w) => w.id)).toEqual(['c1'])
+  })
 })
 
 describe('describedHistory', () => {
@@ -212,6 +228,22 @@ describe('getDashboard', () => {
     expect(d.rsvps.map((r) => r.id)).toEqual(['e2'])
     expect(d.projects.map((p) => p.id).sort()).toEqual(['p1', 'p2'])
     expect(d.queues).toBeNull()
+    // m1 leads the semester: nobody above, neighbors run down the board.
+    expect(d.board.above).toBeNull()
+    expect(d.board.neighbors.map((n) => [n.userId, n.me])).toEqual([
+      ['m1', true],
+      ['m2', false],
+      ['m3', false],
+    ])
+    expect(d.collection.map((b) => b.name).sort()).toEqual(['First Blood', 'Legend'])
+    expect(d.values.attendance).toBeGreaterThan(0)
+  })
+
+  it('names who to pass next on the board', async () => {
+    const d = await getDashboard(db, { id: 'm3', role: 'member' }, now)
+    if (d.kind !== 'member') throw new Error('expected member dashboard')
+    expect(d.board.above).toMatchObject({ rank: 2, points: 25 })
+    expect(d.board.neighbors.at(-1)).toMatchObject({ userId: 'm3', me: true })
   })
 
   it('adds queue counts for officers', async () => {

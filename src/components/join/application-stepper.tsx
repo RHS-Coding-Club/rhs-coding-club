@@ -162,7 +162,7 @@ export function ApplicationStepper({
               onValueChange={(v) =>
                 set('experience', v as ApplicationInput['experience'])
               }
-              className="grid gap-2 sm:grid-cols-2"
+              className="grid grid-cols-1 gap-2 sm:grid-cols-2"
               aria-describedby={errors.experience ? 'experience-error' : undefined}
             >
               {EXPERIENCE_LEVELS.map((x) => (

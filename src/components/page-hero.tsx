@@ -57,7 +57,7 @@ export function PageHero({
       />
       <div
         className={cn(
-          'pointer-events-none relative mx-auto grid h-full max-w-6xl gap-10 px-(--gutter) pt-[calc(var(--header-offset)+3.5rem)] pb-14 sm:pt-[calc(var(--header-offset)+5rem)] sm:pb-20',
+          'pointer-events-none relative mx-auto grid h-full max-w-6xl grid-cols-1 gap-10 px-(--gutter) pt-[calc(var(--header-offset)+3.5rem)] pb-14 sm:pt-[calc(var(--header-offset)+5rem)] sm:pb-20',
           aside && 'lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end',
           size === 'sm' && 'min-h-[calc(18rem+var(--header-offset))] content-end',
           size === 'md' &&
@@ -66,42 +66,42 @@ export function PageHero({
             'min-h-[calc(30rem+var(--header-offset))] content-end sm:min-h-[calc(36rem+var(--header-offset))]',
         )}
       >
-        <div className="max-w-3xl text-ink">
+        <div className="max-w-3xl min-w-0 text-ink">
           {eyebrow && (
             <div
-              style={riseIn(0.05)}
+              style={riseIn(0)}
               className="rise-in mb-4 text-sm font-medium text-ink/60"
             >
               {eyebrow}
             </div>
           )}
-          <h1 className="text-[clamp(2.75rem,6.5vw,5.25rem)] leading-[1.02] font-semibold tracking-[-0.045em]">
+          <h1 className="text-[clamp(2.75rem,6.5vw,5.25rem)] leading-[1.02] font-semibold tracking-[-0.045em] [overflow-wrap:anywhere]">
             {title}
           </h1>
           {description && (
             <div
-              style={riseIn(0.25)}
-              className="rise-in mt-5 max-w-2xl text-lg text-balance text-ink/75 sm:text-xl"
+              style={riseIn(0.06)}
+              className="rise-in mt-5 max-w-2xl text-lg text-balance text-ink/75 [overflow-wrap:anywhere] sm:text-xl"
             >
               {description}
             </div>
           )}
           {actions && (
             <div
-              style={riseIn(0.4)}
+              style={riseIn(0.12)}
               className="rise-in pointer-events-auto mt-8 flex flex-wrap items-center gap-3"
             >
               {actions}
             </div>
           )}
           {children && (
-            <div style={riseIn(0.5)} className="rise-in pointer-events-auto mt-8">
+            <div style={riseIn(0.18)} className="rise-in pointer-events-auto mt-8">
               {children}
             </div>
           )}
         </div>
         {aside && (
-          <div style={riseIn(0.35)} className="rise-in pointer-events-auto">
+          <div style={riseIn(0.12)} className="rise-in pointer-events-auto">
             {aside}
           </div>
         )}
