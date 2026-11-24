@@ -1,5 +1,11 @@
 import { createMcpProtectedRequestHandler } from '@better-auth/mcp'
-import { Server, createMcpHandler } from '@modelcontextprotocol/server'
+import {
+  CLIENT_CAPABILITIES_META_KEY,
+  Server,
+  createMcpHandler,
+  inputRequired,
+  inputResponse,
+} from '@modelcontextprotocol/server'
 import { createDpopReplayStore } from 'better-auth/oauth2'
 import { env } from 'cloudflare:workers'
 import { eq } from 'drizzle-orm'
@@ -8,7 +14,8 @@ import { getAuth } from '#/lib/auth'
 import { MCP_SCOPE, mcpResource } from '#/lib/mcp-config'
 import { isRateLimited } from '#/lib/rate-limit'
 import { hasRole, isRole } from '#/lib/roles'
-import { callTool, listToolsFor } from './execute'
+import { answerApproval, callTool, listToolsFor } from './execute'
+import type { AppDecision } from './execute'
 import type { McpUser } from './types'
 
 // The MCP endpoint and the discovery documents clients read before signing in.
@@ -29,13 +36,29 @@ const rpcError = (status: number, message: string, headers?: HeadersInit) =>
     { status, headers },
   )
 
+const APPROVE_KEY = 'approve'
+
+/** Whether the app declared form elicitation explicitly. */
+function canShowForm(envelope: unknown) {
+  const caps = (envelope as Record<string, unknown> | undefined)?.[
+    CLIENT_CAPABILITIES_META_KEY
+  ] as { elicitation?: { form?: unknown } } | undefined
+  const form = caps?.elicitation?.form
+  return typeof form === 'object' && form !== null
+}
+
+function decisionOf(responses: Record<string, unknown> | undefined): AppDecision {
+  const view = inputResponse(responses, APPROVE_KEY)
+  return view.kind === 'elicit' ? view.action : 'missing'
+}
+
 function createServer(auth: RequestAuth) {
   const server = new Server(
     { name: 'rhs-coding-club', title: 'RHS Coding Club', version: '1.0.0' },
     {
       capabilities: { tools: {} },
       instructions:
-        "Manage the RHS Coding Club website as the signed-in officer or admin. Risky tools return an approval link instead of acting: show it to the person and don't report the action as done until they say they approved it.",
+        "Manage the RHS Coding Club website as the signed-in officer or admin. Risky tools may ask the person to approve them in this app. If a result says awaiting_approval, show the person its link and don't report the action as done until they say they approved it.",
     },
   )
   server.setRequestHandler('tools/list', () => ({
@@ -44,12 +67,31 @@ function createServer(auth: RequestAuth) {
     ttlMs: 5 * 60_000,
     cacheScope: 'private' as const,
   }))
-  server.setRequestHandler('tools/call', async (request) => {
-    const result = await callTool(
-      { db: getDb(), ...auth },
-      request.params.name,
-      request.params.arguments,
-    )
+  server.setRequestHandler('tools/call', async (request, ctx) => {
+    const caller = { db: getDb(), ...auth, canAsk: canShowForm(ctx.mcpReq.envelope) }
+    const { name } = request.params
+    // A retry after the app asked the person carries the pending action's id.
+    const pendingId = ctx.mcpReq.requestState<string>()
+    const result =
+      typeof pendingId === 'string'
+        ? await answerApproval(
+            caller,
+            name,
+            pendingId,
+            decisionOf(ctx.mcpReq.inputResponses),
+          )
+        : await callTool(caller, name, request.params.arguments)
+    if (result.ask)
+      return inputRequired({
+        inputRequests: {
+          [APPROVE_KEY]: inputRequired.elicit({
+            message: result.ask.message,
+            // Nothing to fill in: Accept is the approval, Decline drops it.
+            requestedSchema: { type: 'object', properties: {} },
+          }),
+        },
+        requestState: result.ask.id,
+      })
     return {
       isError: result.isError,
       content: result.text.map((text) => ({ type: 'text' as const, text })),
