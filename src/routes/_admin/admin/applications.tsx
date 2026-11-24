@@ -163,7 +163,10 @@ function AdminApplications() {
                       <UserAvatar user={r} className="size-8" />
                       <span className="min-w-0">
                         <span className="block truncate font-medium">{r.name}</span>
-                        <span className="text-muted-foreground block truncate text-xs">
+                        <span
+                          className="text-muted-foreground block max-w-[14rem] truncate text-xs"
+                          title={r.email}
+                        >
                           {r.email}
                         </span>
                       </span>

@@ -343,6 +343,9 @@ function DockMenu({
   const shapeRef = useRef<SVGSVGElement>(null)
   const pathRef = useRef<SVGPathElement>(null)
   const highlightRef = useRef<HTMLSpanElement>(null)
+  // RHS: set by arrow keys, so the highlight jumps to the row instead of
+  // sliding (keyboard moves never animate).
+  const keyMoveRef = useRef(false)
   const rowRefs = useRef<(HTMLButtonElement | null)[]>([])
   const frameRef = useRef<Frame | null>(null)
   const timerRef = useRef(0)
@@ -456,16 +459,17 @@ function DockMenu({
       callbacks.current.onExited?.()
     }
     if (outer && !reduceRef.current) {
+      // RHS: exits ease out (was ease-in), like every other exit on the site.
       outer.animate([{ transform: 'scale(1)' }, { transform: 'scale(0.96)' }], {
         duration,
-        easing: 'ease-in',
+        easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
         fill: 'forwards',
       })
     }
     layers.forEach((layer) =>
       layer.animate([{ opacity: 1 }, { opacity: 0 }], {
         duration,
-        easing: 'ease-in',
+        easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
         fill: 'forwards',
       }),
     )
@@ -482,7 +486,9 @@ function DockMenu({
       highlight.style.opacity = '0'
       return
     }
-    const jump = highlight.style.opacity !== '1' || reduceRef.current
+    const jump =
+      highlight.style.opacity !== '1' || reduceRef.current || keyMoveRef.current
+    keyMoveRef.current = false
     if (jump) highlight.style.transition = 'none'
     highlight.style.transform = `translateY(${row.offsetTop}px)`
     highlight.style.height = `${row.offsetHeight}px`
@@ -562,6 +568,7 @@ function DockMenu({
         else if (key === 'ArrowDown') next = order[(at + 1) % order.length]
         else if (key === 'ArrowUp') next = order[at <= 0 ? order.length - 1 : at - 1]
         if (sub) closeSub()
+        keyMoveRef.current = true
         activate(next)
       }
     } else if (key === 'ArrowRight' && rows[active]?.items?.length) {
@@ -1298,11 +1305,8 @@ export default function Dock({
               actionsRef.current?.hop(index)
               item.onClick?.()
             }}
-            onFocus={(event) => {
-              if (event.currentTarget.matches(':focus-visible'))
-                actionsRef.current?.focus(index)
-            }}
-            onBlur={() => actionsRef.current?.focus(-1)}
+            // RHS: keyboard focus shows only the focus ring; it no longer
+            // magnifies the tile, so arrowing along the dock moves nothing.
             onKeyDown={(event) => onItemKeyDown(event, index)}
           >
             <span className={TILE}>

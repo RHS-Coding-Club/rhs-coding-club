@@ -148,7 +148,7 @@ function ProjectPage() {
         </FadeUp>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-12 px-(--gutter) py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <section className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-(--gutter) py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <FadeUp>
           <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
             About the project
@@ -178,7 +178,7 @@ function ProjectPage() {
           )}
         </FadeUp>
 
-        <FadeUp delay={0.08} className="flex flex-col gap-4">
+        <FadeUp className="flex flex-col gap-4">
           <aside
             aria-labelledby="team-heading"
             className="bg-card ring-border/70 rounded-3xl p-6 ring-1"

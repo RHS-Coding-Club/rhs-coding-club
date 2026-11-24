@@ -19,7 +19,6 @@ export function BeamsBackground({ initialDark }: { initialDark: boolean }) {
   return (
     <div className="absolute inset-0">
       <Beams
-        key={dark ? 'dark' : 'light'}
         color={beam}
         lightMode={!dark}
         beamWidth={dark ? 120 : 110}

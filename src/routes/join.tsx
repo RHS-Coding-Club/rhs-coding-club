@@ -249,7 +249,7 @@ function SignedOut() {
             Three steps, about two minutes
           </h2>
         </FadeUp>
-        <FadeUp delay={0.08}>
+        <FadeUp>
           <JoinSteps current={0} className="mt-12" />
         </FadeUp>
       </section>
@@ -265,14 +265,10 @@ function SignedOut() {
                 What membership unlocks
               </h2>
             </FadeUp>
-            <ul className="mt-12 grid gap-10 sm:grid-cols-2">
-              {PERKS.map((p, i) => (
+            <ul className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2">
+              {PERKS.map((p) => (
                 <li key={p.title}>
-                  <FadeUp
-                    delay={(i % 2) * 0.06}
-                    distance={12}
-                    className="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-4"
-                  >
+                  <FadeUp className="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-4">
                     <span className="bg-secondary text-brand-sky grid size-11 place-items-center rounded-xl">
                       <p.icon className="size-5" aria-hidden="true" />
                     </span>
@@ -302,7 +298,7 @@ function SignedOut() {
             Good questions
           </h2>
         </FadeUp>
-        <FadeUp delay={0.08}>
+        <FadeUp>
           <JoinFaq className="mt-10" />
         </FadeUp>
         <FadeUp className="mt-14 flex flex-col items-center gap-4 text-center">

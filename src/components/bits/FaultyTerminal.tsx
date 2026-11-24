@@ -776,7 +776,7 @@ export default function FaultyTerminal({
       gl.uniform1f(cu.uScale, s.scale)
       gl.uniform2f(cu.uMouse, mouse.x, mouse.y)
       gl.uniform1f(cu.uMouseStrength, s.mouseStrength)
-      gl.uniform1f(cu.uUseMouse, s.mouseReact ? 1 : 0)
+      gl.uniform1f(cu.uUseMouse, s.mouseReact && !reduce ? 1 : 0)
       gl.uniform1f(cu.uPageLoadProgress, introClock)
       gl.uniform1f(cu.uUsePageLoadAnimation, s.pageLoadAnimation ? 1 : 0)
       gl.uniform2i(cu.uOrigin, cells.x, cells.y)
@@ -899,6 +899,9 @@ export default function FaultyTerminal({
     }
 
     const onPointerMove = (event: PointerEvent) => {
+      // RHS: with reduced motion the screen ignores the pointer: no distortion,
+      // and no pointer move restarts the render loop.
+      if (reduce) return
       const { x, y, inside } = locate(event)
       const was = pointer.inside
       pointer.inside = inside
@@ -923,6 +926,7 @@ export default function FaultyTerminal({
     }
 
     const onPointerLeave = () => {
+      if (reduce) return
       pointer.inside = false
       wake()
     }

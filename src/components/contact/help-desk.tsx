@@ -96,9 +96,8 @@ export function ContactHelpDesk({
         aria-label="Common reasons to get in touch"
         className="mx-auto max-w-6xl px-(--gutter) pt-14 sm:pt-20"
       >
-        <ul className="grid gap-4 md:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <Door
-            index={0}
             dark={dark}
             icon={Rocket}
             title="I want to join"
@@ -111,7 +110,6 @@ export function ContactHelpDesk({
             }
           />
           <Door
-            index={1}
             dark={dark}
             icon={Users}
             title="Volunteer, sponsor, or judge"
@@ -128,7 +126,6 @@ export function ContactHelpDesk({
             }
           />
           <Door
-            index={2}
             dark={dark}
             icon={CalendarDays}
             title="Come to a meeting"
@@ -146,7 +143,7 @@ export function ContactHelpDesk({
       <section
         id="message"
         aria-labelledby="message-title"
-        className="mx-auto grid max-w-6xl scroll-mt-(--header-offset) gap-12 px-(--gutter) py-16 sm:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:gap-16"
+        className="mx-auto grid grid-cols-1 max-w-6xl scroll-mt-(--header-offset) gap-12 px-(--gutter) py-16 sm:py-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:gap-16"
       >
         <FadeUp>
           <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
@@ -170,7 +167,7 @@ export function ContactHelpDesk({
           {links.length > 0 && (
             <div className="mt-12">
               <h2 className="text-muted-foreground text-sm font-medium">Follow along</h2>
-              <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+              <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {links.map((s) => (
                   <li key={s.href}>
                     <a
@@ -200,7 +197,7 @@ export function ContactHelpDesk({
           )}
         </FadeUp>
 
-        <FadeUp delay={0.08}>
+        <FadeUp>
           <div className="bg-card ring-border/70 rounded-3xl p-6 ring-1 sm:p-8">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
@@ -248,14 +245,12 @@ export function ContactHelpDesk({
 }
 
 function Door({
-  index,
   dark,
   icon: Icon,
   title,
   body,
   action,
 }: {
-  index: number
   dark: boolean
   icon: IconComponent
   title: string
@@ -264,7 +259,7 @@ function Door({
 }) {
   return (
     <li>
-      <FadeUp delay={index * 0.06} distance={16} className="h-full">
+      <FadeUp className="h-full">
         <SpotlightCard
           theme={dark ? 'dark' : 'light'}
           spotlightColor="color-mix(in srgb, var(--brand-sky) 90%, transparent)"

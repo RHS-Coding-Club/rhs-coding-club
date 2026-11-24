@@ -72,7 +72,11 @@ function MemberPage() {
       />
 
       <div className="mx-auto flex max-w-6xl flex-col gap-20 px-(--gutter) py-14 sm:gap-24 sm:py-20">
-        <section aria-labelledby="badges-heading">
+        <section
+          id="collection"
+          aria-labelledby="badges-heading"
+          className="scroll-mt-(--header-offset)"
+        >
           <FadeUp className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 id="badges-heading" className={heading}>
@@ -110,7 +114,7 @@ function MemberPage() {
 
         <section
           aria-labelledby="solved-heading"
-          className="grid gap-8 lg:grid-cols-[1fr_2fr]"
+          className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]"
         >
           <FadeUp>
             <h2 id="solved-heading" className={heading}>

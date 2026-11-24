@@ -26,7 +26,6 @@
   }
 
   & .cw-nav {
-    will-change: transform;
     display: flex;
     align-items: center;
     gap: 9px;
@@ -66,7 +65,6 @@
   }
 
   & .cw-view {
-    will-change: transform;
     position: absolute;
     inset: 0 0 auto;
     display: flex;
@@ -177,7 +175,6 @@
   }
 
   & .cw-row {
-    will-change: transform;
     position: absolute;
     top: 0;
     left: -12px;
@@ -223,7 +220,6 @@
   }
 
   & .cw-gain {
-    will-change: transform;
     font-family: var(--ss-mono);
     font-size: 12px;
     font-weight: 600;

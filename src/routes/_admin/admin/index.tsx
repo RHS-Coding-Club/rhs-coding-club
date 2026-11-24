@@ -57,7 +57,7 @@ function AdminHome() {
 
       {/* Phones get one row per queue (count on the right, thumb-sized);
           wider screens get a card per queue. */}
-      <ul className="grid gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
+      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
         {queues.map((q) => {
           const n = 'queue' in q ? counts[q.queue] : 0
           const Icon = q.icon
@@ -103,7 +103,7 @@ function AdminHome() {
       <h2 className="mt-10 mb-3 text-lg font-semibold tracking-[-0.02em] sm:mt-12 sm:mb-4">
         Manage
       </h2>
-      <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {rest.map((p) => {
           const Icon = p.icon
           return (

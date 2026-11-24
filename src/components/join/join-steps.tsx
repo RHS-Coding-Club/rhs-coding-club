@@ -25,7 +25,7 @@ export function JoinSteps({
   className?: string
 }) {
   return (
-    <ol className={cn('grid gap-6 sm:grid-cols-3 sm:gap-0', className)}>
+    <ol className={cn('grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-0', className)}>
       {STEPS.map((s, i) => {
         const done = i < current
         const now = i === current && current > 0

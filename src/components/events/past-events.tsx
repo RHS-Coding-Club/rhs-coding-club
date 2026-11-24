@@ -18,8 +18,8 @@ export function PastEvents({ events }: { events: EventCardData[] }) {
 
   return (
     <div className="flex flex-col gap-10">
-      {groups.map((g, gi) => (
-        <FadeUp key={g.month} delay={Math.min(gi, 3) * 0.05}>
+      {groups.map((g) => (
+        <FadeUp key={g.month}>
           <h3 className="text-muted-foreground mb-3 font-mono text-xs tracking-[0.14em] uppercase">
             {g.month}
           </h3>

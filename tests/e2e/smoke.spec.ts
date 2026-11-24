@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import type { Page } from '@playwright/test'
+import type { Cookie, Page } from '@playwright/test'
 
 const PASSWORD = 'password123'
 
@@ -9,6 +9,22 @@ const PASSWORD = 'password123'
  * the next navigation carries the session.
  */
 async function logIn(page: Page, email: string) {
+  // One real sign-in per account, then reuse its session cookie: AUTH_LIMIT
+  // allows 10 password checks a minute per IP, and the suite outgrew that.
+  const saved = sessions.get(email)
+  if (saved) {
+    await page.context().addCookies(saved)
+    // Land where a fresh sign-in would, so callers can't tell the difference.
+    await page.goto('/dashboard')
+    return
+  }
+  await signInThroughForm(page, email)
+  sessions.set(email, await page.context().cookies())
+}
+
+const sessions = new Map<string, Cookie[]>()
+
+async function signInThroughForm(page: Page, email: string) {
   await page.goto('/login', { waitUntil: 'networkidle' })
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Password').fill(PASSWORD)

@@ -30,7 +30,7 @@ export function FeaturedProjects({
       className="mx-auto max-w-6xl px-(--gutter) py-16 sm:py-24"
       aria-labelledby="projects-heading"
     >
-      <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-center">
+      <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-center">
         <FadeUp className="max-w-md">
           <h2
             id="projects-heading"
@@ -56,7 +56,7 @@ export function FeaturedProjects({
             No approved projects yet. Members submit theirs from the dashboard.
           </FadeUp>
         ) : (
-          <FadeUp delay={0.1} className="h-[380px] sm:h-[440px]">
+          <FadeUp className="h-[380px] sm:h-[440px]">
             <CardSwap
               width={420}
               height={300}
@@ -107,10 +107,15 @@ function ProjectCard({ project, dark }: { project: Project; dark: boolean }) {
       </div>
       <div className="px-2.5 pt-3.5 pb-1.5">
         <div className="flex items-baseline justify-between gap-3">
-          <h3 className="truncate text-base font-semibold tracking-tight">
+          <h3 className="min-w-0 flex-1 truncate text-base font-semibold tracking-tight">
             {project.title}
           </h3>
-          <span className="shrink-0 text-xs opacity-60">{project.authorName}</span>
+          <span
+            className="max-w-[45%] min-w-0 truncate text-xs opacity-60"
+            title={project.authorName}
+          >
+            {project.authorName}
+          </span>
         </div>
         <div className="mt-2 flex gap-1.5 overflow-hidden">
           {project.tech.slice(0, 3).map((t) => (

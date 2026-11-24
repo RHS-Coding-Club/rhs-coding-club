@@ -95,7 +95,8 @@ export async function getHomeData(db: Db, now = new Date()) {
       .innerJoin(schema.badge, eq(schema.badge.id, schema.userBadge.badgeId))
       .where(eq(schema.badge.isActive, true))
       .orderBy(desc(schema.userBadge.awardedAt))
-      .limit(6),
+      // Grouped per member below, so read enough rows to find six people.
+      .limit(40),
     // The newest published challenge is "this week's".
     db.query.challenge.findFirst({
       where: and(
@@ -164,7 +165,7 @@ export async function getHomeData(db: Db, now = new Date()) {
     },
     featuredProjects,
     latestPosts,
-    recentAwards,
+    recentAwards: groupAwards(recentAwards),
   }
 }
 
@@ -293,3 +294,21 @@ export async function getAdminOverview(db: Db) {
 }
 
 export type AdminOverview = Awaited<ReturnType<typeof getAdminOverview>>
+
+/**
+ * One entry per member for the home page's "Badges earned recently": their
+ * newest badge plus how many more they earned in the same window, so one busy
+ * member doesn't fill the strip.
+ */
+export function groupAwards<T extends { userId: string }>(
+  rows: T[],
+  limit = 6,
+): (T & { more: number })[] {
+  const byUser = new Map<string, T & { more: number }>()
+  for (const row of rows) {
+    const seen = byUser.get(row.userId)
+    if (seen) seen.more += 1
+    else if (byUser.size < limit) byUser.set(row.userId, { ...row, more: 0 })
+  }
+  return [...byUser.values()]
+}

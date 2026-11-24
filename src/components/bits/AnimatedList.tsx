@@ -621,16 +621,17 @@ const AnimatedList = ({
     const track = trackRef.current
     const item = itemRefs.current[selected]
     if (!viewport || !track || !item) return
+    // RHS: keyboard selection scrolls instantly ('auto', was 'smooth').
     const top = track.offsetTop + item.offsetTop
     const bottom = top + item.offsetHeight
     const room = Math.max(0, (viewport.clientHeight - item.offsetHeight) / 2)
     const margin = Math.min(showGradients ? Math.max(12, fadeSize) : 12, room)
     if (top < viewport.scrollTop + margin) {
-      viewport.scrollTo({ top: Math.max(0, top - margin), behavior: 'smooth' })
+      viewport.scrollTo({ top: Math.max(0, top - margin), behavior: 'auto' })
     } else if (bottom > viewport.scrollTop + viewport.clientHeight - margin) {
       viewport.scrollTo({
         top: bottom - viewport.clientHeight + margin,
-        behavior: 'smooth',
+        behavior: 'auto',
       })
     }
   }, [selected, fadeSize, showGradients])

@@ -1,7 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { CalendarDays } from '#/components/icons/calendar-days'
 import { MapPin } from '#/components/icons/map-pin'
-import CountUp from '#/components/bits/CountUp'
 import { OfficerCredits } from '#/components/about/officer-credits'
 import { WavesBackground } from '#/components/about/waves-bg'
 import { YearRail } from '#/components/about/year-rail'
@@ -108,11 +107,7 @@ function AboutPage() {
 }
 
 function Num({ n }: { n: number }) {
-  return (
-    <span className="text-primary tabular-nums">
-      <CountUp to={n} duration={1.2} trigger="view" />
-    </span>
-  )
+  return <span className="text-primary tabular-nums">{n.toLocaleString('en-US')}</span>
 }
 
 function Fact({

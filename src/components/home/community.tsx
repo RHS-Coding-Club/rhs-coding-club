@@ -29,7 +29,7 @@ export function Community({
       className="mx-auto max-w-6xl px-(--gutter) py-16 sm:py-24"
       aria-labelledby="community-heading"
     >
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:items-end">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:items-end">
         <FadeUp>
           <h2
             id="community-heading"
@@ -42,11 +42,10 @@ export function Community({
           </p>
         </FadeUp>
 
-        <dl className="divide-border grid divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {items.map((item, i) => (
+        <dl className="divide-border grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          {items.map((item) => (
             <FadeUp
               key={item.label}
-              delay={i * 0.08}
               className="flex flex-col gap-2 py-6 sm:px-8 sm:py-2 sm:first:pl-0"
             >
               <dt className="text-muted-foreground order-2 text-sm">{item.label}</dt>
@@ -66,15 +65,15 @@ export function Community({
       </div>
 
       {awards.length > 0 && (
-        <FadeUp delay={0.15} className="border-border mt-16 border-t pt-10">
+        <FadeUp className="border-border mt-16 border-t pt-10">
           <p className="text-muted-foreground mb-5 text-sm">Badges earned recently</p>
           <ul className="flex flex-wrap gap-2.5">
             {awards.map((a) => (
               <li
                 key={a.id}
-                className="bg-card ring-border/70 flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 text-sm ring-1"
+                className="bg-card ring-border/70 flex max-w-full min-w-0 items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 text-sm ring-1"
               >
-                <Avatar className="size-7">
+                <Avatar className="size-7 shrink-0">
                   <AvatarImage
                     src={avatarUrl({ avatarKey: a.userAvatarKey, image: a.userImage })}
                     alt=""
@@ -83,12 +82,26 @@ export function Community({
                     {initials(a.userName)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="font-medium">{a.userName}</span>
-                <span className="text-muted-foreground hidden sm:inline">earned</span>
-                <span className="text-brand-sky inline-flex items-center gap-1 font-medium">
-                  <Award className="size-3.5" aria-hidden="true" />
-                  {a.badgeName}
+                <span
+                  className="max-w-[12rem] min-w-0 truncate font-medium"
+                  title={a.userName}
+                >
+                  {a.userName}
                 </span>
+                <span className="text-muted-foreground hidden shrink-0 sm:inline">
+                  earned
+                </span>
+                <span className="text-brand-sky inline-flex min-w-0 items-center gap-1 font-medium">
+                  <Award className="size-3.5 shrink-0" aria-hidden="true" />
+                  <span className="truncate" title={a.badgeName}>
+                    {a.badgeName}
+                  </span>
+                </span>
+                {a.more > 0 && (
+                  <span className="text-muted-foreground shrink-0 text-xs">
+                    +{a.more} more
+                  </span>
+                )}
                 <span className="text-muted-foreground hidden font-mono text-xs md:inline">
                   {fmtDate(a.awardedAt, 'short')}
                 </span>

@@ -80,7 +80,7 @@ export function HowItWorks({
         </dl>
       </FadeUp>
 
-      <FadeUp className="mt-10 grid gap-3 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+      <FadeUp className="mt-10 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
         <ol className="flex flex-col gap-1">
           {STEPS.map((s, i) => {
             const lit = step === i

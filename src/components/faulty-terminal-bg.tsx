@@ -16,7 +16,6 @@ export function FaultyBackground() {
   const [accent, line] = useCssColors('--art-accent', '--art-line')
   return (
     <FaultyTerminal
-      key={dark ? 'dark' : 'light'}
       tint={dark ? accent : line}
       lightMode={!dark}
       scale={1.4}

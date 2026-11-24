@@ -219,12 +219,12 @@ function NewsletterCard({ theme }: { theme: Theme }) {
             aria-live="polite"
           >
             {status.kind === 'ok' && (
-              <span className="text-white">
+              <span className="enter text-white">
                 You're on the list. See you in the next update.
               </span>
             )}
             {status.kind === 'error' && (
-              <span className="text-white">{status.message}</span>
+              <span className="enter text-white">{status.message}</span>
             )}
           </p>
         </form>

@@ -204,7 +204,7 @@ function ResourcesPage() {
             </RaisedButton>
           )}
         </FadeUp>
-        <FadeUp delay={0.1} className="mt-6 sm:mt-10">
+        <FadeUp className="mt-6 sm:mt-10">
           <LevelFolders
             selected={level}
             onSelect={setLevel}
@@ -327,10 +327,10 @@ function ResourcesPage() {
               : 'Try another level or tag, or clear the search.'}
           </EmptyState>
         ) : (
-          <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {visible.map((r, i) => (
+          <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {visible.map((r) => (
               <li key={r.id}>
-                <FadeUp delay={(i % 3) * 0.05} distance={16} className="h-full">
+                <FadeUp className="h-full">
                   <ResourceCard
                     resource={r}
                     canSave={Boolean(user)}

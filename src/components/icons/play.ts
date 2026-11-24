@@ -1,6 +1,7 @@
 /**
- * Plays an icon when the control around it is hovered or gets keyboard focus. One pair of
- * document listeners serves every icon on the page, and exists only while there are icons.
+ * Plays an icon when the control around it is hovered with a pointer. Keyboard focus never
+ * plays one: Tab is pressed far too often for every stop to move. One document listener serves
+ * every icon on the page, and exists only while there are icons.
  */
 
 /** An icon answers to the nearest of these, or to itself when it isn't inside one. */
@@ -14,9 +15,12 @@ const HOST = [
 
 const DISABLED = ':disabled, [aria-disabled=true], [data-disabled]'
 
-/** Icons that show a control's state, and toasts, never move. */
+/**
+ * Icons that show a control's state, toasts, and the admin panel (high-frequency tools, where
+ * a moving icon under every hover is noise) never move.
+ */
 const CALM =
-  '[data-slot$=indicator], [data-slot^=select-], [role=menuitemcheckbox], [role=menuitemradio], [data-sonner-toast]'
+  '[data-slot$=indicator], [data-slot^=select-], [role=menuitemcheckbox], [role=menuitemradio], [data-sonner-toast], #admin-dock, [data-calm-icons]'
 
 const icons = new Map<Element, () => void>()
 let hovered: Element | null = null
@@ -25,14 +29,12 @@ let hovered: Element | null = null
 export function watchIcon(svg: SVGSVGElement, play: () => void): () => void {
   if (icons.size === 0) {
     document.addEventListener('pointerover', onPointerOver, { passive: true })
-    document.addEventListener('focusin', onFocusIn)
   }
   icons.set(svg, play)
   return () => {
     icons.delete(svg)
     if (icons.size > 0) return
     document.removeEventListener('pointerover', onPointerOver)
-    document.removeEventListener('focusin', onFocusIn)
     hovered = null
   }
 }
@@ -44,15 +46,6 @@ function onPointerOver(event: PointerEvent) {
   if (host === hovered) return
   hovered = host
   if (host) playIcons(host)
-}
-
-function onFocusIn({ target }: FocusEvent) {
-  if (
-    target instanceof Element &&
-    target.matches(HOST) &&
-    target.matches(':focus-visible')
-  )
-    playIcons(target)
 }
 
 function playIcons(host: Element) {

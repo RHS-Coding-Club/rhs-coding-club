@@ -153,7 +153,10 @@ export function AdminDock({
     accentColor: 'var(--brand-sky)',
     badgeColor: 'var(--alert)',
     baseItemSize: 46,
-    magnification: 66,
+    // Officers click these dozens of times a day, so the tiles hold still:
+    // no magnify under the cursor and no hop on click.
+    magnification: 46,
+    bounce: false,
     panelHeight: 62,
     distance: 150,
     gap: 8,

@@ -144,7 +144,7 @@ function EventPage() {
         aside={<Cover event={event} initialDark={theme === 'dark'} />}
       />
 
-      <section className="mx-auto grid max-w-6xl gap-10 px-(--gutter) py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14">
+      <section className="mx-auto grid grid-cols-1 max-w-6xl gap-10 px-(--gutter) py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14">
         <aside className="flex flex-col gap-4 self-start lg:sticky lg:top-28 lg:col-start-2 lg:row-start-1">
           {(attendedAt || fresh) && (
             <Panel tone="success">
@@ -267,7 +267,7 @@ function EventPage() {
           </FadeUp>
 
           <FadeUp>
-            <dl className="border-border/70 grid gap-px overflow-hidden rounded-3xl border bg-[var(--border)] sm:grid-cols-2">
+            <dl className="border-border/70 grid grid-cols-1 gap-px overflow-hidden rounded-3xl border bg-[var(--border)] sm:grid-cols-2">
               <Fact
                 term="Date"
                 value={fmtDate(event.startsAt, 'date')}

@@ -133,7 +133,7 @@ export function BackupManager({ overview }: { overview: Overview }) {
         </p>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Panel title="Schedule">
           <form onSubmit={onSave} className="grid gap-5">
             <div className="flex items-center justify-between gap-4">

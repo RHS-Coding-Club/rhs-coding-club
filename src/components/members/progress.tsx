@@ -70,7 +70,7 @@ export function Meter({
       className={cn('bg-foreground/8 h-1.5 overflow-hidden rounded-full', className)}
     >
       <div
-        className="meter-fill h-full origin-left rounded-full"
+        className="h-full origin-left rounded-full"
         style={{ background: color, transform: `scaleX(${pct / 100})` }}
       />
     </div>

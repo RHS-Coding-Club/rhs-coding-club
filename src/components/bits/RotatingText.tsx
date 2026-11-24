@@ -342,7 +342,10 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>((props, ref)
   const enterTo = blurAmount > 0 ? withFilter(restState, 'blur(0px)') : restState
   const leaveTo =
     blurAmount > 0 ? withFilter(leaveState, `blur(${blurAmount}px)`) : leaveState
-  const charStyle = effect === 'flip' ? FLIP_STYLE : undefined
+  // RHS: an explicit will-change stops Motion leaving `will-change: opacity`
+  // on every character after its animation ends (dozens of idle layers).
+  const charStyle =
+    effect === 'flip' ? { ...FLIP_STYLE, willChange: 'auto' } : { willChange: 'auto' }
 
   const blockStyle = highlight
     ? {

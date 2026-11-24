@@ -10,7 +10,6 @@ export function WavesBackground({ initialDark = true }: { initialDark?: boolean 
   const [line, accent] = useCssColors('--art-line', '--art-accent')
   return (
     <Waves
-      key={dark ? 'dark' : 'light'}
       lineColor={line}
       accentColor={accent}
       lightMode={!dark}

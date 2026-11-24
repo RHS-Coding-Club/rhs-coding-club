@@ -200,7 +200,7 @@ export function AccountSettings({ data, dark }: { data: AccountData; dark: boole
             title="Account"
             description="Set by how you signed up. Only an admin can change your role."
           >
-            <dl className="grid gap-5 sm:grid-cols-3">
+            <dl className="grid grid-cols-1 gap-5 sm:grid-cols-3">
               <Fact term="Email" value={user.email} />
               <Fact term="Role" value={ROLE_LABEL[user.role]} />
               <Fact term="Joined" value={fmtDate(user.createdAt, 'date')} />
@@ -251,7 +251,7 @@ function Group({
   children: ReactNode
 }) {
   return (
-    <section className="grid gap-5 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
+    <section className="grid grid-cols-1 gap-5 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
       <div>
         <h2 className="text-base font-semibold tracking-[-0.01em]">{title}</h2>
         <p className="text-muted-foreground mt-1 text-sm text-pretty">{description}</p>

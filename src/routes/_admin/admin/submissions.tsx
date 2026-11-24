@@ -254,7 +254,7 @@ function AdminSubmissions() {
               : 'Try another filter.'}
         </EmptyState>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
           <ul
             aria-label="Submissions"
             className="divide-border border-border self-start divide-y overflow-hidden rounded-lg border"

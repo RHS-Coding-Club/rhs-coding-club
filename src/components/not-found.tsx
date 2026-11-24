@@ -89,8 +89,11 @@ export function NotFound() {
             className="rise-in mt-4 max-w-md text-lg text-pretty text-ink/75"
           >
             Nothing lives at{' '}
-            <code className="rounded-md bg-ink/10 px-1.5 py-0.5 font-mono text-[0.9em] break-all text-ink">
-              {path}
+            <code
+              title={path.length > 80 ? path : undefined}
+              className="rounded-md bg-ink/10 px-1.5 py-0.5 font-mono text-[0.9em] break-all text-ink"
+            >
+              {middleTruncate(path, 80)}
             </code>
             .{' '}
             {guess ? (
@@ -134,7 +137,7 @@ export function NotFound() {
         <h2 id="nf-b-jump" className="sr-only">
           Popular pages
         </h2>
-        <ul className="grid overflow-hidden rounded-3xl border border-border sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 overflow-hidden rounded-3xl border border-border sm:grid-cols-2 lg:grid-cols-3">
           {DESTINATIONS.map((d) => {
             const Icon = ICONS[d.to]
             return (
@@ -165,4 +168,11 @@ export function NotFound() {
       </nav>
     </>
   )
+}
+
+/** Keeps the start and end of a long path ("/blog/2019/…/old-post") so the actions stay in view. */
+function middleTruncate(text: string, max: number): string {
+  if (text.length <= max) return text
+  const keep = max - 1
+  return `${text.slice(0, Math.ceil(keep / 2))}…${text.slice(-Math.floor(keep / 2))}`
 }

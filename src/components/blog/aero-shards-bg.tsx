@@ -26,7 +26,6 @@ export function AeroShardsBackground({ initialDark }: { initialDark: boolean }) 
 
   return (
     <AeroShards
-      key={dark ? 'dark' : 'light'}
       shardColor={line}
       accentColor={accent}
       backgroundColor={stage}

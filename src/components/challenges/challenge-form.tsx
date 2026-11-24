@@ -164,7 +164,7 @@ export function ChallengeForm({
     <form
       onSubmit={onSubmit}
       noValidate
-      className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
+      className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
     >
       <div className="flex min-w-0 flex-col gap-5">
         <div className="flex flex-col gap-1.5">
@@ -208,7 +208,7 @@ export function ChallengeForm({
           />
           {err('prompt')}
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="ch-in">
               Sample input <span className="text-muted-foreground">(optional)</span>

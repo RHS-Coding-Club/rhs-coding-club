@@ -88,7 +88,7 @@ export function ChallengeArchive({
         </div>
       </FadeUp>
 
-      <FadeUp delay={0.05} className="mt-8 flex flex-wrap items-center gap-3">
+      <FadeUp className="mt-8 flex flex-wrap items-center gap-3">
         <FilterPills
           label="Filter by difficulty"
           value={difficulty}
@@ -123,7 +123,6 @@ export function ChallengeArchive({
           <AnimatedList
             asList
             label="Past challenges"
-            key={`${difficulty}-${solved}`}
             items={items}
             theme={dark ? 'dark' : 'light'}
             accentColor="var(--brand-sky)"

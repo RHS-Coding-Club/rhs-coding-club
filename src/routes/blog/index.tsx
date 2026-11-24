@@ -139,9 +139,9 @@ function BlogPage() {
               </p>
             ) : (
               <ol className="border-border mt-10 border-t">
-                {rest.map((p, i) => (
+                {rest.map((p) => (
                   <li key={p.id}>
-                    <FadeUp delay={Math.min(i, 4) * 0.04}>
+                    <FadeUp>
                       <PostRow post={p} />
                     </FadeUp>
                   </li>
@@ -346,12 +346,12 @@ function LeadPost({ post }: { post: PostListItem }) {
         aria-hidden="true"
         className="absolute inset-0 bg-[radial-gradient(60%_80%_at_100%_0%,color-mix(in_srgb,var(--brand-sky)_45%,transparent)_0%,transparent_60%),radial-gradient(50%_60%_at_0%_100%,color-mix(in_srgb,var(--brand-ink)_60%,transparent)_0%,transparent_70%)] transition-opacity duration-700 group-hover:opacity-80"
       />
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-(--gutter) py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-end">
-        <div>
+      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-10 px-(--gutter) py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-end">
+        <div className="min-w-0">
           <p className="font-mono text-sm text-brand-frost/80">
             Latest · {fmtDate(post.publishedAt)}
           </p>
-          <h2 className="mt-5 max-w-4xl text-[clamp(2.25rem,5vw,4.25rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-balance">
+          <h2 className="mt-5 max-w-4xl text-[clamp(2.25rem,5vw,4.25rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-balance [overflow-wrap:anywhere]">
             {post.title}
           </h2>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-brand-frost/80 sm:text-xl">
@@ -393,7 +393,7 @@ function PostRow({ post }: { post: PostListItem }) {
     <Link
       to="/blog/$slug"
       params={{ slug: post.slug }}
-      className="group border-border focus-visible:bg-muted/40 grid gap-4 border-b py-8 outline-none sm:grid-cols-[9rem_minmax(0,1fr)_auto] sm:gap-8"
+      className="group border-border focus-visible:bg-muted/40 grid grid-cols-1 gap-4 border-b py-8 outline-none sm:grid-cols-[9rem_minmax(0,1fr)_auto] sm:gap-8"
     >
       <time
         dateTime={new Date(post.publishedAt).toISOString()}
@@ -423,7 +423,7 @@ function PostRow({ post }: { post: PostListItem }) {
         </div>
       </div>
       <ArrowUpRight
-        className="text-muted-foreground group-hover:text-brand-sky hidden size-6 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:block"
+        className="text-muted-foreground group-hover:text-brand-sky hidden size-6 transition-[translate,color] duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:block"
         aria-hidden="true"
       />
     </Link>

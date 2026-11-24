@@ -87,7 +87,7 @@ function GithubPage() {
         }
       />
 
-      <section className="mx-auto grid max-w-6xl gap-10 px-(--gutter) py-16 sm:py-24 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-14">
+      <section className="mx-auto grid grid-cols-1 max-w-6xl gap-10 px-(--gutter) py-16 sm:py-24 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-14">
         <FadeUp>
           <div className="bg-card ring-border/70 rounded-3xl p-6 ring-1 sm:p-8">
             {!isMember ? (
@@ -114,7 +114,7 @@ function GithubPage() {
           </div>
         </FadeUp>
 
-        <FadeUp delay={0.1} className="lg:pt-4">
+        <FadeUp className="lg:pt-4">
           <h2 className="text-2xl font-semibold tracking-[-0.025em]">What you get</h2>
           <ul className="mt-6 flex flex-col gap-6">
             {PERKS.map((p) => (

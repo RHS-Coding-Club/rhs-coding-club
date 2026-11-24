@@ -71,7 +71,6 @@
   }
 
   & .cb-points {
-    will-change: transform;
     margin-left: auto;
     font-family: var(--ss-mono);
     font-size: 13px;
@@ -144,7 +143,6 @@
   }
 
   & .cb-board-row {
-    will-change: transform;
     position: absolute;
     top: 8px;
     left: 8px;
@@ -200,7 +198,6 @@
 
   & .cb-events {
     position: absolute;
-    will-change: transform;
     left: 24px;
     display: flex;
     flex-direction: column;
@@ -394,7 +391,6 @@
   }
 
   & .cb-org-badge {
-    will-change: transform;
     flex: none;
     background:
       linear-gradient(var(--ss-success-soft), var(--ss-success-soft)), var(--ss-surface);

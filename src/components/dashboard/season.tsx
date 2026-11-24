@@ -51,7 +51,10 @@ function weekDays(now: Date) {
   )
 }
 
-/** Hero aside: the season total on React Bits Counter, rolling into place. */
+/** Held badges shown as chips before "+N more". */
+const HELD_CHIPS = 8
+
+/** Hero aside: the season total on React Bits Counter (it rolls when the total changes, not on every visit). */
 export function SeasonScore({ d }: { d: MemberDash }) {
   const streak = streakWeeks(d.points.weeks)
   return (
@@ -60,14 +63,17 @@ export function SeasonScore({ d }: { d: MemberDash }) {
       <div className="mt-2 text-foreground" aria-hidden="true">
         <Counter
           value={d.points.semester}
-          fontSize="clamp(3.25rem, 7vw, 4.5rem)"
+          fontSize={
+            d.points.semester >= 100_000
+              ? 'clamp(2.75rem, 6vw, 3.75rem)'
+              : 'clamp(3.25rem, 7vw, 4.5rem)'
+          }
           fontWeight={600}
           textColor="currentColor"
           gap={0}
           padding={4}
           tabular
-          intro
-          duration={1.1}
+          intro={false}
           digitStyle={{ letterSpacing: '-0.04em' }}
         />
       </div>
@@ -112,11 +118,13 @@ export function SeasonMeter({ d }: { d: MemberDash }) {
       <div className="flex items-baseline justify-between gap-4 text-sm text-ink/75">
         <span>
           <span className="font-medium text-ink">
-            {gap === 0 ? 'Tied' : `${gap} pts`}
+            {gap === 0 ? 'Tied' : `${gap.toLocaleString('en-US')} pts`}
           </span>{' '}
           {gap === 0 ? 'with' : 'to pass'} {above.name}
         </span>
-        <span className="font-mono tabular-nums">Next: #{above.rank}</span>
+        <span className="shrink-0 font-mono whitespace-nowrap tabular-nums">
+          Next: #{above.rank}
+        </span>
       </div>
       <Meter
         value={above.points ? mine / above.points : 0}
@@ -285,7 +293,7 @@ function QuestList({ d, now }: { d: MemberDash; now: Date }) {
             <span className="min-w-0 flex-1">
               <span
                 className={cn(
-                  'block truncate text-[15px] font-medium',
+                  'line-clamp-2 text-[15px] font-medium sm:line-clamp-1',
                   q.done && 'text-muted-foreground line-through decoration-1',
                 )}
               >
@@ -362,10 +370,12 @@ function Neighborhood({ board }: { board: MemberDash['board'] }) {
                 </span>
                 {!n.me && me && diff !== 0 && (
                   <span className="text-muted-foreground hidden text-xs sm:inline">
-                    {diff > 0 ? `${diff} ahead` : `${-diff} behind`}
+                    {diff > 0
+                      ? `${diff.toLocaleString('en-US')} ahead`
+                      : `${(-diff).toLocaleString('en-US')} behind`}
                   </span>
                 )}
-                <span className="w-14 text-right font-mono text-sm tabular-nums">
+                <span className="min-w-14 shrink-0 text-right font-mono text-sm tabular-nums">
                   {n.points.toLocaleString('en-US')}
                 </span>
               </li>
@@ -401,7 +411,7 @@ function Unlocks({
           {held.length} of {collection.length} collected
         </CardLink>
       </header>
-      <ul className="grid gap-3 sm:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {next.map((b) => {
           const r = RARITY[b.rarity]
           return (
@@ -427,7 +437,6 @@ function Unlocks({
                     stroke="color-mix(in oklab, var(--foreground) 9%, transparent)"
                   />
                   <circle
-                    className="progress-ring"
                     cx="30"
                     cy="30"
                     r="26"
@@ -437,7 +446,6 @@ function Unlocks({
                     stroke={r.color}
                     strokeDasharray={RING}
                     strokeDashoffset={RING * (1 - b.ratio)}
-                    style={{ '--ring-length': `${RING}` } as React.CSSProperties}
                   />
                 </svg>
                 <Award className="size-6" style={{ color: r.color }} aria-hidden="true" />
@@ -474,7 +482,7 @@ function Unlocks({
           className="mt-4 flex flex-wrap items-center gap-2"
           aria-label="Badges you hold"
         >
-          {held.map((b) => {
+          {held.slice(0, HELD_CHIPS).map((b) => {
             const r = RARITY[b.rarity]
             return (
               <li
@@ -486,7 +494,7 @@ function Unlocks({
                 }}
               >
                 <span
-                  className="grid size-6 place-items-center rounded-full"
+                  className="grid size-6 shrink-0 place-items-center rounded-full"
                   style={{
                     color: r.color,
                     background: `color-mix(in oklab, ${r.color} 16%, transparent)`,
@@ -498,9 +506,21 @@ function Unlocks({
               </li>
             )
           })}
+          {held.length > HELD_CHIPS && (
+            <li>
+              <Link
+                to="/members/$id"
+                params={{ id: userId }}
+                hash="collection"
+                className="text-muted-foreground hover:text-foreground rounded-full px-2 py-1 text-xs font-medium"
+              >
+                +{held.length - HELD_CHIPS} more
+              </Link>
+            </li>
+          )}
           {collection
             .filter((b) => !b.awardedAt && b.current === null)
-            .slice(0, 3)
+            .slice(0, held.length > HELD_CHIPS ? 0 : 3)
             .map((b) => (
               <li
                 key={b.id}
@@ -545,7 +565,9 @@ function Receipt({ d, now }: { d: MemberDash; now: Date }) {
               <span className="text-muted-foreground w-12 shrink-0 tabular-nums">
                 {fmtDate(e.createdAt, 'short')}
               </span>
-              <span className="min-w-0 text-pretty sm:truncate">{ledgerLabel(e)}</span>
+              <span className="line-clamp-2 min-w-0 text-pretty sm:truncate">
+                {ledgerLabel(e)}
+              </span>
               <span className="receipt-leader h-3 min-w-4 flex-1" aria-hidden="true" />
               <span
                 className={cn(
@@ -593,7 +615,7 @@ function Builds({ d }: { d: MemberDash }) {
           Nothing shipped yet. A project is worth points for every teammate.
         </p>
       ) : (
-        <ul className="grid gap-2">
+        <ul className="grid grid-cols-1 gap-2">
           {d.projects.slice(0, 4).map((p) => (
             <li key={p.id}>
               <Link

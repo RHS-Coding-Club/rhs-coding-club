@@ -73,7 +73,8 @@ export function ProjectGrid({
       radius={24}
       animateFrom="bottom"
       stagger={0.04}
-      duration={0.7}
+      duration={0.4}
+      blurToFocus={false}
       bounce={0.12}
       hoverEffect="lift"
       captions="always"

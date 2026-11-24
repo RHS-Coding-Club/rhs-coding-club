@@ -92,6 +92,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
           logoHref="/"
           linkComponent={RouterLink}
           actions={user ? <AccountMenu user={user} /> : <GuestActions />}
+          intro={false}
           cardEffect="rise"
           cardHeight={196}
           bounce={0.25}

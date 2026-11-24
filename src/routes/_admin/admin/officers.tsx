@@ -376,7 +376,7 @@ function OfficerForm({
           A square headshot. Without one, the card shows their initials.
         </p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {field('name', 'Name', { autoComplete: 'off' })}
         {field('title', 'Title', { placeholder: 'Vice President' })}
       </div>
@@ -396,7 +396,7 @@ function OfficerForm({
           </p>
         )}
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {field('email', 'Email (optional)', { type: 'email' })}
         {field('githubUrl', 'GitHub profile (optional)', {
           placeholder: 'https://github.com/…',

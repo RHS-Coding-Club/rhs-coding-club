@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
-import { motion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowRight } from '#/components/icons/arrow-right'
 import RotatingText from '#/components/bits/RotatingText'
 import ShinyText from '#/components/bits/ShinyText'
@@ -25,8 +26,12 @@ const rise = (delay: number) => riseIn(delay, 18, 0.9)
  */
 export function Hero() {
   const [ink, inkSoft] = useCssColors('--ink', '--ink-soft')
+  const rotating = useRotates()
   return (
-    <section className="relative mx-2.5 mt-2.5 min-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-4xl">
+    <section
+      ref={rotating.ref}
+      className="relative mx-2.5 mt-2.5 min-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-4xl"
+    >
       <AsciiBackground />
       {/* Soft scrim in the ground color behind the headline so the glyph field never fights the copy. */}
       <div
@@ -59,7 +64,7 @@ export function Hero() {
               highlight
               highlightColor="var(--brand-sky)"
               style={{ color: 'var(--on-sky)' }}
-              auto
+              auto={rotating.on}
               loop
               pauseOnHover={false}
               animatePresenceInitial
@@ -106,4 +111,31 @@ export function Hero() {
       </div>
     </section>
   )
+}
+
+/**
+ * Whether the headline word should keep rotating: only while the hero is on
+ * screen and the tab is visible, and never with reduced motion on (the first
+ * word just stays). A prop, so the markup never branches on it.
+ */
+function useRotates() {
+  const ref = useRef<HTMLElement>(null)
+  const reduced = useReducedMotion()
+  const [onScreen, setOnScreen] = useState(true)
+  const [visible, setVisible] = useState(true)
+  useEffect(() => {
+    const el = ref.current
+    const observer = new IntersectionObserver(([entry]) =>
+      setOnScreen(entry.isIntersecting),
+    )
+    if (el) observer.observe(el)
+    const onVisibility = () => setVisible(document.visibilityState === 'visible')
+    onVisibility()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      observer.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [])
+  return { ref, on: onScreen && visible && !reduced }
 }

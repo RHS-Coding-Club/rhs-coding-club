@@ -2,7 +2,6 @@ import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 import { ArrowLeft } from '#/components/icons/arrow-left'
 import { Eye } from '#/components/icons/eye'
 import { Users } from '#/components/icons/users'
-import SplitText from '#/components/bits/SplitText'
 import { PageHero } from '#/components/page-hero'
 import { FadeUp } from '#/components/motion'
 import { RichText } from '#/components/rich-text/rich-text'
@@ -55,19 +54,7 @@ function ChallengePage() {
             All challenges
           </Link>
         }
-        title={
-          <SplitText
-            key={challenge.id}
-            text={challenge.title}
-            tag="span"
-            effect="rise"
-            splitType="words"
-            delay={60}
-            duration={0.9}
-            trigger="load"
-            textAlign="left"
-          />
-        }
+        title={challenge.title}
         description={challenge.description}
       >
         <dl className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-ink/70">
@@ -130,7 +117,7 @@ function ChallengePage() {
         </div>
       )}
 
-      <div className="mx-auto grid max-w-6xl gap-10 px-(--gutter) py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-14">
+      <div className="mx-auto grid grid-cols-1 max-w-6xl gap-10 px-(--gutter) py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-14">
         <FadeUp className="min-w-0 lg:col-start-1 lg:row-start-1">
           <article aria-label="Challenge prompt">
             <RichText value={challenge.prompt} className="max-w-[68ch]" />
@@ -144,7 +131,7 @@ function ChallengePage() {
               >
                 Sample
               </h2>
-              <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
                 {challenge.sampleInput && (
                   <SamplePanel label="Input" value={challenge.sampleInput} />
                 )}
@@ -157,7 +144,7 @@ function ChallengePage() {
         </FadeUp>
 
         <div className="lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
-          <FadeUp delay={0.1}>
+          <FadeUp>
             <SubmissionPanel
               key={`${challenge.id}-${mine?.status ?? 'none'}`}
               challengeId={challenge.id}

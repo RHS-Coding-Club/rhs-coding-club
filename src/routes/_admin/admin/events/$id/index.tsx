@@ -122,7 +122,7 @@ function AttendancePage() {
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
         <CheckInControls sheet={sheet} />
         <Stats counts={sheet.counts} />
       </div>

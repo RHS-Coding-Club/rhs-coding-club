@@ -140,7 +140,7 @@ function ProjectsPage() {
           </FadeUp>
           <div className="mt-10 grid gap-5">
             {featured.map((p, i) => (
-              <FadeUp key={p.id} delay={i * 0.08} className="min-w-0">
+              <FadeUp key={p.id} className="min-w-0">
                 <FeaturedProject
                   project={p}
                   initialDark={initialDark}
@@ -169,7 +169,7 @@ function ProjectsPage() {
           </p>
         </FadeUp>
 
-        <FadeUp delay={0.05}>
+        <FadeUp>
           <form
             role="search"
             onSubmit={(e) => e.preventDefault()}

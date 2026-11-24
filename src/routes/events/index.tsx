@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { CalendarDays } from '#/components/icons/calendar-days'
 import { CalendarPlus } from '#/components/icons/calendar-plus'
@@ -48,6 +49,17 @@ function EventsPage() {
   }
   const tags = [...data.tags].sort((a, b) => order(a) - order(b) || a.localeCompare(b))
   const active = tag && tags.includes(tag) ? tag : undefined
+  // The club's own event types lead; one-off tags wait behind "+N more" so a
+  // single heavily tagged event can't fill the hero with pills.
+  const [allTags, setAllTags] = useState(false)
+  const MAX_PILLS = 6
+  const shownTags =
+    allTags || tags.length <= MAX_PILLS + 1
+      ? tags
+      : tags
+          .slice(0, MAX_PILLS)
+          .concat(active && !tags.slice(0, MAX_PILLS).includes(active) ? [active] : [])
+  const hiddenTags = tags.length - shownTags.length
   const matches = <T extends { tags: string[] }>(list: T[]) =>
     active ? list.filter((e) => e.tags.includes(active)) : list
 
@@ -91,11 +103,16 @@ function EventsPage() {
             <FilterChip active={!active} onClick={() => setTag(undefined)}>
               All
             </FilterChip>
-            {tags.map((t) => (
+            {shownTags.map((t) => (
               <FilterChip key={t} active={active === t} onClick={() => setTag(t)}>
                 {tagLabel(t)}
               </FilterChip>
             ))}
+            {hiddenTags > 0 && (
+              <FilterChip active={false} onClick={() => setAllTags(true)}>
+                +{hiddenTags} more
+              </FilterChip>
+            )}
           </div>
         )}
       </PageHero>
@@ -142,10 +159,10 @@ function EventsPage() {
               </p>
             </div>
           </FadeUp>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {later.map((e, i) => (
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {later.map((e) => (
               <li key={e.id} className="h-full">
-                <FadeUp delay={(i % 3) * 0.07} className="h-full">
+                <FadeUp className="h-full">
                   <EventCard event={e} dark={dark} />
                 </FadeUp>
               </li>

@@ -89,8 +89,12 @@ export function AccountMenu({ user }: { user: SessionUser }) {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="truncate font-semibold tracking-[-0.01em]">{user.name}</p>
-              <p className="text-muted-foreground truncate text-xs">{user.email}</p>
+              <p className="truncate font-semibold tracking-[-0.01em]" title={user.name}>
+                {user.name}
+              </p>
+              <p className="text-muted-foreground truncate text-xs" title={user.email}>
+                {user.email}
+              </p>
               <span
                 className={cn(
                   'mt-1.5 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium',

@@ -27,7 +27,7 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
 
   return (
     <div data-legal-doc className="pb-24">
-      <header className="mx-auto grid max-w-6xl gap-8 px-(--gutter) pt-8 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <header className="mx-auto grid grid-cols-1 max-w-6xl gap-8 px-(--gutter) pt-8 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <div style={riseIn(0.02)} className="rise-in">
             <DocTabs kind={doc.kind} />
@@ -80,7 +80,7 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
             key={s.id}
             aria-labelledby={s.id}
             className={cn(
-              'grid gap-x-12 gap-y-5 md:grid-cols-[17rem_minmax(0,1fr)]',
+              'grid grid-cols-1 gap-x-12 gap-y-5 md:grid-cols-[17rem_minmax(0,1fr)]',
               i > 0 && 'border-t border-border',
               short ? 'py-7' : 'py-12 sm:py-14',
             )}
@@ -120,7 +120,7 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
 
         <div
           data-print-hide
-          className="mt-4 grid gap-6 border-t border-border pt-12 md:grid-cols-[17rem_minmax(0,1fr)] md:gap-x-12"
+          className="mt-4 grid grid-cols-1 gap-6 border-t border-border pt-12 md:grid-cols-[17rem_minmax(0,1fr)] md:gap-x-12"
         >
           <p className="font-mono text-sm text-muted-foreground">Questions</p>
           <div className="flex flex-col items-start gap-5">

@@ -14,7 +14,6 @@ export function LightRaysBackground({ initialDark = true }: { initialDark?: bool
   const [sky] = useCssColors('--brand-sky')
   return (
     <LightRays
-      key={dark ? 'dark' : 'light'}
       raysOrigin="top-right"
       raysColor={sky}
       lightMode={!dark}

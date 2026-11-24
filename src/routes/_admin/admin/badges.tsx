@@ -97,7 +97,7 @@ function AdminBadges() {
           Badges show on profiles and the leaderboard.
         </EmptyState>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {badges.map((b) => (
             <li key={b.id}>
               <button
@@ -128,7 +128,7 @@ function AdminBadges() {
                     {criteriaSummary(b)}
                   </span>
                 </span>
-                <span className="text-right">
+                <span className="shrink-0 text-right">
                   <span className="tabular block font-mono text-lg">{b.holders}</span>
                   <span className="text-muted-foreground text-[11px]">
                     {b.holders === 1 ? 'holder' : 'holders'}

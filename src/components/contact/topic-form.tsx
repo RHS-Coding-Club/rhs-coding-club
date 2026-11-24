@@ -232,7 +232,7 @@ export function TopicContactForm({
               </div>
             </fieldset>
 
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="tc-name">Your name</Label>
                 <Input
@@ -296,7 +296,7 @@ export function TopicContactForm({
                 rows={6}
                 required
                 onChange={(e) => setLength(e.target.value.trim().length)}
-                className="min-h-36 resize-y"
+                className="max-h-[50vh] min-h-36 resize-y"
                 {...aria('message')}
               />
               {err('message')}

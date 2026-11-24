@@ -57,13 +57,9 @@ export function OfficerCredits({
         </p>
       ) : (
         <ul className="border-border mt-10 border-t">
-          {officers.map((o, i) => (
+          {officers.map((o) => (
             <li key={o.id} className="border-border border-b">
-              <FadeUp
-                delay={i * 0.05}
-                distance={12}
-                className="grid gap-4 py-8 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center lg:grid-cols-[10rem_minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-10"
-              >
+              <FadeUp className="grid grid-cols-1 gap-4 py-8 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center lg:grid-cols-[10rem_minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-10">
                 <p className="text-primary font-mono text-xs">{o.title}</p>
                 <div className="flex min-w-0 items-center gap-4">
                   <Avatar className="size-14 shrink-0">
@@ -71,7 +67,7 @@ export function OfficerCredits({
                     <AvatarFallback>{initials(o.name)}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
-                    <h3 className="truncate text-2xl font-semibold tracking-[-0.025em] sm:text-3xl">
+                    <h3 className="text-2xl font-semibold tracking-[-0.025em] text-balance [overflow-wrap:anywhere] sm:text-3xl">
                       {o.name}
                     </h3>
                     {o.githubUrl && (

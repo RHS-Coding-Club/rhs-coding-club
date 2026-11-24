@@ -13,7 +13,6 @@ export function DotGridBackground({ initialDark = true }: { initialDark?: boolea
   const [dot, line] = useCssColors('--art-dot', '--art-line')
   return (
     <DotGrid
-      key={dark ? 'dark' : 'light'}
       dotSize={4}
       gap={22}
       baseColor={dot}

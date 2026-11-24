@@ -41,7 +41,7 @@ export function LatestPosts({ posts }: { posts: HomeData['latestPosts'] }) {
         <>
           {/* Phones: a plain list. The flowing band is a pointer effect, and
               its 45px titles don't fit a narrow column. */}
-          <FadeUp delay={0.1} className="sm:hidden">
+          <FadeUp className="sm:hidden">
             <ul className="divide-border border-border divide-y border-y">
               {posts.map((p, i) => (
                 <li key={p.slug}>
@@ -72,11 +72,7 @@ export function LatestPosts({ posts }: { posts: HomeData['latestPosts'] }) {
               ))}
             </ul>
           </FadeUp>
-          <FadeUp
-            delay={0.1}
-            className="hidden sm:block"
-            style={{ height: posts.length * 112 }}
-          >
+          <FadeUp className="hidden sm:block" style={{ height: posts.length * 112 }}>
             <FlowingMenu
               items={posts.map((p) => ({
                 text: p.title,

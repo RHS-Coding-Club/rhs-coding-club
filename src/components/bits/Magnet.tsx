@@ -51,6 +51,9 @@ type Entry = {
   reduce: boolean
   wake: () => void
   active: boolean
+  // RHS: false while the magnet is off screen, so a pointer move doesn't
+  // measure it (getBoundingClientRect forces layout).
+  onScreen: boolean
 }
 
 const DEFAULT_SPRING = { stiffness: 170, damping: 16, mass: 1 }
@@ -84,7 +87,7 @@ const arbitrate = () => {
   for (const entry of registry) {
     const s = entry.settings.current
     let near: { dx: number; dy: number; outside: number } | null = null
-    if (field.pointer && !s.disabled && !entry.reduce) {
+    if (field.pointer && !s.disabled && !entry.reduce && entry.onScreen) {
       near = reach(entry.wrapper.getBoundingClientRect(), field.pointer)
       if (near.outside > s.padding) near = null
     }
@@ -264,8 +267,20 @@ const Magnet = ({
       if (!raf) raf = requestAnimationFrame(frame)
     }
 
-    const entry: Entry = { wrapper, settings: settingsRef, reduce, wake, active: false }
+    const entry: Entry = {
+      wrapper,
+      settings: settingsRef,
+      reduce,
+      wake,
+      active: false,
+      onScreen: false,
+    }
     registry.add(entry)
+    const visibility = new IntersectionObserver(([record]) => {
+      entry.onScreen = record.isIntersecting
+      if (!entry.onScreen) wake()
+    })
+    visibility.observe(wrapper)
     if (!detach) detach = attach()
     wakeRef.current = () => {
       arbitrate()
@@ -274,6 +289,7 @@ const Magnet = ({
 
     return () => {
       cancelAnimationFrame(raf)
+      visibility.disconnect()
       wakeRef.current = null
       registry.delete(entry)
       if (field.owner === entry) field.owner = null

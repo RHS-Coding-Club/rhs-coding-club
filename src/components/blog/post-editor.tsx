@@ -262,7 +262,7 @@ export function PostEditor({ initial }: { initial: PostEditorInitial }) {
         </p>
       )}
 
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_18rem]">
         <div className="flex min-w-0 flex-col gap-5">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="post-title" className="sr-only">

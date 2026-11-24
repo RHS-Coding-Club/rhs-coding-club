@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { getDb, schema } from '#/db'
-import { getAboutData, getAdminOverview, getHomeData } from '#/services/home'
+import { getAboutData, getAdminOverview, getHomeData, groupAwards } from '#/services/home'
 import { getSetting, setSetting } from '#/services/settings'
 
 const db = getDb()
@@ -76,6 +76,24 @@ describe('getHomeData', () => {
   it('returns club defaults when no settings row exists', async () => {
     const data = await getHomeData(db, now)
     expect(data.club.clubName).toBe('RHS Coding Club')
+  })
+})
+
+describe('groupAwards', () => {
+  it('keeps one entry per member, newest first, and counts the rest', () => {
+    const rows = [
+      { id: 'a1', userId: 'ann' },
+      { id: 'b1', userId: 'bo' },
+      { id: 'a2', userId: 'ann' },
+      { id: 'a3', userId: 'ann' },
+      { id: 'c1', userId: 'cy' },
+    ]
+    expect(groupAwards(rows)).toEqual([
+      { id: 'a1', userId: 'ann', more: 2 },
+      { id: 'b1', userId: 'bo', more: 0 },
+      { id: 'c1', userId: 'cy', more: 0 },
+    ])
+    expect(groupAwards(rows, 2).map((r) => r.userId)).toEqual(['ann', 'bo'])
   })
 })
 

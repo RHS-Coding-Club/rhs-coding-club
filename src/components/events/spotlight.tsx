@@ -56,11 +56,14 @@ export function NextEventSpotlight({
       aria-labelledby="next-event-heading"
     >
       <FadeUp>
-        <article className="bg-card ring-border/70 grid overflow-hidden rounded-4xl ring-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+        <article className="bg-card ring-border/70 grid grid-cols-1 overflow-hidden rounded-4xl ring-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
           <div className="flex flex-col gap-6 p-6 sm:p-10">
             <p className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
               <span className="relative flex size-2" aria-hidden="true">
-                <span className="bg-brand-sky absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:animate-none" />
+                {/* Only a live event pulses; "Next up" is a still dot. */}
+                {live && (
+                  <span className="bg-brand-sky absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:animate-none" />
+                )}
                 <span className="bg-brand-sky relative inline-flex size-2 rounded-full" />
               </span>
               {live ? 'Happening now' : 'Next up'}

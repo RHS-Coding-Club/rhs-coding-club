@@ -49,16 +49,28 @@ export function MemberCard({ p, dark }: { p: MemberProfile; dark: boolean }) {
               No. {user.id.slice(-4).toUpperCase()} · since{' '}
               {fmtDate(user.createdAt, 'date')}
             </p>
-            <p className="mt-4 text-lg leading-snug font-medium text-pretty">
+            <p className="mt-4 line-clamp-6 text-lg leading-snug font-medium text-pretty [overflow-wrap:anywhere]">
               {user.bio ?? `${user.name.split(' ')[0]} hasn't written a bio yet.`}
             </p>
             {user.skills.length > 0 && (
+              // The back is a fixed height: show the first six and count the rest.
               <ul className="mt-auto flex flex-wrap gap-1.5" aria-label="Skills">
-                {user.skills.map((s) => (
-                  <li key={s} className="bg-muted rounded-md px-2 py-1 font-mono text-xs">
+                {user.skills.slice(0, 6).map((s) => (
+                  <li
+                    key={s}
+                    className="bg-muted max-w-full truncate rounded-md px-2 py-1 font-mono text-xs"
+                  >
                     {s}
                   </li>
                 ))}
+                {user.skills.length > 6 && (
+                  <li
+                    className="text-muted-foreground rounded-md px-2 py-1 font-mono text-xs"
+                    title={user.skills.slice(6).join(', ')}
+                  >
+                    +{user.skills.length - 6}
+                  </li>
+                )}
               </ul>
             )}
           </div>
@@ -90,15 +102,17 @@ export function MemberCard({ p, dark }: { p: MemberProfile; dark: boolean }) {
               <p className="truncate text-2xl font-semibold tracking-[-0.03em]">
                 {user.name}
               </p>
-              <dl className="mt-auto grid grid-cols-3 gap-2 border-t border-white/12 pt-3">
+              <dl className="mt-auto grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)] gap-3 border-t border-white/12 pt-3">
                 {[
-                  { n: stats.allTime.toLocaleString('en-US'), l: 'Points' },
+                  { n: compactPoints(stats.allTime), l: 'Points' },
                   { n: stats.rank ? `#${stats.rank}` : 'None', l: 'Rank' },
                   { n: String(stats.solved), l: 'Solves' },
                 ].map((s) => (
                   <div key={s.l}>
                     <dt className="text-[11px] text-brand-frost/60">{s.l}</dt>
-                    <dd className="font-mono text-lg font-medium tabular-nums">{s.n}</dd>
+                    <dd className="truncate font-mono text-lg font-medium tabular-nums">
+                      {s.n}
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -126,11 +140,22 @@ export function GithubLink({ user }: { user: MemberProfile['user'] }) {
       href={`https://github.com/${user.githubUsername}`}
       target="_blank"
       rel="noreferrer"
-      className="inline-flex items-center gap-2 rounded-full bg-ink/8 px-4 py-2 font-mono text-sm text-ink ring-1 ring-ink/12 transition-colors hover:bg-ink/14"
+      title={`github.com/${user.githubUsername}`}
+      className="inline-flex max-w-full min-w-0 items-center gap-2 rounded-full bg-ink/8 px-4 py-2 font-mono text-sm text-ink ring-1 ring-ink/12 transition-colors hover:bg-ink/14"
     >
-      <Github className="size-4" aria-hidden="true" />
-      {user.githubUsername}
-      <ArrowUpRight className="size-3.5 opacity-60" aria-hidden="true" />
+      <Github className="size-4 shrink-0" aria-hidden="true" />
+      <span className="truncate">{user.githubUsername}</span>
+      <ArrowUpRight className="size-3.5 shrink-0 opacity-60" aria-hidden="true" />
     </a>
   )
+}
+
+/** Points on the card: 128,450 reads as "128K" so the three stats keep their columns. */
+function compactPoints(points: number): string {
+  return points >= 100_000
+    ? new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        maximumFractionDigits: 1,
+      }).format(points)
+    : points.toLocaleString('en-US')
 }

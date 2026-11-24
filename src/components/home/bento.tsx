@@ -261,13 +261,10 @@ export function FeatureBento({
           enableStars={false}
           enableTilt={false}
           enableMagnetism={false}
-          clickEffect
+          clickEffect={false}
           intro
-          onItemClick={(item) => {
-            const to = (item as Cell).to
-            // Let the click wave start before the route changes.
-            window.setTimeout(() => void router.navigate({ to }), 260)
-          }}
+          // Navigate on the click itself; nothing waits for decoration.
+          onItemClick={(item) => void router.navigate({ to: (item as Cell).to })}
           style={{ ...MAGIC_BENTO_VARS, '--mb-pad': '0px' } as CSSProperties}
         />
       </div>
